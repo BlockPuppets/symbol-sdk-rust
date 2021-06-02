@@ -1,0 +1,36 @@
+use std::any::Any;
+
+use crate::H256;
+
+use super::{MerkleTreeNodeType, MerkleTreeTrait};
+
+/// Merkle tree leaf node.
+///
+#[derive(Debug, Deserialize, Serialize)]
+pub struct MerkleTreeLeaf {
+    /// Merkle tree node type.
+    pub r#type: MerkleTreeNodeType,
+    /// Leaf node path.
+    pub path: H256,
+    /// Leaf node path encoded.
+    pub encoded_path: H256,
+    /// Leaf nibble count.
+    pub nibble_count: usize,
+    /// Leaf node value hash.
+    pub value: H256,
+    /// Leaf node hash.
+    pub leaf_hash: H256,
+}
+
+impl MerkleTreeTrait for MerkleTreeLeaf {
+    fn get_type(&self) -> MerkleTreeNodeType {
+        MerkleTreeNodeType::Leaf
+    }
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn into_any(self: Box<Self>) -> Box<dyn Any> {
+        self
+    }
+}
