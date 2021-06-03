@@ -128,6 +128,7 @@ impl std::convert::TryFrom<char> for NetworkType {
 }
 
 /// Creates `NetworkType` with the default parameters.
+///
 impl Default for NetworkType {
     fn default() -> Self {
         NetworkType::TEST_NET

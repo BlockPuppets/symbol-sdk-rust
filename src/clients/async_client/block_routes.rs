@@ -1,7 +1,7 @@
-use crate::{Client, Error, H192, H256, Order, request::Request, Response, RetryStrategy};
 use crate::blockchain::BlockInfo;
 use crate::clients::model_dto::{BlockInfoDto, MerkleProofInfoDto};
 use crate::clients::search_criteria::block_search_criteria::BlockSearchCriteria;
+use crate::{request::Request, Client, Error, Order, Response, RetryStrategy, H192, H256};
 
 pub struct BlockApi<R: RetryStrategy>(pub(crate) Client<R>);
 
@@ -10,6 +10,11 @@ impl<R: RetryStrategy> BlockApi<R> {
     /// # Inputs
     ///
     /// * `height`: The Block height.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` whose okay value is an `BlockInfo` or whose error value
+    /// is an `Error` describing the error that occurred.
     ///
     pub async fn get_block_by_height(&self, height: u64) -> Result<BlockInfo<H192>, Error> {
         let resp: Response<BlockInfoDto> = self

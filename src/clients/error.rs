@@ -1,9 +1,12 @@
 use super::JsonRpcResponse;
+use std::error::Error as StdError;
 
 #[derive(Debug)]
 pub enum Error {
     // Error when send http request failed
     NetworkError(reqwest::Error),
+    // Error when Symbol node Response http status is 409
+    SymbolError(SymbolError),
     // Response http status is not 200
     InvalidHTTPStatus(String, reqwest::StatusCode),
     // Response body can't be decoded as json-rpc response
@@ -27,16 +30,34 @@ impl Error {
     }
 }
 
+// impl std::fmt::Display for Error {
+//     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+//         write!(f, "{:#?}", self)
+//     }
+// }
+
+
 impl std::fmt::Display for Error {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:#?}", self)
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        use Error::*;
+        match self.to_owned() {
+            NetworkError(e) => write!(f, "{}", e),
+            SymbolError(e) => write!(f, "{}", e),
+            InvalidHTTPStatus(e, s) => write!(f, "{}, {}", e, s),
+            InvalidHTTPResponse(e) => write!(f, "{}", e),
+            DeserializeResponseJsonError(e) => write!(f, "{}", e),
+            ResponseTimeout(e) => write!(f, "{}", e),
+            ResultNotFound(e) => write!(f, "{:?}", e),
+            UnexpectedError(e) => write!(f, "{}", e),
+        }
     }
 }
 
-impl std::error::Error for Error {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+impl StdError for Error {
+    fn source(&self) -> Option<&(dyn StdError + 'static)> {
         match self {
             Error::NetworkError(e) => Some(e),
+            Error::SymbolError(e) => Some(e),
             Error::InvalidHTTPResponse(e) => Some(e),
             Error::DeserializeResponseJsonError(e) => Some(e),
             Error::UnexpectedError(e) => Some(e),
@@ -57,8 +78,8 @@ impl std::fmt::Display for UnexpectedError {
     }
 }
 
-impl std::error::Error for UnexpectedError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+impl StdError for UnexpectedError {
+    fn source(&self) -> Option<&(dyn StdError + 'static)> {
         match self {
             _ => None,
         }
@@ -83,11 +104,34 @@ impl std::fmt::Display for WaitForTransactionError {
     }
 }
 
-impl std::error::Error for WaitForTransactionError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+impl StdError for WaitForTransactionError {
+    fn source(&self) -> Option<&(dyn StdError + 'static)> {
         match self {
             WaitForTransactionError::GetTransactionError(e) => Some(e),
             _ => None,
         }
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SymbolError {
+    pub code: String,
+    pub message: String,
+}
+
+impl StdError for SymbolError {
+    fn source(&self) -> Option<&(dyn StdError + 'static)> {
+        Some(self)
+    }
+}
+
+impl std::fmt::Display for SymbolError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(&self).unwrap_or_default()
+        )
     }
 }

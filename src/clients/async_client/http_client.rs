@@ -4,8 +4,9 @@ use std::fmt::Debug;
 use async_trait::async_trait;
 use reqwest::Method;
 
-use crate::clients::{consts::HTTP_REQUEST_TIMEOUT, Error, JsonRpcResponse};
 use crate::clients::async_client::request::Request;
+use crate::clients::{consts::HTTP_REQUEST_TIMEOUT, Error, JsonRpcResponse};
+use crate::SymbolError;
 
 #[derive(Debug)]
 pub struct Response<R> {
@@ -44,6 +45,11 @@ async fn send_json_request<T: for<'de> serde::Deserialize<'de>>(
         .send()
         .await
         .map_err(Error::NetworkError)?;
+
+    if resp.status().as_u16() == 409 {
+        let err: SymbolError = resp.json().await.map_err(Error::InvalidHTTPResponse)?;
+        return Err(Error::SymbolError(err));
+    }
     if !resp.status().is_success() {
         return Err(Error::InvalidHTTPStatus(
             format!("{:#?}", resp),
@@ -105,11 +111,9 @@ impl HttpClient for SimpleHttpClient {
         }
 
         let url = self.url.join(&uri_str).unwrap();
-        println!("{:?}", url);
 
         let rpc_resp: JsonRpcResponse =
             send_json_request(self.http_client.clone(), url, request.method.clone()).await?;
-        // println!("{:#?}", rpc_resp.result);
 
         Ok(rpc_resp)
     }

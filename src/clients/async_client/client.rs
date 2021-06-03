@@ -4,11 +4,11 @@ use std::sync::Arc;
 use serde::de::DeserializeOwned;
 use serde::Deserialize;
 
-use crate::{BlockApi, GenerationHash};
-use crate::clients::{Error, JsonRpcResponse, model_dto::BlockInfoDto, retry::RetryStrategy};
+use crate::clients::{model_dto::BlockInfoDto, retry::RetryStrategy, Error, JsonRpcResponse};
 use crate::network::NetworkType;
+use crate::{BlockApi, GenerationHash};
 
-use super::{HttpClient, request::Request, Response, SimpleHttpClient};
+use super::{request::Request, HttpClient, Response, SimpleHttpClient};
 
 #[derive(Clone)]
 pub struct Client<R> {
@@ -60,7 +60,12 @@ impl<R: RetryStrategy> Client<R> {
             let ret = self.http_client.single_request(request).await;
             match ret {
                 Ok(r) => return Ok(r),
-                Err(err) => retries = self.handle_retry_error(retries, err, retry).await?,
+                Err(err) => {
+                    if let Error::SymbolError(_) = err {
+                        return Err(err);
+                    }
+                    retries = self.handle_retry_error(retries, err, retry).await?
+                }
             }
         }
     }
