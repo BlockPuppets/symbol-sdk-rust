@@ -44,10 +44,11 @@ impl<H: AddressSchema> Address<H> {
         self.address.to_base32()
     }
 
-    /// Converts `Address` String into a more readable/pretty format.
+    /// Converts `Address` String into a more readable/pretty format,
+    /// a Symbol prettify address string looks like:
     ///
-    /// Before: TATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA37JGO5Q
-    /// After: TATNE7-Q5BITM-UTRRN6-IB4I7F-LSDRDW-ZA37JG-O5Q
+    /// * Before: TATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA37JGO5Q
+    /// * After: TATNE7-Q5BITM-UTRRN6-IB4I7F-LSDRDW-ZA37JG-O5Q
     pub fn prettify(&self) -> String {
         raw_prettify(&self.address_str(), self.address.size_suffix())
     }
@@ -101,8 +102,10 @@ impl AddressSym {
 
     /// Creates an Symbol 'Address' from a given raw address string.
     ///
+    /// # Info
+    ///
     /// A Symbol raw address string looks like:
-    /// TATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA37JGO5Q or TATNE7-Q5BITM-UTRRN6-IB4I7F-LSDRDW-ZA37JG-O5Q.
+    /// * TATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA37JGO5Q or TATNE7-Q5BITM-UTRRN6-IB4I7F-LSDRDW-ZA37JG-O5Q.
     ///
     /// # Inputs
     ///

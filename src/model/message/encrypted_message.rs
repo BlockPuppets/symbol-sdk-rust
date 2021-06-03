@@ -25,10 +25,10 @@ impl EncryptedMessage {
     ) -> Result<Self> {
         ensure!(!message.is_empty(), "message must not be empty.");
 
-        let signer_private_key = crypto::PrivateKey::from_str(signer_private_key)?;
-        let recipient_public_key = crypto::PublicKey::from_str(recipient_public_key)?;
+        let signer_private_key = crypto::prelude::PrivateKey::from_str(signer_private_key)?;
+        let recipient_public_key = crypto::prelude::PublicKey::from_str(recipient_public_key)?;
 
-        let encrypt_message = signer_private_key.encrypt_message::<crypto::CryptoSym>(
+        let encrypt_message = signer_private_key.encrypt_message::<crypto::prelude::CryptoSym>(
             recipient_public_key.as_fixed_bytes(),
             message,
         )?;
@@ -65,10 +65,10 @@ impl EncryptedMessage {
         recipient_private_key: &str,
         signer_public_key: &str,
     ) -> Result<PlainMessage> {
-        let recipient_private_key = crypto::PrivateKey::from_str(recipient_private_key)?;
-        let signer_public_key = crypto::PublicKey::from_str(signer_public_key)?;
+        let recipient_private_key = crypto::prelude::PrivateKey::from_str(recipient_private_key)?;
+        let signer_public_key = crypto::prelude::PublicKey::from_str(signer_public_key)?;
 
-        let decrypted_message = recipient_private_key.decrypt_message::<crypto::CryptoSym>(
+        let decrypted_message = recipient_private_key.decrypt_message::<crypto::prelude::CryptoSym>(
             signer_public_key.as_fixed_bytes(),
             &self.payload_to_vec(),
         )?;

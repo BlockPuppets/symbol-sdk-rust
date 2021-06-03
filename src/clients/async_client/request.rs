@@ -4,8 +4,8 @@ use hex::ToHex;
 use reqwest::Method;
 use serde_json::json;
 
-use crate::{BlockOrderBy, H192, H256, Order};
-use crate::account::{Address, PublicAccount};
+use crate::clients::search_criteria::block_search_criteria::BlockSearchCriteria;
+use crate::{Order, H256};
 
 /// Type alias to improve readability.
 pub(crate) type RoutePathName = &'static str;
@@ -86,35 +86,37 @@ impl Request {
     }
 
     pub fn search_blocks(
-        signer_public_key: Option<PublicAccount<H192>>,
-        beneficiary_address: Option<Address<H192>>,
+        criteria: Option<BlockSearchCriteria>,
         page_size: Option<i32>,
         page_number: Option<i32>,
         offset: Option<&str>,
         order: Option<Order>,
-        order_by: Option<BlockOrderBy>,
     ) -> Self {
         let mut query_params = HashMap::new();
-        if let Some(ref s) = signer_public_key {
-            query_params.insert("signerPublicKey", s.public_key_to_hex());
+
+        if let Some(c) = criteria {
+            if let Some(value) = c.signer_public_key {
+                query_params.insert("signerPublicKey", value.public_key_to_hex());
+            }
+            if let Some(value) = c.beneficiary_address {
+                query_params.insert("beneficiaryAddress", value.address_str());
+            }
+            if let Some(value) = c.order_by {
+                query_params.insert("orderBy", value.to_string());
+            }
         }
-        if let Some(ref s) = beneficiary_address {
-            query_params.insert("beneficiaryAddress", s.address_str());
+
+        if let Some(value) = page_size {
+            query_params.insert("pageSize", value.to_string());
         }
-        if let Some(ref s) = page_size {
-            query_params.insert("pageSize", s.to_string());
+        if let Some(value) = page_number {
+            query_params.insert("pageNumber", value.to_string());
         }
-        if let Some(ref s) = page_number {
-            query_params.insert("pageNumber", s.to_string());
+        if let Some(value) = offset {
+            query_params.insert("offset", value.to_string());
         }
-        if let Some(ref s) = offset {
-            query_params.insert("offset", s.to_string());
-        }
-        if let Some(ref s) = order {
-            query_params.insert("order", s.to_string());
-        }
-        if let Some(ref s) = order_by {
-            query_params.insert("orderBy", s.to_string());
+        if let Some(value) = order {
+            query_params.insert("order", value.to_string());
         }
 
         Self::new(

@@ -15,7 +15,7 @@ name = "symbol_sdk"
 crate-type = ["lib"]
 
 [dependencies.symbol-crypto-core]
-version = "^0.1.1-alpha.0"
+version = "^0.1.1-alpha.1"
 features = ['serde', 'with_mnemonic']
 optional = true
 

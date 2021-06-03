@@ -1,4 +1,4 @@
-use symbol_crypto_core::Sym;
+use symbol_crypto_core::prelude::KpSym;
 
 use symbol_sdk::account::Account;
 use symbol_sdk::H192;
@@ -7,13 +7,13 @@ use symbol_sdk::network::NetworkType;
 
 fn main() {
     let network_type = NetworkType::TEST_NET;
-    let sender = Account::<Sym, H192>::from_hex_private_key(
+    let sender = Account::<KpSym, H192>::from_hex_private_key(
         "2602F4236B199B3DF762B2AAB46FC3B77D8DDB214F0B62538D3827576C46C108",
         network_type,
     )
         .unwrap();
 
-    let recipient = Account::<Sym, H192>::from_hex_private_key(
+    let recipient = Account::<KpSym, H192>::from_hex_private_key(
         "B72F2950498111BADF276D6D9D5E345F04E0D5C9B8342DA983C3395B4CF18F08",
         network_type,
     )

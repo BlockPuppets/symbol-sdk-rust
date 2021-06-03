@@ -1,8 +1,7 @@
-use crate::{BlockOrderBy, Client, Error, H192, H256, Order, request::Request, Response, RetryStrategy};
-use crate::account::PublicAccount;
+use crate::{Client, Error, H192, H256, Order, request::Request, Response, RetryStrategy};
 use crate::blockchain::BlockInfo;
-use crate::clients::model_dto::BlockInfoDto;
-use crate::model::account::Address;
+use crate::clients::model_dto::{BlockInfoDto, MerkleProofInfoDto};
+use crate::clients::search_criteria::block_search_criteria::BlockSearchCriteria;
 
 pub struct BlockApi<R: RetryStrategy>(pub(crate) Client<R>);
 
@@ -40,7 +39,7 @@ impl<R: RetryStrategy> BlockApi<R> {
     /// is an `Error` describing the error that occurred.
     ///
     pub async fn get_merkle_receipts(&self, height: u64, hash: H256) -> Result<(), Error> {
-        let _resp: Response<BlockInfoDto> = self
+        let _resp: Response<MerkleProofInfoDto> = self
             .as_ref()
             .send(Request::get_merkle_receipts(height, hash))
             .await?;
@@ -67,7 +66,7 @@ impl<R: RetryStrategy> BlockApi<R> {
     /// is an `Error` describing the error that occurred.
     ///
     pub async fn get_merkle_transaction(&self, height: u64, hash: H256) -> Result<(), Error> {
-        let _resp: Response<BlockInfoDto> = self
+        let _resp: Response<MerkleProofInfoDto> = self
             .as_ref()
             .send(Request::get_merkle_transaction(height, hash))
             .await?;
@@ -78,8 +77,7 @@ impl<R: RetryStrategy> BlockApi<R> {
     ///
     /// # Inputs
     ///
-    /// * `signer`: Filter by `PublicAccount` of the account signing the entity.
-    /// * `beneficiaryAddress`: Filter by beneficiary address.
+    /// * `criteria`: Defines the params used to search blocks.
     /// * `pageSize`: Select the number of entries to return, (Default = 10).
     /// * `pageNumber`: Filter by page number, (Default = 1).
     /// * `offset`: Entry id at which to start pagination.
@@ -87,7 +85,6 @@ impl<R: RetryStrategy> BlockApi<R> {
     ///     Otherwise, newer elements with respect to the id are returned, (Default = "desc")
     /// * `order`: Sort responses in ascending or descending order based on the collection property set on the param orderBy.
     ///     If the request does not specify orderBy, REST returns the collection ordered by id, (Default: "desc").
-    /// * `orderBy`: Sort responses by the property set.
     ///
     /// # Returns
     ///
@@ -96,24 +93,20 @@ impl<R: RetryStrategy> BlockApi<R> {
     ///
     pub async fn search_blocks(
         &self,
-        signer: Option<PublicAccount<H192>>,
-        beneficiary_address: Option<Address<H192>>,
+        criteria: Option<BlockSearchCriteria>,
         page_size: Option<i32>,
         page_number: Option<i32>,
         offset: Option<&str>,
         order: Option<Order>,
-        order_by: Option<BlockOrderBy>,
     ) -> Result<Vec<BlockInfo<H192>>, Error> {
         let _resp: Response<Vec<BlockInfoDto>> = self
             .as_ref()
             .send(Request::search_blocks(
-                signer,
-                beneficiary_address,
+                criteria,
                 page_size,
                 page_number,
                 offset,
                 order,
-                order_by,
             ))
             .await?;
         todo!()

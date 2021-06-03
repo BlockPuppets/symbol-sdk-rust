@@ -105,9 +105,12 @@ impl HttpClient for SimpleHttpClient {
         }
 
         let url = self.url.join(&uri_str).unwrap();
+        println!("{:?}", url);
 
         let rpc_resp: JsonRpcResponse =
             send_json_request(self.http_client.clone(), url, request.method.clone()).await?;
+        // println!("{:#?}", rpc_resp.result);
+
         Ok(rpc_resp)
     }
 }

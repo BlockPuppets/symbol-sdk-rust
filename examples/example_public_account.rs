@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use symbol_crypto_core::Signature;
+use symbol_crypto_core::prelude::Signature;
 
 use symbol_sdk::{H192, H200};
 use symbol_sdk::account::PublicAccount;

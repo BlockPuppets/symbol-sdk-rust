@@ -13,11 +13,11 @@ use std::fmt::Debug;
 use std::str::FromStr;
 
 use anyhow::{ensure, Result};
-use crypto::{KeyPairSchema, PublicKey};
+use crypto::prelude::{KeyPairSchema, PublicKey};
 use hex::ToHex;
 use serde::Serialize;
 
-use crate::{AddressSchema, H192, is_hex, Sym};
+use crate::{AddressSchema, H192, is_hex, KpSym};
 use crate::account::{Address, AddressSym};
 use crate::network::NetworkType;
 
@@ -75,7 +75,7 @@ impl PublicAccountSym {
     /// #
     /// use symbol_sdk::Sym;
     /// let public_key: &str = "2E834140FD66CF87B254A693A2C7862C819217B676D3943267156625E816EC6F";
-    /// let public_account = PublicAccount::<Sym>::from_public_key(public_key,
+    /// let public_account = PublicAccount::<KpSym>::from_public_key(public_key,
     /// NetworkType::TEST_NET)
     /// .unwrap();
     /// # println!("{}", public_account);
@@ -109,8 +109,8 @@ impl PublicAccountSym {
     ///
     /// A `Result` whose okay value True if the signature is valid or whose error value
     /// is an `Error` describing the error that occurred.
-    pub fn verify_signature(&self, data: &str, signature: crypto::Signature) -> Result<()> {
-        verify_signature::<Sym>(self.public_key, data, signature)
+    pub fn verify_signature(&self, data: &str, signature: crypto::prelude::Signature) -> Result<()> {
+        verify_signature::<KpSym>(self.public_key, data, signature)
     }
 }
 
@@ -128,13 +128,13 @@ impl<H: AddressSchema + Serialize> fmt::Display for PublicAccount<H> {
 pub(crate) fn verify_signature<Kp: KeyPairSchema>(
     public_key: PublicKey,
     data: &str,
-    signature: crypto::Signature,
+    signature: crypto::prelude::Signature,
 ) -> Result<()> {
     ensure!(!data.is_empty(), "data cannot be empty");
 
     let kp = <Kp>::from_null_private_key(public_key);
 
-    let signature: crypto::Signature = (signature.as_fixed_bytes()).into();
+    let signature: crypto::prelude::Signature = (signature.as_fixed_bytes()).into();
 
     let data = if is_hex(data) {
         hex::decode(data)?

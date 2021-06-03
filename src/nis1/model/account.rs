@@ -11,26 +11,26 @@
 use std::str::FromStr;
 
 use anyhow::{anyhow, ensure, Result};
-use crypto::{KeyPairSchema, PrivateKey, PublicKey};
+use crypto::prelude::{KeyPairSchema, PrivateKey, PublicKey};
 use hex::ToHex;
 
-use crate::{H200, H256, is_hex, Nis1};
+use crate::{H200, H256, is_hex, KpNis1};
 use crate::account::{Account, Address, PublicAccount, sign_data, verify_signature};
 use crate::core::format::{decode_base32, public_key_to_address};
 use crate::network::NetworkType;
 
 pub type AddressNis1 = Address<H200>;
 pub type PublicAccountNis1 = PublicAccount<H200>;
-pub type AccountNis1 = Account<Nis1, H200>;
+pub type AccountNis1 = Account<KpNis1, H200>;
 
 impl AccountNis1 {
     pub fn random(network_type: NetworkType) -> Self {
-        let key_pair = <Nis1>::random();
+        let key_pair = <KpNis1>::random();
         Self::from_private_key(key_pair.private_key, network_type)
     }
 
     pub fn from_private_key(private_key: PrivateKey, network_type: NetworkType) -> Self {
-        let key_pair = <Nis1>::from_private_key(private_key);
+        let key_pair = <KpNis1>::from_private_key(private_key);
         Self::from_hex_private_key(
             key_pair.private_key.encode_hex_upper::<String>(),
             network_type,
@@ -44,7 +44,7 @@ impl AccountNis1 {
     ) -> Result<Self> {
         ensure!(is_hex(private_key.as_ref()), "private_key it's not hex.");
 
-        let key_pair = <Nis1>::from_hex_private_key(private_key.as_ref())?;
+        let key_pair = <KpNis1>::from_hex_private_key(private_key.as_ref())?;
 
         let public_key = key_pair.public_key().encode_hex::<String>();
         let public_account = PublicAccountNis1::from_public_key(public_key, network_type)?;
@@ -55,11 +55,11 @@ impl AccountNis1 {
         })
     }
 
-    pub fn sign_data(&self, data: &str) -> Result<crypto::Signature> {
-        sign_data::<Nis1>(self.key_pair, data)
+    pub fn sign_data(&self, data: &str) -> Result<crypto::prelude::Signature> {
+        sign_data::<KpNis1>(self.key_pair, data)
     }
 
-    pub fn verify_signature(&self, data: &str, signature: crypto::Signature) -> Result<()> {
+    pub fn verify_signature(&self, data: &str, signature: crypto::prelude::Signature) -> Result<()> {
         self.public_account
             .verify_signature(data.as_ref(), signature)
     }
@@ -77,8 +77,8 @@ impl PublicAccountNis1 {
         })
     }
 
-    pub fn verify_signature(&self, data: &str, signature: crypto::Signature) -> Result<()> {
-        verify_signature::<Nis1>(self.public_key, data, signature)
+    pub fn verify_signature(&self, data: &str, signature: crypto::prelude::Signature) -> Result<()> {
+        verify_signature::<KpNis1>(self.public_key, data, signature)
     }
 }
 

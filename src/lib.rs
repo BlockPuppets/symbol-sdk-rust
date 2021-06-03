@@ -13,13 +13,11 @@ extern crate fixed_hash;
 #[macro_use]
 extern crate serde;
 extern crate symbol_crypto_core as crypto;
-// #[macro_use]
-// extern crate num_derive;
 
 pub use self::clients::*;
 #[cfg(feature = "nis1")]
-pub use self::crypto::Nis1;
-pub use self::crypto::Sym;
+pub use self::crypto::prelude::KpNis1;
+pub use self::crypto::prelude::KpSym;
 pub use self::helpers::*;
 pub use self::model::*;
 #[cfg(feature = "nis1")]

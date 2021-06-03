@@ -12,17 +12,17 @@ use std::fmt;
 use std::fmt::Debug;
 
 use anyhow::{ensure, Result};
-use crypto::{KeyPairSchema, PrivateKey, Signature};
+use crypto::prelude::{KeyPairSchema, PrivateKey, Signature};
 use hex::ToHex;
 use serde::{Deserialize, Serialize, Serializer};
 use serde::ser::SerializeStruct;
 
-use crate::{AddressSchema, GenerationHash, H192, is_hex, Sym};
+use crate::{AddressSchema, GenerationHash, H192, is_hex, KpSym};
 use crate::account::PublicAccount;
 use crate::message::{EncryptedMessage, PlainMessage};
 use crate::network::NetworkType;
 
-pub type AccountSym = Account<Sym, H192>;
+pub type AccountSym = Account<KpSym, H192>;
 
 /// The `Account` struct contains account's `Keypair` and `PublicAccount`.
 ///
@@ -78,7 +78,7 @@ impl AccountSym {
     /// #
     /// # fn main() {
     /// #
-    /// let account = Account::<Sym>::random(NetworkType::TEST_NET);
+    /// let account = Account::<KpSym>::random(NetworkType::TEST_NET);
     /// # println!("{}", account);
     /// # }
     /// ```
@@ -87,7 +87,7 @@ impl AccountSym {
     ///
     /// A Symbol `Account`.
     pub fn random(network_type: NetworkType) -> Self {
-        let key_pair = <Sym>::random();
+        let key_pair = <KpSym>::random();
         let public_key = key_pair.public_key().encode_hex::<String>();
         let public_account =
             PublicAccount::<H192>::from_public_key(public_key, network_type).unwrap();
@@ -117,7 +117,7 @@ impl AccountSym {
     /// # fn main() {
     /// #
     /// let private_key: &str = "75027D85CE92E2C469297F4C91E4E88AE03868A91B23C835AEF7C5EFDAD0DBDB";
-    /// let account = Account::<Sym>::from_hex_private_key(private_key, NetworkType::TEST_NET).unwrap();
+    /// let account = Account::<KpSym>::from_hex_private_key(private_key, NetworkType::TEST_NET).unwrap();
     /// # println!("{}", account);
     /// # }
     /// ```
@@ -132,7 +132,7 @@ impl AccountSym {
     ) -> Result<Self> {
         ensure!(is_hex(private_key.as_ref()), "private_key it's not hex.");
 
-        let key_pair = <Sym>::from_hex_private_key(private_key.as_ref())?;
+        let key_pair = <KpSym>::from_hex_private_key(private_key.as_ref())?;
 
         let public_key = key_pair.public_key().encode_hex::<String>();
         let public_account = PublicAccount::<H192>::from_public_key(public_key, network_type)?;
@@ -162,7 +162,7 @@ impl AccountSym {
     /// #
     /// # fn main() {
     /// #
-    /// let (account, mnemonic) = Account::<Sym>::create_with_mnemonic("any_password", NetworkType::TEST_NET).unwrap();
+    /// let (account, mnemonic) = Account::<KpSym>::create_with_mnemonic("any_password", NetworkType::TEST_NET).unwrap();
     /// # println!("{}", account);
     /// # println!("{}", mnemonic);
     /// # }
@@ -204,7 +204,7 @@ impl AccountSym {
     /// let mnemonic: &str = r"force night tumble pole record inflict idea bone deal section
     ///                         essay razor hunt kiwi drill include rifle broken lucky infant
     ///                         satoshi sweet boss blue";
-    /// let account = Account::<Sym>::from_mnemonic(mnemonic , "any_password", NetworkType::TEST_NET).unwrap();
+    /// let account = Account::<KpSym>::from_mnemonic(mnemonic , "any_password", NetworkType::TEST_NET).unwrap();
     /// # println!("{}", account);
     /// # }
     /// ```
@@ -276,13 +276,13 @@ impl AccountSym {
 
     /// Sign raw data.
     ///
-    pub fn sign_data(&self, data: &str) -> Result<crypto::Signature> {
-        sign_data::<Sym>(self.key_pair, data)
+    pub fn sign_data(&self, data: &str) -> Result<crypto::prelude::Signature> {
+        sign_data::<KpSym>(self.key_pair, data)
     }
 
     /// Verify a signature.
     ///
-    pub fn verify_signature(&self, data: &str, signature: crypto::Signature) -> Result<()> {
+    pub fn verify_signature(&self, data: &str, signature: crypto::prelude::Signature) -> Result<()> {
         self.public_account
             .verify_signature(data.as_ref(), signature)
     }
@@ -298,7 +298,7 @@ impl AccountSym {
     pub fn sign_transaction_with_cosignatories(
         &self,
         _transaction: Vec<u8>,
-        _cosignatories: Vec<Account<Sym, H192>>,
+        _cosignatories: Vec<Account<KpSym, H192>>,
         _generation_hash: GenerationHash,
     ) -> Result<Vec<u8>> {
         unimplemented!()

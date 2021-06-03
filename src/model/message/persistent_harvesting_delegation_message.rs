@@ -1,6 +1,6 @@
 use anyhow::{ensure, Result};
 
-use crate::{H192, hex_decode, is_hex, Sym};
+use crate::{H192, hex_decode, is_hex, KpSym};
 use crate::account::{Account, PublicAccount};
 use crate::message::{EncryptedMessage, Message, MessageType};
 
@@ -26,9 +26,9 @@ impl PersistentHarvestingDelegationMessage {
         node_public_account: PublicAccount<H192>,
     ) -> Self
         where
-            C: crypto::KeyPairSchema,
+            C: crypto::prelude::KeyPairSchema,
     {
-        let ephemeral_keypair = Account::<Sym, H192>::random(node_public_account.network_type());
+        let ephemeral_keypair = Account::<KpSym, H192>::random(node_public_account.network_type());
 
         let data = remote_linked_private_key.to_string() + vrf_private_key;
         let mut encrypted = String::new();
@@ -82,7 +82,7 @@ impl PersistentHarvestingDelegationMessage {
     ///
     pub fn decrypt(
         &self,
-        private_account: Account<Sym, H192>,
+        private_account: Account<KpSym, H192>,
     ) -> Result<String> {
         let marker_length = PERSISTENT_DELEGATION_UNLOCK.len();
         let ephemeral_public_key = &self.payload[marker_length..marker_length + 64];
