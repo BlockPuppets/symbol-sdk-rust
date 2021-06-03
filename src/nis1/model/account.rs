@@ -14,10 +14,11 @@ use anyhow::{anyhow, ensure, Result};
 use crypto::prelude::{KeyPairSchema, PrivateKey, PublicKey};
 use hex::ToHex;
 
-use crate::{H200, H256, is_hex, KpNis1};
-use crate::account::{Account, Address, PublicAccount, sign_data, verify_signature};
+use crate::account::{sign_data, verify_signature, Account, Address, PublicAccount};
 use crate::core::format::{decode_base32, public_key_to_address};
 use crate::network::NetworkType;
+use crate::{is_hex, KpNis1, H200, H256};
+use std::convert::TryFrom;
 
 pub type AddressNis1 = Address<H200>;
 pub type PublicAccountNis1 = PublicAccount<H200>;
@@ -35,7 +36,7 @@ impl AccountNis1 {
             key_pair.private_key.encode_hex_upper::<String>(),
             network_type,
         )
-            .unwrap()
+        .unwrap()
     }
 
     pub fn from_hex_private_key<S: AsRef<str>>(
@@ -59,7 +60,11 @@ impl AccountNis1 {
         sign_data::<KpNis1>(self.key_pair, data)
     }
 
-    pub fn verify_signature(&self, data: &str, signature: crypto::prelude::Signature) -> Result<()> {
+    pub fn verify_signature(
+        &self,
+        data: &str,
+        signature: crypto::prelude::Signature,
+    ) -> Result<()> {
         self.public_account
             .verify_signature(data.as_ref(), signature)
     }
@@ -77,7 +82,11 @@ impl PublicAccountNis1 {
         })
     }
 
-    pub fn verify_signature(&self, data: &str, signature: crypto::prelude::Signature) -> Result<()> {
+    pub fn verify_signature(
+        &self,
+        data: &str,
+        signature: crypto::prelude::Signature,
+    ) -> Result<()> {
         verify_signature::<KpNis1>(self.public_key, data, signature)
     }
 }
@@ -88,10 +97,8 @@ impl AddressNis1 {
 
     pub fn from_public_key(public_key: &str, network_type: NetworkType) -> Result<Self> {
         ensure!(is_hex(public_key), "public_key it's not hex.");
-        ensure!(
-            network_type != NetworkType::MIJIN_TEST,
-            "Unknown NetworkType"
-        );
+
+        Self::__internal_valid_network_type(network_type)?;
 
         let public_key_hash =
             H256::from_str(public_key).map_err(|e| anyhow!("public_key {}", e))?;
@@ -115,12 +122,9 @@ impl AddressNis1 {
 
         let network_identifier = address_raw.to_uppercase().chars().next().unwrap();
 
-        let network_type = NetworkType::from(network_identifier);
-        ensure!(
-            network_type != NetworkType::UnknownNetworkType
-                && network_type != NetworkType::MIJIN_TEST,
-            "Unknown NetworkType"
-        );
+        let network_type = NetworkType::try_from(network_identifier)?;
+
+        Self::__internal_valid_network_type(network_type)?;
 
         let mut address = H200::zero();
         decode_base32(address.as_mut(), &address_raw);
@@ -129,5 +133,16 @@ impl AddressNis1 {
             address,
             network_type,
         })
+    }
+
+    // internal function
+    fn __internal_valid_network_type(network_type: NetworkType) -> Result<()> {
+        ensure!(
+            network_type != NetworkType::MIJIN_TEST
+                && network_type != NetworkType::PRIVATE
+                && network_type != NetworkType::PRIVATE_TEST,
+            format!("Invalid NetworkType \"{}\"", network_type)
+        );
+        Ok(())
     }
 }

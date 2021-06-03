@@ -139,11 +139,7 @@ impl AddressSym {
 
         let network_identifier = address_raw.to_uppercase().chars().next().unwrap();
 
-        let network_type = NetworkType::from(network_identifier);
-        ensure!(
-            network_type != NetworkType::UnknownNetworkType,
-            "Unknown NetworkType"
-        );
+        let network_type = NetworkType::try_from(network_identifier)?;
 
         let mut address = H192::zero();
         decode_base32(address.as_mut(), &address_raw);
