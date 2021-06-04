@@ -59,7 +59,11 @@ use symbol_sdk::account::Account;
 use symbol_sdk::network::NetworkType;
 
 fn main() {
-    let account = Account::<KpSym, H192>::random(NetworkType::TEST_NET);
+    // if feature = "nis1" hash type must be specified.
+    // H192 = symbol.
+    // H200 = nis1.
+    // example: Account::<KpSym, H192>::random(NetworkType::TEST_NET);
+    let account = Account::random(NetworkType::TEST_NET);
     println!("network_type: {}", account.network_type());
     println!("address: {}", account.address_str());
     println!("public_key: {}", account.public_key_to_hex());

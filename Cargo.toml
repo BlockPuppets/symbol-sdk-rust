@@ -79,3 +79,4 @@ sym = ['symbol-crypto-core/sym']
 full = ['sym', 'nis1']
 
 [dev-dependencies]
+symbol-sdk = { path = ".", features = ['full'] }
