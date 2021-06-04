@@ -1,4 +1,4 @@
-use super::JsonRpcResponse;
+use super::JsonResponse;
 use std::error::Error as StdError;
 
 #[derive(Debug)]
@@ -16,7 +16,7 @@ pub enum Error {
     // There was a timeout waiting for the response
     ResponseTimeout(String),
     // JSON-RPC Response result is null
-    ResultNotFound(JsonRpcResponse),
+    ResultNotFound(JsonResponse),
     // Unexpected error, should never happen, likely is a bug if it happens.
     UnexpectedError(UnexpectedError),
 }

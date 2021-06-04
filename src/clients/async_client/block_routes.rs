@@ -1,5 +1,5 @@
 use crate::blockchain::{BlockInfo, MerkleProofInfo};
-use crate::clients::model_dto::{BlockInfoDto, MerkleProofInfoDto};
+use crate::clients::model_dto::{BlockInfoDto, MerkleProofInfoDto, BlockPageDto};
 use crate::clients::search_criteria::block_search_criteria::BlockSearchCriteria;
 use crate::{request::Request, Client, Error, Order, Response, RetryStrategy, H192, H256};
 
@@ -115,7 +115,7 @@ impl<R: RetryStrategy> BlockApi<R> {
         offset: Option<&str>,
         order: Option<Order>,
     ) -> Result<Vec<BlockInfo<H192>>, Error> {
-        let _resp: Response<Vec<BlockInfoDto>> = self
+        let resp: Response<BlockPageDto> = self
             .as_ref()
             .send(Request::search_blocks(
                 criteria,
@@ -125,7 +125,7 @@ impl<R: RetryStrategy> BlockApi<R> {
                 order,
             ))
             .await?;
-        todo!()
+        resp.to_compact().map_err(|e| Error::unexpected_uncategorized(e.to_string()))
     }
 }
 

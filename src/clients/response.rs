@@ -16,12 +16,12 @@ impl std::fmt::Display for JsonRpcError {
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
-pub struct JsonRpcResponse {
+pub struct JsonResponse {
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
     pub result: Option<serde_json::Value>,
 }
 
-impl JsonRpcResponse {
+impl JsonResponse {
     pub fn new() -> Self {
         Self {
             result: None,

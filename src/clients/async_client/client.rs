@@ -4,7 +4,7 @@ use std::sync::Arc;
 use serde::de::DeserializeOwned;
 use serde::Deserialize;
 
-use crate::clients::{model_dto::BlockInfoDto, retry::RetryStrategy, Error, JsonRpcResponse};
+use crate::clients::{model_dto::BlockInfoDto, retry::RetryStrategy, Error, JsonResponse};
 use crate::network::NetworkType;
 use crate::{BlockApi, GenerationHash};
 
@@ -31,7 +31,9 @@ impl<R: RetryStrategy> Client<R> {
         let info = BlockInfoDto::deserialize(ret.result.unwrap())
             .map_err(Error::DeserializeResponseJsonError)?;
 
-        let info = info.to_compat().unwrap();
+        let info = info
+            .to_compat()
+            .map_err(|e| Error::unexpected_uncategorized(e.to_string()))?;
 
         Ok(Self {
             http_client,
@@ -54,7 +56,7 @@ impl<R: RetryStrategy> Client<R> {
         &self,
         request: &Request,
         retry: &RS,
-    ) -> Result<JsonRpcResponse, Error> {
+    ) -> Result<JsonResponse, Error> {
         let mut retries: u32 = 0;
         loop {
             let ret = self.http_client.single_request(request).await;
