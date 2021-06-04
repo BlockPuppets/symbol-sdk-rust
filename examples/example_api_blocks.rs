@@ -1,4 +1,4 @@
-use symbol_sdk::{Client, Retry, H256};
+use symbol_sdk::{Client, Retry,H192, H256};
 use symbol_sdk::account::{PublicAccount, Address};
 use symbol_sdk::block_search_criteria::BlockSearchCriteria;
 use std::str::FromStr;
@@ -24,9 +24,7 @@ async fn main() {
     // if feature = "nis1" hash type must be specified.
     // H192 = symbol.
     // H200 = nis1.
-    // let beneficiary_address = Address::<H192>::from_raw("TBGMAET6V4Q6CKO5R44C25UUPCAUEXES4QVSKXY").unwrap();
-
-    let beneficiary_address = Address::from_raw("TBGMAET6V4Q6CKO5R44C25UUPCAUEXES4QVSKXY").unwrap();
+    let beneficiary_address = Address::<H192>::from_raw("TBGMAET6V4Q6CKO5R44C25UUPCAUEXES4QVSKXY").unwrap();
 
     let criteria = BlockSearchCriteria{
         signer_public_key: None,
