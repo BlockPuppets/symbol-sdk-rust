@@ -6,7 +6,7 @@ use serde::Deserialize;
 
 use crate::clients::{model_dto::BlockInfoDto, retry::RetryStrategy, Error, JsonResponse};
 use crate::network::NetworkType;
-use crate::{BlockApi, GenerationHash};
+use crate::{BlockApi, GenerationHash, ChainApi};
 
 use super::{request::Request, HttpClient, Response, SimpleHttpClient};
 
@@ -102,8 +102,8 @@ impl<R: RetryStrategy> Client<R> {
         BlockApi(self.clone())
     }
 
-    pub fn chain_routes(&self) {
-        todo!()
+    pub fn chain_routes(&self)-> ChainApi<R>  {
+        ChainApi(self.clone())
     }
 
     pub fn network_routes(&self) {

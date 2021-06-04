@@ -127,3 +127,17 @@ impl Request {
         )
     }
 }
+
+// Blocks requests
+impl Request {
+    pub const CHAIN_INFO_PATH: RoutePathName = "/chain/info";
+
+    pub fn get_chain_info() -> Self {
+        Self::new(
+            Self::CHAIN_INFO_PATH,
+            Default::default(),
+            Default::default(),
+            Method::GET,
+        )
+    }
+}

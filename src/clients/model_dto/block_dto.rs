@@ -1,5 +1,5 @@
 #[serde(rename_all = "camelCase")]
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct BlockDto {
     /// A number that allows uint 32 values.
     pub size: u32,
