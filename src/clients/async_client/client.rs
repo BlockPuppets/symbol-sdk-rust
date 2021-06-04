@@ -31,7 +31,7 @@ impl<R: RetryStrategy> Client<R> {
         let info = BlockInfoDto::deserialize(ret.result.unwrap())
             .map_err(Error::DeserializeResponseJsonError)?;
 
-        let info = info.to_block_info().unwrap();
+        let info = info.to_compat().unwrap();
 
         Ok(Self {
             http_client,

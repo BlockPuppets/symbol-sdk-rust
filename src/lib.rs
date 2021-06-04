@@ -24,10 +24,10 @@ pub use self::model::*;
 pub use self::nis1::*;
 pub use self::sym::*;
 
+mod clients;
 mod core;
 mod helpers;
 mod model;
 #[cfg(feature = "nis1")]
 mod nis1;
 mod sym;
-mod clients;

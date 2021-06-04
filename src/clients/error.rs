@@ -30,13 +30,6 @@ impl Error {
     }
 }
 
-// impl std::fmt::Display for Error {
-//     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-//         write!(f, "{:#?}", self)
-//     }
-// }
-
-
 impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         use Error::*;
@@ -92,10 +85,6 @@ pub enum WaitForTransactionError {
     GetTransactionError(Error),
     // Wait timeout, value is waited duration.
     Timeout(std::time::Duration),
-    // Transaction not found, latest known block (ledger info) timestamp is more recent
-    // than expiration_time_secs argument.
-    // Value is the latest known block (ledger info) timestamp.
-    TransactionExpired(u64),
 }
 
 impl std::fmt::Display for WaitForTransactionError {

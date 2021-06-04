@@ -19,7 +19,7 @@ pub struct BlockInfoDto {
 }
 
 impl BlockInfoDto {
-    pub fn to_block_info(&self) -> Result<BlockInfo<H192>> {
+    pub fn to_compat(&self) -> Result<BlockInfo<H192>> {
         let network_type = NetworkType::try_from(self.block.network)?;
         let signer =
             PublicAccount::<H192>::from_public_key(&self.block.signer_public_key, network_type)?;

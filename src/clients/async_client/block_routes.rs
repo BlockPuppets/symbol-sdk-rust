@@ -1,4 +1,4 @@
-use crate::blockchain::BlockInfo;
+use crate::blockchain::{BlockInfo, MerkleProofInfo};
 use crate::clients::model_dto::{BlockInfoDto, MerkleProofInfoDto};
 use crate::clients::search_criteria::block_search_criteria::BlockSearchCriteria;
 use crate::{request::Request, Client, Error, Order, Response, RetryStrategy, H192, H256};
@@ -21,7 +21,8 @@ impl<R: RetryStrategy> BlockApi<R> {
             .as_ref()
             .send(Request::get_block_by_height(height))
             .await?;
-        Ok(resp.to_block_info().unwrap())
+        resp.to_compat()
+            .map_err(|e| Error::unexpected_uncategorized(e.to_string()))
     }
 
     /// Get the merkle path for a given a receipt statement hash and block.
@@ -43,12 +44,17 @@ impl<R: RetryStrategy> BlockApi<R> {
     /// A `Result` whose okay value is an `MerkleProofInfo` or whose error value
     /// is an `Error` describing the error that occurred.
     ///
-    pub async fn get_merkle_receipts(&self, height: u64, hash: H256) -> Result<(), Error> {
-        let _resp: Response<MerkleProofInfoDto> = self
+    pub async fn get_merkle_receipts(
+        &self,
+        height: u64,
+        hash: H256,
+    ) -> Result<MerkleProofInfo, Error> {
+        let resp: Response<MerkleProofInfoDto> = self
             .as_ref()
             .send(Request::get_merkle_receipts(height, hash))
             .await?;
-        todo!()
+        resp.to_compact()
+            .map_err(|e| Error::unexpected_uncategorized(e.to_string()))
     }
 
     /// Get the merkle path for a given a transaction and block.
@@ -70,12 +76,17 @@ impl<R: RetryStrategy> BlockApi<R> {
     /// A `Result` whose okay value is an `MerkleProofInfo` or whose error value
     /// is an `Error` describing the error that occurred.
     ///
-    pub async fn get_merkle_transaction(&self, height: u64, hash: H256) -> Result<(), Error> {
-        let _resp: Response<MerkleProofInfoDto> = self
+    pub async fn get_merkle_transaction(
+        &self,
+        height: u64,
+        hash: H256,
+    ) -> Result<MerkleProofInfo, Error> {
+        let resp: Response<MerkleProofInfoDto> = self
             .as_ref()
             .send(Request::get_merkle_transaction(height, hash))
             .await?;
-        todo!()
+        resp.to_compact()
+            .map_err(|e| Error::unexpected_uncategorized(e.to_string()))
     }
 
     /// Gets an vec of blocks.

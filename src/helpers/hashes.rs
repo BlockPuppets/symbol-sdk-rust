@@ -97,7 +97,7 @@ pub trait AddressSchema {
 
 #[cfg(feature = "nis1")]
 construct_fixed_hash! {
-    /// Symbol 200 bit hash type.
+    /// Nis1 200 bit hash type.
     #[derive(Deserialize)]
     pub struct H200(25);
 }
