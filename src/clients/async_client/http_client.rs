@@ -5,7 +5,7 @@ use async_trait::async_trait;
 use reqwest::Method;
 
 use crate::clients::async_client::request::Request;
-use crate::clients::{consts::HTTP_REQUEST_TIMEOUT, Error, JsonResponse};
+use crate::clients::{consts::HTTP_REQUEST_TIMEOUT, Error, SymbolResponse};
 use crate::SymbolError;
 
 #[derive(Debug)]
@@ -13,10 +13,10 @@ pub struct Response<R> {
     pub result: R,
 }
 
-impl<R: for<'de> serde::Deserialize<'de>> TryFrom<JsonResponse> for Response<R> {
+impl<R: for<'de> serde::Deserialize<'de>> TryFrom<SymbolResponse> for Response<R> {
     type Error = Error;
 
-    fn try_from(resp: JsonResponse) -> Result<Self, Error> {
+    fn try_from(resp: SymbolResponse) -> Result<Self, Error> {
         match resp.result {
             Some(ret) => Ok(Self {
                 result: serde_json::from_value::<R>(ret)
@@ -61,7 +61,7 @@ async fn send_json_request<T: for<'de> serde::Deserialize<'de>>(
 
 #[async_trait]
 pub trait HttpClient: Sync + Send + 'static {
-    async fn single_request(&self, request: &Request) -> Result<JsonResponse, Error>;
+    async fn single_request(&self, request: &Request) -> Result<SymbolResponse, Error>;
 }
 
 pub struct SimpleHttpClient {
@@ -86,7 +86,7 @@ impl SimpleHttpClient {
 
 #[async_trait]
 impl HttpClient for SimpleHttpClient {
-    async fn single_request(&self, request: &Request) -> Result<JsonResponse, Error> {
+    async fn single_request(&self, request: &Request) -> Result<SymbolResponse, Error> {
         let mut uri_str = request.base_path.to_string();
 
         if !request.path_params.is_empty() {
@@ -112,7 +112,7 @@ impl HttpClient for SimpleHttpClient {
 
         let url = self.url.join(&uri_str).unwrap();
 
-        let rpc_resp: JsonResponse =
+        let rpc_resp: SymbolResponse =
             send_json_request(self.http_client.clone(), url, request.method.clone()).await?;
         Ok(rpc_resp)
     }

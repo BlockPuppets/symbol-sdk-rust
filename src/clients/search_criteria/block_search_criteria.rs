@@ -1,5 +1,6 @@
 use crate::account::{Address, PublicAccount};
-use crate::{BlockOrderBy, H192};
+use crate::{H192};
+use super::block_order_by::BlockOrderBy;
 
 /// Defines the params used to search blocks. With this criteria, you can sort and filter
 /// block queries using rest.

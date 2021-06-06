@@ -1,6 +1,6 @@
 use symbol_sdk::{Client, Retry,H192, H256};
 use symbol_sdk::account::{PublicAccount, Address};
-use symbol_sdk::block_search_criteria::BlockSearchCriteria;
+use symbol_sdk::BlockSearchCriteria;
 use std::str::FromStr;
 
 #[tokio::main]

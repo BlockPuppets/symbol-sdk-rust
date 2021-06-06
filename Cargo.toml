@@ -51,6 +51,10 @@ version = "1.0"
 [dependencies.regex]
 version = "^1"
 
+[dependencies.rand]
+version = "0.7"
+default-features = false
+
 [dependencies.byteorder]
 version = "^1"
 

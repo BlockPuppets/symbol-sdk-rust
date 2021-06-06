@@ -78,6 +78,12 @@ impl Uint64 {
         self.0
     }
 
+    /// Returns a u64 to the value.
+    #[inline]
+    pub fn to_hex(&self) -> String {
+        self.to_string()
+    }
+
     /// Creates a new `Uint64` zero-initialized.
     #[inline]
     pub fn zero() -> Self {

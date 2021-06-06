@@ -4,7 +4,7 @@ use std::sync::Arc;
 use serde::de::DeserializeOwned;
 use serde::Deserialize;
 
-use crate::clients::{model_dto::BlockInfoDto, retry::RetryStrategy, Error, JsonResponse};
+use crate::clients::{model_dto::BlockInfoDto, retry::RetryStrategy, Error, SymbolResponse};
 use crate::network::NetworkType;
 use crate::{BlockApi, GenerationHash, ChainApi};
 
@@ -56,7 +56,7 @@ impl<R: RetryStrategy> Client<R> {
         &self,
         request: &Request,
         retry: &RS,
-    ) -> Result<JsonResponse, Error> {
+    ) -> Result<SymbolResponse, Error> {
         let mut retries: u32 = 0;
         loop {
             let ret = self.http_client.single_request(request).await;
@@ -98,70 +98,87 @@ impl<R: RetryStrategy> Client<R> {
 
 // routes api
 impl<R: RetryStrategy> Client<R> {
+    /// Symbol client block routes api.
     pub fn block_routes(&self) -> BlockApi<R> {
         BlockApi(self.clone())
     }
 
+    /// Symbol client chain routes api.
     pub fn chain_routes(&self)-> ChainApi<R>  {
         ChainApi(self.clone())
     }
 
+    /// Symbol client network routes api.
     pub fn network_routes(&self) {
         todo!()
     }
 
+    /// Symbol client node routes api.
     pub fn node_routes(&self) {
         todo!()
     }
 
+    /// Symbol client namespace routes api.
     pub fn namespace_routes(&self) {
         todo!()
     }
 
+    /// Symbol client mosaic routes api.
     pub fn mosaic_routes(&self) {
         todo!()
     }
 
+    /// Symbol client account routes api.
     pub fn account_routes(&self) {
         todo!()
     }
 
+    /// Symbol client finalization routes api.
     pub fn finalization_routes(&self) {
         todo!()
     }
 
+    /// Symbol client hash_lock routes api.
     pub fn hash_lock_routes(&self) {
         todo!()
     }
 
+    /// Symbol client metadata routes api.
     pub fn metadata_routes(&self) {
         todo!()
     }
 
+    /// Symbol client multisig routes api.
     pub fn multisig_routes(&self) {
         todo!()
     }
 
+    /// Symbol client receipt routes api.
     pub fn receipt_routes(&self) {
         todo!()
     }
 
+    /// Symbol client restriction routes api.
     pub fn restriction_account_routes(&self) {
         todo!()
     }
 
+    /// Symbol client restriction routes api.
     pub fn restriction_mosaic_routes(&self) {
         todo!()
     }
 
+    /// Symbol client secret_lock routes api.
     pub fn secret_lock_routes(&self) {
         todo!()
     }
 
+    /// Symbol client transaction routes api.
     pub fn transaction_routes(&self) {
         todo!()
     }
 
+    /// Symbol client transaction_status routes api.
     pub fn transaction_status_routes(&self) {
         todo!()
     }

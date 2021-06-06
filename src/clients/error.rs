@@ -1,5 +1,6 @@
-use super::JsonResponse;
+use super::SymbolResponse;
 use std::error::Error as StdError;
+use crate::SymbolError;
 
 #[derive(Debug)]
 pub enum Error {
@@ -16,7 +17,7 @@ pub enum Error {
     // There was a timeout waiting for the response
     ResponseTimeout(String),
     // JSON-RPC Response result is null
-    ResultNotFound(JsonResponse),
+    ResultNotFound(SymbolResponse),
     // Unexpected error, should never happen, likely is a bug if it happens.
     UnexpectedError(UnexpectedError),
 }
@@ -99,28 +100,5 @@ impl StdError for WaitForTransactionError {
             WaitForTransactionError::GetTransactionError(e) => Some(e),
             _ => None,
         }
-    }
-}
-
-#[derive(Debug, Eq, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SymbolError {
-    pub code: String,
-    pub message: String,
-}
-
-impl StdError for SymbolError {
-    fn source(&self) -> Option<&(dyn StdError + 'static)> {
-        Some(self)
-    }
-}
-
-impl std::fmt::Display for SymbolError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(&self).unwrap_or_default()
-        )
     }
 }

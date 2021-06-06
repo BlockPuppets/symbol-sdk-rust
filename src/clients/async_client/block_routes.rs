@@ -1,7 +1,10 @@
+use super::{request::Request, Client, Response};
 use crate::blockchain::{BlockInfo, MerkleProofInfo};
-use crate::clients::model_dto::{BlockInfoDto, MerkleProofInfoDto, BlockPageDto};
-use crate::clients::search_criteria::block_search_criteria::BlockSearchCriteria;
-use crate::{request::Request, Client, Error, Order, Response, RetryStrategy, H192, H256};
+use crate::clients::{
+    model_dto::{BlockInfoDto, BlockPageDto, MerkleProofInfoDto},
+    Error,
+};
+use crate::{BlockSearchCriteria, Order, RetryStrategy, H192, H256};
 
 pub struct BlockApi<R: RetryStrategy>(pub(crate) Client<R>);
 
@@ -125,7 +128,8 @@ impl<R: RetryStrategy> BlockApi<R> {
                 order,
             ))
             .await?;
-        resp.to_compact().map_err(|e| Error::unexpected_uncategorized(e.to_string()))
+        resp.to_compact()
+            .map_err(|e| Error::unexpected_uncategorized(e.to_string()))
     }
 }
 

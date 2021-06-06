@@ -12,7 +12,9 @@ pub use self::uint64::Uint64;
 
 pub mod account;
 pub mod blockchain;
+mod id;
 pub mod message;
+pub mod mosaic;
 pub mod network;
 pub mod state;
 mod uint64;

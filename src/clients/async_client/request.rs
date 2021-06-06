@@ -4,7 +4,7 @@ use hex::ToHex;
 use reqwest::Method;
 use serde_json::json;
 
-use crate::clients::search_criteria::block_search_criteria::BlockSearchCriteria;
+use crate::clients::search_criteria::BlockSearchCriteria;
 use crate::{Order, H256};
 
 /// Type alias to improve readability.

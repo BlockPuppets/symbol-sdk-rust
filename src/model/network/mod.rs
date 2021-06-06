@@ -8,6 +8,8 @@
  * // except according to those terms.
  */
 
+pub use self::network_name::*;
 pub use self::network_type::*;
 
+mod network_name;
 mod network_type;

@@ -1,27 +1,28 @@
-use serde_json::Value;
-
 #[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct JsonRpcError {
-    pub code: i16,
+pub struct SymbolError {
+    pub code: String,
     pub message: String,
-    pub data: Option<Value>,
 }
 
-impl std::error::Error for JsonRpcError {}
+impl std::error::Error for SymbolError {}
 
-impl std::fmt::Display for JsonRpcError {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{:?}", self)
+impl std::fmt::Display for SymbolError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(&self).unwrap_or_default()
+        )
     }
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
-pub struct JsonResponse {
+pub struct SymbolResponse {
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
     pub result: Option<serde_json::Value>,
 }
 
-impl JsonResponse {
+impl SymbolResponse {
     pub fn new() -> Self {
         Self {
             result: None,
