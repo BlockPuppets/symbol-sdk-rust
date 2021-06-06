@@ -1,4 +1,14 @@
-use crate::{is_hex, random_bytes};
+/*
+ * // Copyright 2021 Developers of the Symbol sdk Rust project.
+ * //
+ * // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+ * // https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+ * // <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
+ * // option. This file may not be copied, modified, or distributed
+ * // except according to those terms.
+ */
+
+use crate::{ random_bytes};
 use anyhow::{ensure, Result};
 use fixed_hash::rustc_hex::ToHex;
 use hex::FromHex;
@@ -35,8 +45,6 @@ impl MosaicNonce {
     /// Creates a new `MosaicNonce` from a hexadecimal string.
     ///
     pub fn from_hex(hex: &str) -> Result<MosaicNonce> {
-        ensure!(!hex.is_empty(), "The hex must not be empty");
-        ensure!(is_hex(hex), format!("Invalid hex \"{}\"", hex));
         ensure!(
             hex.len() == Self::LENGTH_IN_HEX,
             format!(
@@ -46,9 +54,9 @@ impl MosaicNonce {
             )
         );
 
-        let mut decoded = <[u8; Self::LENGTH]>::from_hex(hex)?;
+        let bytes = <[u8; Self::LENGTH]>::from_hex(hex)?;
 
-        Ok(MosaicNonce(decoded))
+        Ok(MosaicNonce(bytes))
     }
 
     /// The `MosaicNonce` as number
@@ -91,7 +99,6 @@ impl fmt::Display for MosaicNonce {
 #[cfg(test)]
 mod tests {
     use crate::mosaic::MosaicNonce;
-    use hex::FromHex;
 
     #[test]
     fn test_should_be_created_from_fixed_bytes() {

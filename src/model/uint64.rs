@@ -1,9 +1,19 @@
+/*
+ * // Copyright 2021 Developers of the Symbol sdk Rust project.
+ * //
+ * // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+ * // https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+ * // <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
+ * // option. This file may not be copied, modified, or distributed
+ * // except according to those terms.
+ */
+
 use std::convert::TryFrom;
 use std::io::{Cursor, Write};
 use std::ops::Deref;
 
 use byteorder::{BigEndian, ReadBytesExt};
-use fixed_hash::rustc_hex;
+use hex::{FromHex, FromHexError};
 
 #[derive(Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Uint64(u64);
@@ -46,12 +56,14 @@ impl Uint64 {
     }
 
     /// Returns the size in bytes.
+    ///
     #[inline]
     pub fn len_bytes() -> usize {
         std::mem::size_of::<Self>()
     }
 
     /// Returns the inner bytes array.
+    ///
     #[inline]
     pub fn to_fixed_bytes(self) -> [u8; Self::BYTES] {
         self.to_be_bytes()
@@ -67,27 +79,31 @@ impl Uint64 {
     }
 
     /// Returns a constant raw pointer to the value.
+    ///
     #[inline]
     pub fn as_ptr(&self) -> *const u8 {
         self.to_fixed_bytes().as_ptr()
     }
 
     /// Returns a u64 to the value.
+    ///
     #[inline]
     pub fn as_u64(&self) -> u64 {
         self.0
     }
 
     /// Returns a u64 to the value.
+    ///
     #[inline]
     pub fn to_hex(&self) -> String {
         self.to_string()
     }
 
     /// Creates a new `Uint64` zero-initialized.
+    ///
     #[inline]
     pub fn zero() -> Self {
-        Self::from(0)
+        Self(0)
     }
 }
 
@@ -134,7 +150,7 @@ impl From<Uint64> for [u8; 8] {
 }
 
 impl TryFrom<&str> for Uint64 {
-    type Error = rustc_hex::FromHexError;
+    type Error = FromHexError;
 
     /// Creates a `Uint64` instance from the given string.
     ///
@@ -146,27 +162,19 @@ impl TryFrom<&str> for Uint64 {
     ///
     /// - When encountering invalid non hex-digits
     /// - Upon empty string input or invalid input length in general
-    fn try_from(input: &str) -> std::result::Result<Self, Self::Error> {
-        use rustc_hex::FromHex;
-        let hex_vec: Vec<u8> = input.from_hex()?;
-        if hex_vec.len() != Self::len_bytes() {
-            return Err(rustc_hex::FromHexError::InvalidHexLength);
-        }
-
-        let mut bytes: [u8; Self::BYTES] = [0x0; Self::BYTES];
-        bytes.copy_from_slice(hex_vec.as_ref());
-
+    fn try_from(hex: &str) -> std::result::Result<Self, Self::Error> {
+        let bytes = <[u8; Self::BYTES]>::from_hex(hex)?;
         Ok(Self::from(bytes))
     }
 }
 
 impl std::str::FromStr for Uint64 {
-    type Err = rustc_hex::FromHexError;
+    type Err = FromHexError;
 
-    /// Parse a value from a string
+    /// Parse a value from a hex string.
     ///
-    fn from_str(input: &str) -> std::result::Result<Self, Self::Err> {
-        Self::try_from(input)
+    fn from_str(hex: &str) -> std::result::Result<Self, Self::Err> {
+        Self::try_from(hex)
     }
 }
 
@@ -206,6 +214,8 @@ impl std::ops::BitAnd for Uint64 {
     }
 }
 
+/// Implementing `LowerHex` for `Uint64`.
+///
 impl std::fmt::LowerHex for Uint64 {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         if f.alternate() {
@@ -218,6 +228,8 @@ impl std::fmt::LowerHex for Uint64 {
     }
 }
 
+/// Implementing `UpperHex` for `Uint64`.
+///
 impl std::fmt::UpperHex for Uint64 {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         if f.alternate() {

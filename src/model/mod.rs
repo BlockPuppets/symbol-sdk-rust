@@ -9,6 +9,7 @@
  */
 
 pub use self::uint64::Uint64;
+pub use self::id::Id;
 
 pub mod account;
 pub mod blockchain;

@@ -5,8 +5,8 @@ authors = ["Puppet Black <blockpuppetblack0@gmail.com>"]
 readme = "README.md"
 license = "Apache-2.0"
 repository = "https://github.com/BlockPuppets/symbol-sdk-rust"
-keywords = ["symbol", "nem"]
-categories = ["blockchain"]
+keywords = ["symbol", "nis1", "nem"]
+categories = ["blockchain", "sdk"]
 exclude = [".gitignore"]
 edition = "2018"
 
