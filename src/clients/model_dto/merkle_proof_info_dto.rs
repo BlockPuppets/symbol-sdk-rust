@@ -8,9 +8,11 @@
  * // except according to those terms.
  */
 
-use super::MerklePathItemDto;
-use crate::blockchain::MerkleProofInfo;
 use anyhow::Result;
+
+use crate::blockchain::MerkleProofInfo;
+
+use super::MerklePathItemDto;
 
 #[serde(rename_all = "camelCase")]
 #[derive(Debug, Clone, Serialize, Deserialize)]

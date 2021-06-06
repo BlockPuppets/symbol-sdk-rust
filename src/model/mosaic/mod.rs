@@ -8,14 +8,19 @@
  * // except according to those terms.
  */
 
-pub use self::mosaic_id::*;
-pub use self::mosaic_nonce::*;
-use crate::account::Address;
-use crate::{Uint64, H192};
-use byteorder::{LittleEndian, ReadBytesExt};
-use sha3::{Digest, Sha3_256};
 use std::io::Cursor;
 
+use byteorder::{LittleEndian, ReadBytesExt};
+use sha3::{Digest, Sha3_256};
+
+use crate::H192;
+use crate::account::Address;
+
+pub use self::mosaic::*;
+pub use self::mosaic_id::*;
+pub use self::mosaic_nonce::*;
+
+mod mosaic;
 mod mosaic_id;
 mod mosaic_nonce;
 

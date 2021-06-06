@@ -8,19 +8,21 @@
  * // except according to those terms.
  */
 
-use crate::{Uint64, H192};
-use anyhow::{ensure, Result};
-use crate::account::{ Address};
-use super::MosaicNonce;
+use std::convert::TryFrom;
 use std::fmt;
 use std::ops::Deref;
+
+use anyhow::{ensure, Result};
+
+use crate::{H192, Uint64};
+use crate::account::Address;
 use crate::model::id::Id;
-use std::convert::TryFrom;
-use crate::mosaic::generate_mosaic_id;
+
+use super::{generate_mosaic_id, MosaicNonce};
 
 /// The `MosaicId` structure describes mosaic id.
 ///
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize, Eq, Copy)]
+#[derive(Default, Debug, Clone, Copy, PartialEq, Serialize, Deserialize, Eq)]
 pub struct MosaicId(Uint64);
 
 impl MosaicId {
@@ -36,7 +38,7 @@ impl MosaicId {
     pub fn from_hex(hex: &str) -> Result<Self> {
         ensure!(
             hex.len() == Self::LENGTH_IN_HEX,
-                "Invalid size for MosaicId hex"
+            "Invalid size for MosaicId hex"
         );
 
         Ok(Self(Uint64::try_from(hex)?))
@@ -98,10 +100,10 @@ impl Deref for MosaicId {
 
 #[cfg(test)]
 mod tests {
-    use crate::mosaic::{MosaicId, MosaicNonce};
     use crate::account::Address;
-    use crate::network::NetworkType;
     use crate::H192;
+    use crate::mosaic::{MosaicId, MosaicNonce};
+    use crate::network::NetworkType;
 
     const PUBLIC_KEY: &str = "b4f12e7c9f6946091e2cb8b6d3a12b50d17ccbbf646386ea27ce2946a7423dcf";
 
@@ -113,26 +115,28 @@ mod tests {
 
     #[test]
     #[should_panic(expected = "Invalid size for MosaicId hex")]
-    fn test_should_return_invalid_input_length() {
+    fn test_should_return_panic_invalid_size() {
         MosaicId::from_hex("85BBEA6CC462B24499").unwrap();
     }
 
     #[test]
     fn test_should_create_given_nonce_and_owner() {
-        let owner = Address::<H192>::from_public_key(PUBLIC_KEY, NetworkType::PRIVATE_TEST).unwrap();
+        let owner =
+            Address::<H192>::from_public_key(PUBLIC_KEY, NetworkType::PRIVATE_TEST).unwrap();
         let nonce = MosaicNonce::from(0);
 
-        let mosaic_id = MosaicId::create_from_nonce(nonce,owner );
+        let mosaic_id = MosaicId::create_from_nonce(nonce, owner);
         assert_eq!(mosaic_id.to_dto(), [3012716716, 1712914778]);
     }
 
     #[test]
     fn test_should_create_twice_the_same_given_nonce_and_owner() {
-        let owner = Address::<H192>::from_public_key(PUBLIC_KEY, NetworkType::PRIVATE_TEST).unwrap();
+        let owner =
+            Address::<H192>::from_public_key(PUBLIC_KEY, NetworkType::PRIVATE_TEST).unwrap();
         let nonce = MosaicNonce::from(0);
 
-        let mosaic_id_one = MosaicId::create_from_nonce(nonce,owner );
-        let mosaic_id_two = MosaicId::create_from_nonce(nonce,owner );
+        let mosaic_id_one = MosaicId::create_from_nonce(nonce, owner);
+        let mosaic_id_two = MosaicId::create_from_nonce(nonce, owner);
         assert_eq!(mosaic_id_one, mosaic_id_two);
     }
 }

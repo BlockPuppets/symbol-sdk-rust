@@ -8,11 +8,11 @@
  * // except according to those terms.
  */
 
+pub(crate) use self::bytes_utils::*;
 pub use self::hashes::*;
 pub use self::hashes::*;
 pub(crate) use self::hex_utils::*;
 pub(crate) use self::int_utils::*;
-pub(crate) use self::bytes_utils::*;
 
 mod hashes;
 mod hex_utils;

@@ -8,9 +8,11 @@
  * // except according to those terms.
  */
 
-use super::SymbolResponse;
 use std::error::Error as StdError;
+
 use crate::SymbolError;
+
+use super::SymbolResponse;
 
 #[derive(Debug)]
 pub enum Error {

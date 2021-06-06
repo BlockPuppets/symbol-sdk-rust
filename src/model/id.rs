@@ -9,13 +9,12 @@
  */
 
 use std::fmt;
+
 use crate::Uint64;
 
 /// An `trait` is used to define mosaicIds and namespaceIds
 #[typetag::serde]
 pub trait Id: Send + Sync
-where
-    Self: fmt::Debug,
 {
     fn to_uint64(&self) -> Uint64;
 
@@ -34,7 +33,19 @@ impl<'a> PartialEq for &'a dyn Id {
     }
 }
 
+impl<'a> PartialEq for Box<dyn Id + 'static> {
+    fn eq(&self, other: &Self) -> bool {
+        self.as_ref() == other.as_ref()
+    }
+}
+
 impl fmt::Display for dyn Id {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.to_uint64().to_hex())
+    }
+}
+
+impl fmt::Debug for dyn Id {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.to_uint64().to_hex())
     }

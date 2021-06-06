@@ -33,11 +33,11 @@ impl Uint64 {
 
     /// The size of this integer type in bits.
     ///
-    pub const BITS: usize = 64;
+    const BITS: usize = 64;
 
     /// The size of this integer type in bytes.
     ///
-    pub const BYTES: usize = Self::BITS / 8;
+    const BYTES: usize = Self::BITS / 8;
 
     /// Creates a `Uint64` from the given low and high bits.
     ///

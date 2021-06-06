@@ -19,7 +19,7 @@ pub use self::search_criteria::*;
 mod async_client;
 mod consts;
 mod error;
-mod model_dto;
+pub(crate) mod model_dto;
 mod order;
 mod response;
 mod retry;

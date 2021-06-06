@@ -8,8 +8,9 @@
  * // except according to those terms.
  */
 
-use crate::H256;
 use std::fmt;
+
+use crate::H256;
 
 /// The finalized block.
 ///

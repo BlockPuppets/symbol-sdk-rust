@@ -16,6 +16,7 @@ pub use self::chain_info_dto::*;
 pub use self::finalized_block_dto::*;
 pub use self::merkle_path_item_dto::*;
 pub use self::merkle_proof_info_dto::*;
+pub use self::mosaic_dto::*;
 pub use self::pagination::*;
 
 mod block_dto;
@@ -27,3 +28,4 @@ mod block_page;
 mod pagination;
 mod finalized_block_dto;
 mod chain_info_dto;
+mod mosaic_dto;

@@ -8,17 +8,17 @@
  * // except according to those terms.
  */
 
+use std::convert::TryFrom;
 use std::str::FromStr;
 
 use anyhow::{anyhow, ensure, Result};
 use crypto::prelude::{KeyPairSchema, PrivateKey, PublicKey};
 use hex::ToHex;
 
-use crate::account::{sign_data, verify_signature, Account, Address, PublicAccount};
+use crate::{H200, H256, is_hex, KpNis1};
+use crate::account::{Account, Address, PublicAccount, sign_data, verify_signature};
 use crate::core::format::{decode_base32, public_key_to_address};
 use crate::network::NetworkType;
-use crate::{is_hex, KpNis1, H200, H256};
-use std::convert::TryFrom;
 
 pub type AddressNis1 = Address<H200>;
 pub type PublicAccountNis1 = PublicAccount<H200>;
@@ -36,7 +36,7 @@ impl AccountNis1 {
             key_pair.private_key.encode_hex_upper::<String>(),
             network_type,
         )
-        .unwrap()
+            .unwrap()
     }
 
     pub fn from_hex_private_key<S: AsRef<str>>(

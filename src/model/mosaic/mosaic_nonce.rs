@@ -8,12 +8,14 @@
  * // except according to those terms.
  */
 
-use crate::{ random_bytes};
+use std::fmt;
+use std::ops::Deref;
+
 use anyhow::{ensure, Result};
 use fixed_hash::rustc_hex::ToHex;
 use hex::FromHex;
-use std::fmt;
-use std::ops::Deref;
+
+use crate::random_bytes;
 
 /// The `MosaicNonce` struct.
 ///
@@ -129,7 +131,7 @@ mod tests {
 
     #[test]
     #[should_panic(expected = "Invalid hex size for nonce, should be 8 bytes but received 12")]
-    fn test_should_create_from_hex_should_panic() {
+    fn test_try_create_from_hex_should_return_panic() {
         MosaicNonce::from_hex("111100000000").unwrap();
     }
 

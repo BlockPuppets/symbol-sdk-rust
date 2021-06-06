@@ -8,8 +8,9 @@
  * // except according to those terms.
  */
 
-use super::MerklePathItem;
 use std::fmt;
+
+use super::MerklePathItem;
 
 /// The block merkle proof info
 ///

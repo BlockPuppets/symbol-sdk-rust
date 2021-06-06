@@ -14,8 +14,8 @@ use std::fmt::Debug;
 use async_trait::async_trait;
 use reqwest::Method;
 
-use crate::clients::async_client::request::Request;
 use crate::clients::{consts::HTTP_REQUEST_TIMEOUT, Error, SymbolResponse};
+use crate::clients::async_client::request::Request;
 use crate::SymbolError;
 
 #[derive(Debug)]

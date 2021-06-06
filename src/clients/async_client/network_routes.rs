@@ -8,8 +8,8 @@
  * // except according to those terms.
  */
 
-use crate::clients::request::Request;
 use crate::{Client, Error, Response, RetryStrategy};
+use crate::clients::request::Request;
 use crate::network::NetworkName;
 
 pub struct NetworkApi<R: RetryStrategy>(pub(crate) Client<R>);

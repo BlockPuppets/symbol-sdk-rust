@@ -8,10 +8,11 @@
  * // except according to those terms.
  */
 
+use anyhow::Result;
+
 use crate::blockchain::BlockInfo;
 use crate::clients::model_dto::{BlockInfoDto, Pagination};
 use crate::H192;
-use anyhow::Result;
 
 #[derive(Serialize, Deserialize)]
 pub struct BlockPageDto {

@@ -14,8 +14,8 @@ use hex::ToHex;
 use reqwest::Method;
 use serde_json::json;
 
+use crate::{H256, Order};
 use crate::clients::search_criteria::BlockSearchCriteria;
-use crate::{Order, H256};
 
 /// Type alias to improve readability.
 pub(crate) type RoutePathName = &'static str;

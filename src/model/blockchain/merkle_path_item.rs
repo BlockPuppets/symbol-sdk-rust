@@ -8,10 +8,11 @@
  * // except according to those terms.
  */
 
+use std::fmt;
+
 use crate::H256;
 
 use super::MerklePosition;
-use std::fmt;
 
 /// The block merkle path item
 ///

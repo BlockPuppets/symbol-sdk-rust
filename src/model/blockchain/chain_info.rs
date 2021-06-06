@@ -8,8 +8,9 @@
  * // except according to those terms.
  */
 
-use super::FinalizedBlock;
 use std::fmt;
+
+use super::FinalizedBlock;
 
 /// The chain information.
 ///

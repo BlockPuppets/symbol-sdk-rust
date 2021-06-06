@@ -8,8 +8,9 @@
  * // except according to those terms.
  */
 
+use crate::H192;
 use crate::account::{Address, PublicAccount};
-use crate::{H192};
+
 use super::block_order_by::BlockOrderBy;
 
 /// Defines the params used to search blocks. With this criteria, you can sort and filter

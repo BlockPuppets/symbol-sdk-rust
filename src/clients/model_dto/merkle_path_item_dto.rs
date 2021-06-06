@@ -8,10 +8,12 @@
  * // except according to those terms.
  */
 
+use std::str::FromStr;
+
+use anyhow::Result;
+
 use crate::blockchain::{MerklePathItem, MerklePosition};
 use crate::H256;
-use anyhow::Result;
-use std::str::FromStr;
 
 /// MerklePathItemDto : Each merkle path item is composed of a hash,
 /// and a position relative to the proofHash being evaluated.
