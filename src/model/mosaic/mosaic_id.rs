@@ -35,6 +35,7 @@ impl MosaicId {
     pub const LENGTH_IN_HEX: usize = Self::LENGTH_IN_BYTES * 2;
 
     /// Creates a new `MosaicId` from a hex string.
+    ///
     pub fn from_hex(hex: &str) -> Result<Self> {
         ensure!(
             hex.len() == Self::LENGTH_IN_HEX,
@@ -45,6 +46,7 @@ impl MosaicId {
     }
 
     /// Create a `MosaicId` for given `MosaicNonce` MosaicNonce and owner `Address`.
+    ///
     pub fn create_from_nonce(nonce: MosaicNonce, owner_address: Address<H192>) -> Self {
         generate_mosaic_id(nonce, owner_address)
     }

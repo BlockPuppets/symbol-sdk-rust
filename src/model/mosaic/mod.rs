@@ -19,10 +19,12 @@ use crate::account::Address;
 pub use self::mosaic::*;
 pub use self::mosaic_id::*;
 pub use self::mosaic_nonce::*;
+pub use self::mosaic_flags::*;
 
 mod mosaic;
 mod mosaic_id;
 mod mosaic_nonce;
+mod mosaic_flags;
 
 /// Generates a `MosaicId` given a `MosaicNonce` and a `Address`.
 ///

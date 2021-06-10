@@ -107,7 +107,6 @@ impl fmt::Display for Mosaic {
 
 #[cfg(test)]
 mod tests {
-    use crate::{Id, Uint64};
     use crate::mosaic::{Mosaic, MosaicId};
 
     const LO_HI: (u32, u32) = (3646934825, 3576016193);
