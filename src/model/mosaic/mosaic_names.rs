@@ -8,5 +8,13 @@
  * // except according to those terms.
  */
 
-#[cfg(test)]
-pub mod plain_message;
+use crate::mosaic::MosaicId;
+
+/// Mosaic with linked names.
+///
+pub struct MosaicNames {
+pub mosaic_id: MosaicId,
+
+  // todo: crate NamespaceName.
+  // pub names: Vec<NamespaceName>,
+}

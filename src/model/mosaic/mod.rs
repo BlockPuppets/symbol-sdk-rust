@@ -13,18 +13,24 @@ use std::io::Cursor;
 use byteorder::{LittleEndian, ReadBytesExt};
 use sha3::{Digest, Sha3_256};
 
-use crate::H192;
 use crate::account::Address;
+use crate::H192;
 
 pub use self::mosaic::*;
-pub use self::mosaic_id::*;
-pub use self::mosaic_nonce::*;
 pub use self::mosaic_flags::*;
+pub use self::mosaic_id::*;
+pub use self::mosaic_info::*;
+pub use self::mosaic_names::*;
+pub use self::mosaic_nonce::*;
+pub use self::mosaic_supply_change_action::*;
 
 mod mosaic;
-mod mosaic_id;
-mod mosaic_nonce;
 mod mosaic_flags;
+mod mosaic_id;
+mod mosaic_info;
+mod mosaic_names;
+mod mosaic_nonce;
+mod mosaic_supply_change_action;
 
 /// Generates a `MosaicId` given a `MosaicNonce` and a `Address`.
 ///
