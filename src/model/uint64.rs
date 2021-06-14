@@ -10,11 +10,11 @@
 
 use std::convert::TryFrom;
 use std::io::{Cursor, Write};
+use std::num::ParseIntError;
 use std::ops::Deref;
 
 use byteorder::{BigEndian, ReadBytesExt};
 use hex::{FromHex, FromHexError};
-use std::num::ParseIntError;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Uint64(u64);
@@ -95,7 +95,7 @@ impl Uint64 {
     ///
     #[inline]
     pub fn to_hex(&self) -> String {
-        self.to_string()
+        format!("{:X}", self)
     }
 
     /// Creates a new `Uint64` zero-initialized.
@@ -260,7 +260,9 @@ impl std::fmt::Display for Uint64 {
     }
 }
 
-pub trait Uint64Trait {
+pub trait AsUint64 {
+    fn as_uint64(&self) -> Uint64;
+
     fn to_dto(&self) -> [u32; 2] {
         self.as_uint64().to_dto()
     }
@@ -278,11 +280,9 @@ pub trait Uint64Trait {
     fn to_lower(&self) -> u32 {
         *self.as_uint64() as u32
     }
-
-    fn as_uint64(&self) -> Uint64;
 }
 
-impl Uint64Trait for u64 {
+impl AsUint64 for u64 {
     fn as_uint64(&self) -> Uint64 {
         Uint64::from(*self)
     }
@@ -296,9 +296,10 @@ impl From<Uint64> for u64 {
 
 #[cfg(test)]
 mod tests {
-    use crate::{Uint64, Uint64Trait};
     use std::convert::TryFrom;
     use std::str::FromStr;
+
+    use crate::{AsUint64, Uint64};
 
     struct TestVector {
         str: &'static str,
@@ -447,13 +448,11 @@ mod tests {
         fn test_should_return_added_value() {
             let value = Uint64::from(0);
             let other = Uint64::from(0);
-
             let result = value + other;
             assert_eq!(*result, 0);
 
             let value = Uint64::from(100);
             let other = Uint64::from(1);
-
             let result = value + other;
             assert_eq!(*result, 101);
         }
@@ -462,21 +461,17 @@ mod tests {
         fn test_should_return_substract_value() {
             let value = Uint64::from(100);
             let other = Uint64::from(1);
-
             let result = value - other;
             assert_eq!(*result, 99);
 
             let value = Uint64::from(1);
             let other = Uint64::from(1);
-
             let result = value - other;
             assert_eq!(*result, 0);
 
             let value = Uint64::from(100);
             let other = Uint64::from(1);
-
             let result = other.checked_sub(*value);
-
             assert!(result.is_none());
         }
     }

@@ -84,4 +84,3 @@ full = ['sym', 'nis1']
 
 [dev-dependencies]
 symbol-sdk = { path = ".", features = ['full'] }
-hex = "0.4.3"
