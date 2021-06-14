@@ -55,7 +55,6 @@ impl NetworkType {
 
     const UNKNOWN_NETWORK_TYPE: &'static str = "Unknown NetworkType";
 
-
     pub fn value(self) -> u8 {
         self as u8
     }
@@ -132,5 +131,46 @@ impl std::convert::TryFrom<char> for NetworkType {
 impl Default for NetworkType {
     fn default() -> Self {
         NetworkType::TEST_NET
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::network::NetworkType;
+
+    #[test]
+    fn test_main_net_is_0x68() {
+        assert_eq!(NetworkType::MAIN_NET as u8, 0x68);
+        assert_eq!(NetworkType::MAIN_NET as u8, 104);
+    }
+
+    #[test]
+    fn test_test_net_is_0x98() {
+        assert_eq!(NetworkType::TEST_NET as u8, 0x98);
+        assert_eq!(NetworkType::TEST_NET as u8, 152);
+    }
+
+    #[test]
+    fn test_private_test_is_0xa8() {
+        assert_eq!(NetworkType::PRIVATE_TEST as u8, 0xa8);
+        assert_eq!(NetworkType::PRIVATE_TEST as u8, 168);
+    }
+
+    #[test]
+    fn test_private_is_0x78() {
+        assert_eq!(NetworkType::PRIVATE as u8, 0x78);
+        assert_eq!(NetworkType::PRIVATE as u8, 120);
+    }
+
+    #[test]
+    fn test_mijin_is_0x60() {
+        assert_eq!(NetworkType::MIJIN as u8, 0x60);
+        assert_eq!(NetworkType::MIJIN as u8, 96);
+    }
+
+    #[test]
+    fn test_mijin_test_is_0x90() {
+        assert_eq!(NetworkType::MIJIN_TEST as u8, 0x90);
+        assert_eq!(NetworkType::MIJIN_TEST as u8, 144);
     }
 }
