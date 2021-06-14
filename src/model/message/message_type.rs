@@ -78,3 +78,37 @@ impl Default for MessageType {
         Self::PlainMessageType
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::message::MessageType;
+
+    #[test]
+    fn test_message_type_is_negative() {
+        assert_eq!(MessageType::RawMessageType as i16, -1);
+    }
+
+    #[test]
+    fn test_plain_message_type_is_0x00() {
+        assert_eq!(MessageType::PlainMessageType as i16, 0x00);
+        assert_eq!(MessageType::PlainMessageType as i16, 0);
+    }
+
+    #[test]
+    fn test_secure_message_type_is_0x01() {
+        assert_eq!(MessageType::SecureMessageType as i16, 0x01);
+        assert_eq!(MessageType::SecureMessageType as i16, 1);
+    }
+
+    #[test]
+    fn test_persistent_harvesting_delegation_message_type_is_0xfe() {
+        assert_eq!(
+            MessageType::PersistentHarvestingDelegationMessageType as i16,
+            0xfe
+        );
+        assert_eq!(
+            MessageType::PersistentHarvestingDelegationMessageType as i16,
+            254
+        );
+    }
+}
