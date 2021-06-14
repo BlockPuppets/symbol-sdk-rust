@@ -16,7 +16,7 @@ use crypto::prelude::{KeyPairSchema, PrivateKey, PublicKey};
 use hex::ToHex;
 
 use crate::{H200, H256, is_hex, KpNis1};
-use crate::account::{Account, Address, PublicAccount, sign_data, verify_signature};
+use crate::account::{Account, Address, PublicAccount, verify_signature};
 use crate::core::format::{decode_base32, public_key_to_address};
 use crate::network::NetworkType;
 
@@ -54,19 +54,6 @@ impl AccountNis1 {
             key_pair,
             public_account,
         })
-    }
-
-    pub fn sign_data(&self, data: &str) -> Result<crypto::prelude::Signature> {
-        sign_data::<KpNis1>(self.key_pair, data)
-    }
-
-    pub fn verify_signature(
-        &self,
-        data: &str,
-        signature: crypto::prelude::Signature,
-    ) -> Result<()> {
-        self.public_account
-            .verify_signature(data.as_ref(), signature)
     }
 }
 

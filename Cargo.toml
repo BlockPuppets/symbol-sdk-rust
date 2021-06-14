@@ -84,3 +84,4 @@ full = ['sym', 'nis1']
 
 [dev-dependencies]
 symbol-sdk = { path = ".", features = ['full'] }
+lazy_static = "1.4.0"

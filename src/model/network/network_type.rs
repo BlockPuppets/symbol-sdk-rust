@@ -134,6 +134,12 @@ impl Default for NetworkType {
     }
 }
 
+impl From<NetworkType> for u8 {
+    fn from(value: NetworkType) -> Self {
+        value as u8
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::network::NetworkType;

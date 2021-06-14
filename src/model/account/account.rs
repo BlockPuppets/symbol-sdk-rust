@@ -14,13 +14,13 @@ use std::fmt::Debug;
 use anyhow::{ensure, Result};
 use crypto::prelude::{KeyPairSchema, PrivateKey, Signature};
 use hex::ToHex;
-use serde::{Deserialize, Serialize, Serializer};
 use serde::ser::SerializeStruct;
+use serde::{Deserialize, Serialize, Serializer};
 
-use crate::{AddressSchema, GenerationHash, H192, is_hex, KpSym};
 use crate::account::PublicAccount;
 use crate::message::{EncryptedMessage, PlainMessage};
 use crate::network::NetworkType;
+use crate::{is_hex, AddressSchema, GenerationHash, KpSym, H192};
 
 pub type AccountSym = Account<KpSym, H192>;
 
@@ -58,6 +58,62 @@ impl<Kp: KeyPairSchema, H: AddressSchema> Account<Kp, H> {
     ///
     pub fn private_key_to_hex(&self) -> String {
         self.key_pair.private_key().encode_hex_upper::<String>()
+    }
+
+    /// Sign raw data.
+    ///
+    pub fn sign_data(&self, data: &str) -> Result<crypto::prelude::Signature> {
+        sign_data::<Kp>(self.key_pair, data)
+    }
+
+    /// Creates an encrypted message from this account to the recipient PublicAccount.
+    ///
+    /// # Inputs
+    ///
+    /// * `message`: Plain message to be encrypted.
+    /// * `recipient_public_account`: Recipient public account.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` whose okay value is an `EncryptedMessage` or whose error value
+    /// is an `Error` describing the error that occurred.
+    ///
+    pub fn encrypt_message<S: AsRef<str>>(
+        &self,
+        message: S,
+        recipient_public_account: PublicAccount<H>,
+    ) -> Result<EncryptedMessage> {
+        let message = message.as_ref();
+
+        ensure!(!message.is_empty(), "message must not be empty.");
+
+        EncryptedMessage::create::<Kp::Crypto>(
+            &message.as_bytes(),
+            &self.private_key_to_hex(),
+            &recipient_public_account.public_key_to_hex(),
+        )
+    }
+
+    /// Decrypts an `EncryptedMessage` received by this account from senderPublicAccount.
+    ///
+    /// # Inputs
+    ///
+    /// * `encrypted_message`: Encrypted message.
+    /// * `signer_public_account`: The public account originally encrypted the message.
+    ///
+    /// A `Result` whose okay value is an `PlainMessage` or whose error value
+    /// is an `Error` describing the error that occurred.
+    ///
+    pub fn decrypt_message(
+        &self,
+        encrypted_message: &EncryptedMessage,
+        signer_public_account: PublicAccount<H>,
+    ) -> Result<PlainMessage> {
+        EncryptedMessage::decrypt::<Kp::Crypto>(
+            encrypted_message,
+            &self.private_key_to_hex(),
+            &signer_public_account.public_key_to_hex(),
+        )
     }
 }
 
@@ -224,65 +280,13 @@ impl AccountSym {
         Self::from_hex_private_key(secret_key.encode_hex::<String>(), network_type)
     }
 
-    /// Creates an encrypted message from this account to the recipient PublicAccount.
-    ///
-    /// # Inputs
-    ///
-    /// * `message`: Plain message to be encrypted.
-    /// * `recipient_public_account`: Recipient public account.
-    ///
-    /// # Returns
-    ///
-    /// A `Result` whose okay value is an `EncryptedMessage` or whose error value
-    /// is an `Error` describing the error that occurred.
-    ///
-    pub fn encrypt_message<S: AsRef<str>>(
-        &self,
-        message: S,
-        recipient_public_account: PublicAccount<H192>,
-    ) -> Result<EncryptedMessage> {
-        let message = message.as_ref();
-
-        ensure!(!message.is_empty(), "message must not be empty.");
-
-        EncryptedMessage::create(
-            &message.as_bytes(),
-            &self.private_key_to_hex(),
-            &recipient_public_account.public_key_to_hex(),
-        )
-    }
-
-    /// Decrypts an `EncryptedMessage` received by this account from senderPublicAccount.
-    ///
-    /// # Inputs
-    ///
-    /// * `encrypted_message`: Encrypted message.
-    /// * `signer_public_account`: The public account originally encrypted the message.
-    ///
-    /// A `Result` whose okay value is an `PlainMessage` or whose error value
-    /// is an `Error` describing the error that occurred.
-    ///
-    pub fn decrypt_message(
-        &self,
-        encrypted_message: &EncryptedMessage,
-        signer_public_account: PublicAccount<H192>,
-    ) -> Result<PlainMessage> {
-        EncryptedMessage::decrypt(
-            encrypted_message,
-            &self.private_key_to_hex(),
-            &signer_public_account.public_key_to_hex(),
-        )
-    }
-
-    /// Sign raw data.
-    ///
-    pub fn sign_data(&self, data: &str) -> Result<crypto::prelude::Signature> {
-        sign_data::<KpSym>(self.key_pair, data)
-    }
-
     /// Verify a signature.
     ///
-    pub fn verify_signature(&self, data: &str, signature: crypto::prelude::Signature) -> Result<()> {
+    pub fn verify_signature(
+        &self,
+        data: &str,
+        signature: crypto::prelude::Signature,
+    ) -> Result<()> {
         self.public_account
             .verify_signature(data.as_ref(), signature)
     }
@@ -334,11 +338,12 @@ impl<Kp: KeyPairSchema, H: AddressSchema + Serialize> fmt::Display for Account<K
     }
 }
 
-impl<Kp: KeyPairSchema + serde::Serialize, H: AddressSchema + Serialize> Serialize for
-Account<Kp, H> {
+impl<Kp: KeyPairSchema + serde::Serialize, H: AddressSchema + Serialize> Serialize
+    for Account<Kp, H>
+{
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-        where
-            S: Serializer,
+    where
+        S: Serializer,
     {
         let mut rgb = serializer.serialize_struct("Account", 2)?;
         rgb.serialize_field("keypair", &self.key_pair)?;

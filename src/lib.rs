@@ -14,6 +14,10 @@ extern crate fixed_hash;
 extern crate serde;
 extern crate symbol_crypto_core as crypto;
 
+#[cfg(test)]
+#[macro_use]
+extern crate lazy_static;
+
 pub use self::clients::*;
 #[cfg(feature = "nis1")]
 pub use self::crypto::prelude::KpNis1;
