@@ -17,9 +17,9 @@ use crypto::prelude::{KeyPairSchema, PublicKey};
 use hex::ToHex;
 use serde::Serialize;
 
-use crate::{AddressSchema, H192, is_hex, KpSym};
 use crate::account::{Address, AddressSym};
 use crate::network::NetworkType;
+use crate::{is_hex, AddressSchema, KpSym, H192};
 
 pub type PublicAccountSym = PublicAccount<H192>;
 
@@ -37,7 +37,7 @@ impl<H: AddressSchema> PublicAccount<H> {
     /// Account public key to hex String.
     ///
     pub fn public_key_to_hex(&self) -> String {
-        self.public_key.encode_hex_upper::<String>()
+        self.public_key.encode_hex::<String>()
     }
 
     /// Account `NetworkType`.
@@ -109,7 +109,11 @@ impl PublicAccountSym {
     ///
     /// A `Result` whose okay value True if the signature is valid or whose error value
     /// is an `Error` describing the error that occurred.
-    pub fn verify_signature(&self, data: &str, signature: crypto::prelude::Signature) -> Result<()> {
+    pub fn verify_signature(
+        &self,
+        data: &str,
+        signature: crypto::prelude::Signature,
+    ) -> Result<()> {
         verify_signature::<KpSym>(self.public_key, data, signature)
     }
 }
@@ -143,4 +147,113 @@ pub(crate) fn verify_signature<Kp: KeyPairSchema>(
     };
 
     kp.verify(data.as_ref(), signature)
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::account::{Account, PublicAccount};
+    use crate::network::NetworkType;
+    use crate::{KpSym, H192};
+    use crypto::prelude::Signature;
+    use std::str::FromStr;
+
+    const PUBLIC_KEY: &str = "b4f12e7c9f6946091e2cb8b6d3a12b50d17ccbbf646386ea27ce2946a7423dcf";
+
+    #[test]
+    fn test_should_create_from_public_key() {
+        let public_account =
+            PublicAccount::<H192>::from_public_key(PUBLIC_KEY, NetworkType::PRIVATE_TEST).unwrap();
+        assert_eq!(public_account.public_key_to_hex(), PUBLIC_KEY);
+        assert_eq!(
+            public_account.address_str(),
+            "VARNASAS2BIAB6LMFA3FPMGBPGIJGK6IJGOH3FA"
+        );
+    }
+
+    #[test]
+    fn test_can_verify_a_signature() {
+        let testing_account: Account<KpSym, H192> =
+            crate::account::account::tests::TESTING_ACCOUNT.clone();
+
+        let signer_public_account = testing_account.public_account;
+        let data =
+            "ff60983e0c5d21d2fb83c67598d560f3cf0e28ae667b5616aaa58a059666cd8cf826b026243c92cf";
+        let signature = testing_account.sign_data(data).unwrap();
+        assert!(signer_public_account
+            .verify_signature(data, signature)
+            .is_ok());
+    }
+
+    #[test]
+    #[should_panic(expected = "Invalid input length")]
+    fn test_return_panic_if_signature_hash_invalid_length() {
+        let signer_public_account = PublicAccount::<H192>::from_public_key(
+            "22816F825B4CACEA334723D51297D8582332D8B875A5829908AAE85831ABB508",
+            NetworkType::PRIVATE_TEST,
+        )
+        .unwrap();
+
+        let data = "I am so so so awesome as always";
+        let signature = Signature::from_str("B01DCA6484026C2ECDF3C822E64DEAAFC15EBCCE337EEE209C28513CB5351CDED8863A8E7B855CD471B55C91FAE611C5486").unwrap();
+        let _ = signer_public_account.verify_signature(data, signature);
+    }
+
+    #[test]
+    #[should_panic(expected = "Invalid character 'w' at position 123")]
+    fn test_return_panic_if_is_not_strictly_hexadecimal() {
+        let signer_public_account = PublicAccount::<H192>::from_public_key(
+            "22816F825B4CACEA334723D51297D8582332D8B875A5829908AAE85831ABB508",
+            NetworkType::PRIVATE_TEST,
+        )
+            .unwrap();
+
+        let data = "I am so so so awesome as always";
+        let signature = Signature::from_str("B01DCA6484026C2ECDF3C822E64DEAAFC15EBCCE337EEE209C28513CB5351CDED8863A8E7B855CD471B55C91FAE611C548625C9A5916A555A24F72F35a1wwwww").unwrap();
+        let _ = signer_public_account.verify_signature(data, signature);
+    }
+
+    #[test]
+    fn test_return_false_if_wrong_public_key_provided() {
+        let signer_public_account = PublicAccount::<H192>::from_public_key(
+            "12816F825B4CACEA334723D51297D8582332D8B875A5829908AAE85831ABB509",
+            NetworkType::PRIVATE_TEST,
+        )
+            .unwrap();
+
+        let data = "I am so so so awesome as always";
+        let signature = Signature::from_str("B01DCA6484026C2ECDF3C822E64DEAAFC15EBCCE337EEE209C28513CB5351CDED8863A8E7B855CD471B55C91FAE611C548625C9A5916A555A24F72F3526FA508").unwrap();
+        assert!(signer_public_account
+            .verify_signature(data, signature)
+            .is_err());
+    }
+
+    #[test]
+    fn test_return_false_if_data_is_not_corresponding_to_signature_provided() {
+        let signer_public_account = PublicAccount::<H192>::from_public_key(
+            "22816F825B4CACEA334723D51297D8582332D8B875A5829908AAE85831ABB508",
+            NetworkType::PRIVATE_TEST,
+        )
+            .unwrap();
+
+        let data = "I am awesome as always";
+        let signature = Signature::from_str("B01DCA6484026C2ECDF3C822E64DEAAFC15EBCCE337EEE209C28513CB5351CDED8863A8E7B855CD471B55C91FAE611C548625C9A5916A555A24F72F3526FA508").unwrap();
+        assert!(signer_public_account
+            .verify_signature(data, signature)
+            .is_err());
+    }
+
+    #[test]
+    fn test_return_false_if_signature_is_not_corresponding_to_data_provided() {
+        let signer_public_account = PublicAccount::<H192>::from_public_key(
+            "22816F825B4CACEA334723D51297D8582332D8B875A5829908AAE85831ABB508",
+            NetworkType::PRIVATE_TEST,
+        )
+            .unwrap();
+
+        let data = "I am so so so awesome as always";
+        let signature = Signature::from_str("A01DCA6484026C2ECDF3C822E64DEAAFC15EBCCE337EEE209C28513CB5351CDED8863A8E7B855CD471B55C91FAE611C548625C9A5916A555A24F72F3526FA509").unwrap();
+        assert!(signer_public_account
+            .verify_signature(data, signature)
+            .is_err());
+    }
 }

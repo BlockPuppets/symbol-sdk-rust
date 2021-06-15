@@ -11,11 +11,11 @@
 use std::str::FromStr;
 
 use hex::ToHex;
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde::de::Error;
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-use crate::core::format::encode_base32;
 use crate::account::AddressSym;
+use crate::core::format::encode_base32;
 use crate::AddressNis1;
 
 pub type GenerationHash = H256;
@@ -30,8 +30,8 @@ construct_fixed_hash! {
 
 impl Serialize for H256 {
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-        where
-            S: Serializer,
+    where
+        S: Serializer,
     {
         serializer.serialize_str(&self.encode_hex_upper::<String>())
     }
@@ -44,8 +44,8 @@ construct_fixed_hash! {
 
 impl<'de> Deserialize<'de> for H512 {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where
-            D: Deserializer<'de>,
+    where
+        D: Deserializer<'de>,
     {
         let string = String::deserialize(deserializer)?;
         H512::from_str(string.as_ref()).map_err(|e| D::Error::custom(e))
@@ -54,8 +54,8 @@ impl<'de> Deserialize<'de> for H512 {
 
 impl Serialize for H512 {
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-        where
-            S: Serializer,
+    where
+        S: Serializer,
     {
         serializer.serialize_str(&self.encode_hex_upper::<String>())
     }
@@ -69,8 +69,8 @@ construct_fixed_hash! {
 
 impl Serialize for H192 {
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-        where
-            S: Serializer,
+    where
+        S: Serializer,
     {
         serializer.serialize_str(&self.to_base32())
     }
@@ -107,8 +107,8 @@ construct_fixed_hash! {
 #[cfg(feature = "nis1")]
 impl Serialize for H200 {
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-        where
-            S: Serializer,
+    where
+        S: Serializer,
     {
         serializer.serialize_str(&self.to_base32())
     }
