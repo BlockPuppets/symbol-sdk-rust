@@ -15,6 +15,8 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde::de::Error;
 
 use crate::core::format::encode_base32;
+use crate::account::AddressSym;
+use crate::AddressNis1;
 
 pub type GenerationHash = H256;
 
@@ -81,10 +83,10 @@ impl AddressSchema for H192 {
         self.as_bytes()
     }
     fn size_suffix(&self) -> usize {
-        3
+        AddressSym::CHECKSUM_SIZE
     }
     fn to_base32(&self) -> String {
-        encode_base32(&self.as_bytes(), 39)
+        encode_base32(&self.as_bytes(), AddressSym::LENGTH_IN_BASE32)
     }
 }
 
@@ -120,9 +122,9 @@ impl AddressSchema for H200 {
         self.as_bytes()
     }
     fn size_suffix(&self) -> usize {
-        4
+        AddressNis1::CHECKSUM_SIZE
     }
     fn to_base32(&self) -> String {
-        encode_base32(&self.as_bytes(), 40)
+        encode_base32(&self.as_bytes(), AddressNis1::LENGTH_IN_BASE32)
     }
 }

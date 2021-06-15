@@ -14,14 +14,15 @@ use std::fmt::Debug;
 use std::str::FromStr;
 
 use anyhow::{anyhow, ensure, Result};
-use serde::{Serialize, Serializer};
 use serde::ser::SerializeStruct;
+use serde::{Serialize, Serializer};
 
-use crate::{AddressSchema, H256};
-use crate::core::format::{decode_base32, public_key_to_address, raw_prettify};
-use crate::helpers::H192;
+use crate::core::format::{decode_base32, is_valid_address, public_key_to_address, raw_prettify};
 use crate::helpers::is_hex;
+use crate::helpers::H192;
 use crate::network::NetworkType;
+use crate::{hex_decode, AddressSchema, H256};
+use hex::ToHex;
 
 pub type AddressSym = Address<H192>;
 
@@ -52,11 +53,23 @@ impl<H: AddressSchema> Address<H> {
     pub fn prettify(&self) -> String {
         raw_prettify(&self.address_str(), self.address.size_suffix())
     }
+
+    /// `Address` in the encoded format ex:
+    ///
+    /// * Before: 985328D6382688F9EF65EBCE38857910D8A64031B784BC17
+    /// * After: TBJSRVRYE2EPT33F5PHDRBLZCDMKMQBRW6CLYFY
+    pub fn address_encoded(&self) -> String {
+        self.address.as_bytes().encode_hex_upper::<String>()
+    }
 }
 
 impl AddressSym {
     /// The length of the Symbol `Address` in base32 string.
-    const LENGTH_IN_BASE32: usize = 39;
+    pub const LENGTH_IN_BASE32: usize = 39;
+
+    pub const LENGTH_IN_DECODED: usize = std::mem::size_of::<H192>();
+
+    pub const CHECKSUM_SIZE: usize = 3;
 
     /// Creates an Symbol `Address` from a given public_key string.
     ///
@@ -91,8 +104,11 @@ impl AddressSym {
         let public_key_hash =
             H256::from_str(public_key).map_err(|e| anyhow!("public_key {}", e))?;
 
-        let address_vec =
-            public_key_to_address::<sha3::Sha3_256, H192>(public_key_hash, network_type, 3);
+        let address_vec = public_key_to_address::<sha3::Sha3_256, H192>(
+            public_key_hash,
+            network_type,
+            Self::CHECKSUM_SIZE,
+        );
 
         Ok(Self {
             address: H192::from_slice(address_vec.as_slice()),
@@ -133,8 +149,9 @@ impl AddressSym {
         let address_raw = raw_address.as_ref().trim().replace("-", "");
         ensure!(
             address_raw.len() == Self::LENGTH_IN_BASE32,
-            "Invalid raw_address length {} ",
-            address_raw.len()
+            "Address {} has to be {} characters long",
+            address_raw,
+            Self::LENGTH_IN_BASE32
         );
 
         let network_identifier = address_raw.to_uppercase().chars().next().unwrap();
@@ -181,10 +198,50 @@ impl AddressSym {
 
         let address =
             H192::from_str(encoded.as_ref()).map_err(|e| anyhow!("encoded address {}", e))?;
-        Ok(Self {
-            address,
-            network_type: NetworkType::try_from(address.0[0])?,
-        })
+
+        Self::from_raw(address.to_base32())
+    }
+
+    /// Determines the validity of an raw address string.
+    ///
+    /// # Inputs
+    ///
+    /// * `raw_address`: The raw address string. Expected format VATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA35C4KNQ.
+    ///
+    /// # Returns
+    ///
+    /// true if the raw address string is valid, false otherwise.
+    ///
+    pub fn is_valid_raw_address(raw_address: String) -> bool {
+        if !['A', 'I', 'Q', 'Y'].contains(raw_address.chars().last().as_ref().unwrap()) {
+            return false;
+        };
+        let mut address = H192::zero();
+        decode_base32(address.as_mut(), &raw_address);
+        is_valid_address(
+            address.as_bytes(),
+            Self::LENGTH_IN_DECODED,
+            Self::CHECKSUM_SIZE,
+        )
+    }
+
+    /// Determines the validity of an encoded address string.
+    /// # Inputs
+    ///
+    /// * `encoded`: The encoded address string. Expected format: 6823BB7C3C089D996585466380EDBDC19D4959184893E38C.
+    /// # Returns
+    ///
+    /// true if the encoded address string is valid, false otherwise.
+    ///
+    pub fn is_valid_encoded_address(encoded: String) -> bool {
+        if !is_hex(&encoded) {
+            return false;
+        }
+        is_valid_address(
+            &hex_decode(&encoded),
+            Self::LENGTH_IN_DECODED,
+            Self::CHECKSUM_SIZE,
+        )
     }
 }
 
@@ -200,12 +257,311 @@ impl<H: Serialize> fmt::Display for Address<H> {
 
 impl<H: Serialize> Serialize for Address<H> {
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-        where
-            S: Serializer,
+    where
+        S: Serializer,
     {
         let mut rgb = serializer.serialize_struct("Address", 2)?;
         rgb.serialize_field("address", &self.address)?;
         rgb.serialize_field("network_type", &self.network_type)?;
         rgb.end()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::account::Account;
+    use crate::account::Address;
+    use crate::network::NetworkType;
+    use crate::KpSym;
+    use crate::H192;
+
+    const PUBLIC_KEY: &str = "2E834140FD66CF87B254A693A2C7862C819217B676D3943267156625E816EC6F";
+
+    #[test]
+    fn test_should_create_given_public_key_with_network_type_private_test() {
+        let address =
+            Address::<H192>::from_public_key(PUBLIC_KEY, NetworkType::PRIVATE_TEST).unwrap();
+        assert_eq!(
+            address.address_str(),
+            "VATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA35C4KNQ"
+        );
+        assert_eq!(address.network_type, NetworkType::PRIVATE_TEST);
+    }
+
+    #[test]
+    fn test_should_print_the_address_in_pretty_format() {
+        let address =
+            Address::<H192>::from_public_key(PUBLIC_KEY, NetworkType::PRIVATE_TEST).unwrap();
+        assert_eq!(
+            address.prettify(),
+            "VATNE7-Q5BITM-UTRRN6-IB4I7F-LSDRDW-ZA35C4-KNQ"
+        );
+    }
+
+    #[test]
+    fn test_should_create_given_public_key_with_network_type_private() {
+        let address = Address::<H192>::from_public_key(PUBLIC_KEY, NetworkType::PRIVATE).unwrap();
+        assert_eq!(
+            address.address_str(),
+            "PATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA35OETNI"
+        );
+        assert_eq!(address.network_type, NetworkType::PRIVATE);
+    }
+
+    #[test]
+    fn test_should_create_given_public_key_with_network_type_main_net() {
+        let address = Address::<H192>::from_public_key(PUBLIC_KEY, NetworkType::MAIN_NET).unwrap();
+        assert_eq!(
+            address.address_str(),
+            "NATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA34SQ33Y"
+        );
+        assert_eq!(address.network_type, NetworkType::MAIN_NET);
+    }
+
+    #[test]
+    fn test_should_create_given_public_key_with_network_type_test_net() {
+        let address = Address::<H192>::from_public_key(PUBLIC_KEY, NetworkType::TEST_NET).unwrap();
+        assert_eq!(
+            address.address_str(),
+            "TATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA37JGO5Q"
+        );
+        assert_eq!(address.network_type, NetworkType::TEST_NET);
+    }
+
+    #[test]
+    fn test_should_create_given_vatne7q5bitmutrrn6ib4i7flsdrdwza35c4knq() {
+        let address = Address::<H192>::from_raw("VATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA35C4KNQ").unwrap();
+        assert_eq!(address.network_type, NetworkType::PRIVATE_TEST);
+    }
+
+    #[test]
+    fn test_should_create_given_patne7q5bitmutrrn6ib4i7flsdrdwza35oetni() {
+        let address = Address::<H192>::from_raw("PATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA35OETNI").unwrap();
+        assert_eq!(address.network_type, NetworkType::PRIVATE);
+    }
+
+    #[test]
+    fn test_should_create_given_natne7q5bitmutrrn6ib4i7flsdrdwza34sq33y() {
+        let address = Address::<H192>::from_raw("NATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA34SQ33Y").unwrap();
+        assert_eq!(address.network_type, NetworkType::MAIN_NET);
+    }
+
+    #[test]
+    fn test_should_create_given_tatne7q5bitmutrrn6ib4i7flsdrdwza37jgo5q() {
+        let address = Address::<H192>::from_raw("TATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA37JGO5Q").unwrap();
+        assert_eq!(address.network_type, NetworkType::TEST_NET);
+    }
+
+    #[test]
+    fn test_should_create_given_vatne7_q5bitm_utrrn6_ib4i7f_lsdrdw_za35c4_knq() {
+        let address =
+            Address::<H192>::from_raw("VATNE7-Q5BITM-UTRRN6-IB4I7F-LSDRDW-ZA35C4-KNQ").unwrap();
+        assert_eq!(address.network_type, NetworkType::PRIVATE_TEST);
+        assert_eq!(
+            address.prettify(),
+            "VATNE7-Q5BITM-UTRRN6-IB4I7F-LSDRDW-ZA35C4-KNQ"
+        );
+    }
+
+    #[test]
+    #[should_panic(expected = "Address Network unsupported")]
+    fn test_should_panic_when_the_address_contain_an_invalid_network_identifier() {
+        Address::<H192>::from_raw("ZCTVW23D2MN5VE4AQ4TZIDZENGNOZXPRPSDRSFR").unwrap();
+    }
+
+    #[test]
+    #[should_panic(
+        expected = "Address ZCTVW234AQ4TZIDZENGNOZXPRPSDRSFRF has to be 39 characters long"
+    )]
+    fn test_should_panic_when_the_address_is_not_valid_in_length() {
+        Address::<H192>::from_raw("ZCTVW234AQ4TZIDZENGNOZXPRPSDRSFRF").unwrap();
+    }
+
+    #[test]
+    fn test_should_turn_a_lowercase_address_to_uppercase() {
+        let address = Address::<H192>::from_raw("tatne7q5bitmutrrn6ib4i7flsdrdwza37jgo5q").unwrap();
+        assert_eq!(
+            address.address_str(),
+            "TATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA37JGO5Q"
+        );
+    }
+
+    #[test]
+    fn test_should_equal_addresses() {
+        let address = Address::<H192>::from_raw("TATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA37JGO5Q").unwrap();
+        let compare_address =
+            Address::<H192>::from_raw("TATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA37JGO5Q").unwrap();
+
+        assert_eq!(address, compare_address);
+    }
+
+    #[test]
+    fn test_should_not_equal_addresses() {
+        let address = Address::<H192>::from_raw("TATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA37JGO5Q").unwrap();
+        let compare_address =
+            Address::<H192>::from_raw("TDR6EW2WBHJQDYMNGFX2UBZHMMZC5PGL2YBO3KA").unwrap();
+
+        assert_ne!(address, compare_address);
+    }
+
+    #[test]
+    fn test_should_creates_from_an_encoded_value() {
+        let encoded = "917E7E29A01014C2F3000000000000000000000000000000";
+        let address = Address::<H192>::from_encoded(encoded).unwrap();
+        assert_eq!(address.address_encoded(), encoded);
+    }
+
+    #[cfg(test)]
+    mod tests_valid_raw_address {
+        use super::*;
+
+        #[test]
+        fn test_returns_true_for_valid_address_when_generated() {
+            assert!(Address::<H192>::is_valid_raw_address(
+                Account::<KpSym, H192>::random(NetworkType::PRIVATE_TEST).address_str()
+            ));
+            assert!(Address::<H192>::is_valid_raw_address(
+                Account::<KpSym, H192>::random(NetworkType::MAIN_NET).address_str()
+            ));
+            assert!(Address::<H192>::is_valid_raw_address(
+                Account::<KpSym, H192>::random(NetworkType::PRIVATE).address_str()
+            ));
+            assert!(Address::<H192>::is_valid_raw_address(
+                Account::<KpSym, H192>::random(NetworkType::TEST_NET).address_str()
+            ));
+        }
+
+        #[test]
+        fn test_returns_true_for_valid_address() {
+            let raw_address = "VATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA35C4KNQ";
+            assert!(Address::<H192>::is_valid_raw_address(
+                raw_address.to_string()
+            ));
+        }
+
+        #[test]
+        fn test_returns_false_for_address_with_invalid_checksum() {
+            let raw_address = "SATNE7Q5BITMUTRRN6YB4I7FLSDRDWZA34I2PMQ";
+            assert_eq!(
+                Address::<H192>::is_valid_raw_address(raw_address.to_string()),
+                false
+            );
+        }
+
+        #[test]
+        fn test_returns_false_for_address_with_invalid_hash() {
+            let raw_address = "SATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA34I2PQQ";
+            assert_eq!(
+                Address::<H192>::is_valid_raw_address(raw_address.to_string()),
+                false
+            );
+        }
+
+        #[test]
+        fn test_returns_false_for_address_with_invalid_prefix() {
+            let raw_address = "AATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA34I2PMQ";
+            assert_eq!(
+                Address::<H192>::is_valid_raw_address(raw_address.to_string()),
+                false
+            );
+        }
+
+        #[test]
+        fn test_returns_true_if_last_char_in_a_or_i_or_q_or_y() {
+            const RAW_ADDRESS: [&str; 4] = [
+                "NAR3W7B4BCOZSZMFIZRYB3N5YGOUSWIYJCJ6HDA",
+                "TDZ4373ASEGJ7S7GQTKF26TIIMC7HK5EWEPHRSI",
+                "PDZ4373ASEGJ7S7GQTKF26TIIMC7HK5EWELJG3Y",
+                "MCOVTFVVDZGNURZFU4IJLJR37X5TXNWMTTARXZQ",
+            ];
+
+            for address in &RAW_ADDRESS {
+                assert!(Address::<H192>::is_valid_raw_address(address.to_string()));
+            }
+        }
+    }
+
+    #[cfg(test)]
+    mod tests_valid_encoded_address {
+        use super::*;
+
+        #[test]
+        fn test_returns_true_for_valid_address_when_generated() {
+            assert!(Address::<H192>::is_valid_encoded_address(
+                Account::<KpSym, H192>::random(NetworkType::PRIVATE_TEST)
+                    .public_account
+                    .address
+                    .address_encoded()
+            ));
+            assert!(Address::<H192>::is_valid_encoded_address(
+                Account::<KpSym, H192>::random(NetworkType::MAIN_NET)
+                    .public_account
+                    .address
+                    .address_encoded()
+            ));
+            assert!(Address::<H192>::is_valid_encoded_address(
+                Account::<KpSym, H192>::random(NetworkType::PRIVATE)
+                    .public_account
+                    .address
+                    .address_encoded()
+            ));
+            assert!(Address::<H192>::is_valid_encoded_address(
+                Account::<KpSym, H192>::random(NetworkType::TEST_NET)
+                    .public_account
+                    .address
+                    .address_encoded()
+            ));
+        }
+        #[test]
+        fn test_returns_true_for_valid_encoded_address() {
+            let encoded = "6823BB7C3C089D996585466380EDBDC19D4959184893E38C";
+            assert!(Address::<H192>::is_valid_encoded_address(
+                encoded.to_string()
+            ));
+        }
+
+        #[test]
+        fn test_returns_false_for_invalid_hex_encoded_address() {
+            let encoded = "Z823BB7C3C089D996585466380EDBDC19D4959184893E38C";
+            assert_eq!(
+                Address::<H192>::is_valid_encoded_address(encoded.to_string()),
+                false
+            );
+        }
+
+        #[test]
+        fn test_returns_false_for_invalid_encoded_address() {
+            let encoded = "6823BB7C3C089D996585466380EDBDC19D4959184893E38D";
+            assert_eq!(
+                Address::<H192>::is_valid_encoded_address(encoded.to_string()),
+                false
+            );
+        }
+
+        #[test]
+        fn test_returns_false_for_encoded_address_with_wrong_length() {
+            let encoded = "6823BB7C3C089D996585466380EDBDC19D4959184893E38CEE";
+            assert_eq!(
+                Address::<H192>::is_valid_encoded_address(encoded.to_string()),
+                false
+            );
+        }
+
+        #[test]
+        fn test_adding_leading_or_trailing_white_space_invalidates_encoded_address() {
+            let encoded = "6823BB7C3C089D996585466380EDBDC19D4959184893E38C";
+            assert_eq!(
+                Address::<H192>::is_valid_encoded_address(format!(" \t {}", encoded)),
+                false
+            );
+            assert_eq!(
+                Address::<H192>::is_valid_encoded_address(format!("{} \t ", encoded)),
+                false
+            );
+            assert_eq!(
+                Address::<H192>::is_valid_encoded_address(format!(" \t {} \t ", encoded)),
+                false
+            );
+        }
     }
 }

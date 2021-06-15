@@ -48,12 +48,12 @@ pub enum NetworkType {
 impl NetworkType {
     pub const PREFIX_TEST_NET: char = 'T';
     pub const PREFIX_MAIN_NET: char = 'N';
-    pub const PREFIX_PRIVATE_TEST: char = 'P';
-    pub const PREFIX_PRIVATE: char = 'V';
+    pub const PREFIX_PRIVATE_TEST: char = 'V';
+    pub const PREFIX_PRIVATE: char = 'P';
     pub const PREFIX_MIJIN_TEST: char = 'S';
     pub const PREFIX_MIJIN: char = 'M';
 
-    const UNKNOWN_NETWORK_TYPE: &'static str = "Unknown NetworkType";
+    const UNKNOWN_NETWORK_TYPE: &'static str = "Address Network unsupported";
 
     pub fn value(self) -> u8 {
         self as u8

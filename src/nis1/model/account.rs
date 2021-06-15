@@ -15,10 +15,10 @@ use anyhow::{anyhow, ensure, Result};
 use crypto::prelude::{KeyPairSchema, PrivateKey, PublicKey};
 use hex::ToHex;
 
-use crate::{H200, H256, is_hex, KpNis1};
-use crate::account::{Account, Address, PublicAccount, verify_signature};
+use crate::account::{verify_signature, Account, Address, PublicAccount};
 use crate::core::format::{decode_base32, public_key_to_address};
 use crate::network::NetworkType;
+use crate::{is_hex, KpNis1, H200, H256};
 
 pub type AddressNis1 = Address<H200>;
 pub type PublicAccountNis1 = PublicAccount<H200>;
@@ -36,7 +36,7 @@ impl AccountNis1 {
             key_pair.private_key.encode_hex_upper::<String>(),
             network_type,
         )
-            .unwrap()
+        .unwrap()
     }
 
     pub fn from_hex_private_key<S: AsRef<str>>(
@@ -80,7 +80,11 @@ impl PublicAccountNis1 {
 
 impl AddressNis1 {
     /// The length of the Nis1 `Address` in base32 string.
-    const LENGTH_IN_BASE32: usize = 40;
+    pub const LENGTH_IN_BASE32: usize = 40;
+
+    pub const LENGTH_IN_DECODED: usize = std::mem::size_of::<H200>();
+
+    pub const CHECKSUM_SIZE: usize = 4;
 
     pub fn from_public_key(public_key: &str, network_type: NetworkType) -> Result<Self> {
         ensure!(is_hex(public_key), "public_key it's not hex.");
@@ -91,7 +95,7 @@ impl AddressNis1 {
             H256::from_str(public_key).map_err(|e| anyhow!("public_key {}", e))?;
 
         let address_vec =
-            public_key_to_address::<sha3::Keccak256, H200>(public_key_hash, network_type, 4);
+            public_key_to_address::<sha3::Keccak256, H200>(public_key_hash, network_type, Self::CHECKSUM_SIZE);
 
         Ok(Self {
             address: H200::from_slice(address_vec.as_slice()),

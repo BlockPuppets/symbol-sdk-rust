@@ -12,7 +12,7 @@ use ::std::mem::size_of;
 
 use base32::Alphabet::RFC4648;
 use ripemd160::Ripemd160;
-use sha3::Digest;
+use sha3::{Digest, Sha3_256};
 
 use crate::H256;
 use crate::network::NetworkType;
@@ -60,4 +60,16 @@ pub fn raw_prettify(address: &str, size_suffix: usize) -> String {
 
     res += &address[address.len() - size_suffix..];
     res
+}
+
+pub fn is_valid_address(decoded: &[u8], sizes_decoded: usize, checksum_size: usize) -> bool {
+    if sizes_decoded != decoded.len() {
+        return false;
+    }
+
+    let checksum_begin = sizes_decoded - checksum_size;
+    let hash = Sha3_256::digest(&decoded[..checksum_begin]);
+    let mut checksum = Vec::with_capacity(checksum_size);
+    checksum.append(&mut hash[..checksum_size].to_vec());
+    checksum == &decoded[checksum_begin..]
 }
