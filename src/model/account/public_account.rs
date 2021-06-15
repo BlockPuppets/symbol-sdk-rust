@@ -67,15 +67,14 @@ impl PublicAccountSym {
     /// # Example
     ///
     /// ```
-    /// use symbol_sdk::account::PublicAccount;
+    /// use symbol_sdk::account::PublicAccountSym;
     /// use symbol_sdk::network::NetworkType;
     ///
     /// #
     /// # fn main() {
     /// #
-    /// use symbol_sdk::Sym;
     /// let public_key: &str = "2E834140FD66CF87B254A693A2C7862C819217B676D3943267156625E816EC6F";
-    /// let public_account = PublicAccount::<KpSym>::from_public_key(public_key,
+    /// let public_account = PublicAccountSym::from_public_key(public_key,
     /// NetworkType::TEST_NET)
     /// .unwrap();
     /// # println!("{}", public_account);

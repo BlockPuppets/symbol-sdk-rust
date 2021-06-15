@@ -1,7 +1,4 @@
-use symbol_sdk::{Client, Retry, H256};
-use symbol_sdk::account::{PublicAccount, Address};
-use symbol_sdk::block_search_criteria::BlockSearchCriteria;
-use std::str::FromStr;
+use symbol_sdk::{Client, Retry};
 
 #[tokio::main]
 async fn main() {

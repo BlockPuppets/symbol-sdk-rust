@@ -127,14 +127,13 @@ impl AccountSym {
     /// # Example
     ///
     /// ```
-    /// use symbol_sdk::Sym;
-    /// use symbol_sdk::account::Account;
+    /// use symbol_sdk::account::AccountSym;
     /// use symbol_sdk::network::NetworkType;
     ///
     /// #
     /// # fn main() {
     /// #
-    /// let account = Account::<KpSym>::random(NetworkType::TEST_NET);
+    /// let account = AccountSym::random(NetworkType::TEST_NET);
     /// # println!("{}", account);
     /// # }
     /// ```
@@ -165,7 +164,7 @@ impl AccountSym {
     /// # Example
     ///
     /// ```
-    /// use symbol_sdk::Sym;
+    /// use symbol_sdk::{KpSym, H192};
     /// use symbol_sdk::account::Account;
     /// use symbol_sdk::network::NetworkType;
     ///
@@ -173,7 +172,7 @@ impl AccountSym {
     /// # fn main() {
     /// #
     /// let private_key: &str = "75027D85CE92E2C469297F4C91E4E88AE03868A91B23C835AEF7C5EFDAD0DBDB";
-    /// let account = Account::<KpSym>::from_hex_private_key(private_key, NetworkType::TEST_NET).unwrap();
+    /// let account = Account::<KpSym, H192>::from_hex_private_key(private_key, NetworkType::TEST_NET).unwrap();
     /// # println!("{}", account);
     /// # }
     /// ```
@@ -211,14 +210,14 @@ impl AccountSym {
     /// # Example
     ///
     /// ```
-    /// use symbol_sdk::Sym;
+    /// use symbol_sdk::{KpSym, H192};
     /// use symbol_sdk::account::Account;
     /// use symbol_sdk::network::NetworkType;
     ///
     /// #
     /// # fn main() {
     /// #
-    /// let (account, mnemonic) = Account::<KpSym>::create_with_mnemonic("any_password", NetworkType::TEST_NET).unwrap();
+    /// let (account, mnemonic) = Account::<KpSym, H192>::create_with_mnemonic("any_password", NetworkType::TEST_NET).unwrap();
     /// # println!("{}", account);
     /// # println!("{}", mnemonic);
     /// # }
@@ -250,7 +249,7 @@ impl AccountSym {
     /// # Example
     ///
     /// ```
-    /// use symbol_sdk::Sym;
+    /// use symbol_sdk::{KpSym, H192};
     /// use symbol_sdk::account::Account;
     /// use symbol_sdk::network::NetworkType;
     ///
@@ -260,7 +259,7 @@ impl AccountSym {
     /// let mnemonic: &str = r"force night tumble pole record inflict idea bone deal section
     ///                         essay razor hunt kiwi drill include rifle broken lucky infant
     ///                         satoshi sweet boss blue";
-    /// let account = Account::<KpSym>::from_mnemonic(mnemonic , "any_password", NetworkType::TEST_NET).unwrap();
+    /// let account = Account::<KpSym, H192>::from_mnemonic(mnemonic , "any_password", NetworkType::TEST_NET).unwrap();
     /// # println!("{}", account);
     /// # }
     /// ```

@@ -82,14 +82,14 @@ impl AddressSym {
     /// # Example
     ///
     /// ```
-    /// use symbol_sdk::account::Address;
+    /// use symbol_sdk::account::AddressSym;
     /// use symbol_sdk::network::NetworkType;
     ///
     /// #
     /// # fn main() {
     /// #
     /// let public_key: &str = "2E834140FD66CF87B254A693A2C7862C819217B676D3943267156625E816EC6F";
-    /// let address = Address::from_public_key(public_key, NetworkType::TEST_NET).unwrap();
+    /// let address = AddressSym::from_public_key(public_key, NetworkType::TEST_NET).unwrap();
     /// # println!("{}", address);
     /// # }
     /// ```
@@ -130,13 +130,13 @@ impl AddressSym {
     /// # Example
     ///
     /// ```
-    /// use symbol_sdk::account::Address;
+    /// use symbol_sdk::account::AddressSym;
     ///
     /// #
     /// # fn main() {
     /// #
     /// let raw_address: &str = "TATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA37JGO5Q";
-    /// let address = Address::from_raw(raw_address).unwrap();
+    /// let address = AddressSym::from_raw(raw_address).unwrap();
     /// # println!("{}", address);
     /// # }
     /// ```
@@ -178,13 +178,13 @@ impl AddressSym {
     /// # Example
     ///
     /// ```
-    /// use symbol_sdk::account::Address;
+    /// use symbol_sdk::account::AddressSym;
     ///
     /// #
     /// # fn main() {
     /// #
     /// let encoded: &str = "908E2C873E8552039933562AFB74A193B48BDD300BEBDB93";
-    /// let address = Address::from_encoded(encoded).unwrap();
+    /// let address = AddressSym::from_encoded(encoded).unwrap();
     /// # println!("{}", address);
     /// # }
     /// ```
