@@ -8,7 +8,7 @@
  * // except according to those terms.
  */
 
-use crate::{BlockSearchCriteria, H192, H256, Order, RetryStrategy};
+use crate::{BlockSearchCriteria, H256, Order, RetryStrategy};
 use crate::blockchain::{BlockInfo, MerkleProofInfo};
 use crate::clients::{
     Error,
@@ -30,7 +30,7 @@ impl<R: RetryStrategy> BlockApi<R> {
     /// A `Result` whose okay value is an `BlockInfo` or whose error value
     /// is an `Error` describing the error that occurred.
     ///
-    pub async fn get_block_by_height(&self, height: u64) -> Result<BlockInfo<H192>, Error> {
+    pub async fn get_block_by_height(&self, height: u64) -> Result<BlockInfo, Error> {
         let resp: Response<BlockInfoDto> = self
             .as_ref()
             .send(Request::get_block_by_height(height))
@@ -128,7 +128,7 @@ impl<R: RetryStrategy> BlockApi<R> {
         page_number: Option<i32>,
         offset: Option<&str>,
         order: Option<Order>,
-    ) -> Result<Vec<BlockInfo<H192>>, Error> {
+    ) -> Result<Vec<BlockInfo>, Error> {
         let resp: Response<BlockPageDto> = self
             .as_ref()
             .send(Request::search_blocks(

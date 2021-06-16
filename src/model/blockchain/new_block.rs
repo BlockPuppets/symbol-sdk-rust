@@ -8,16 +8,16 @@
  * // except according to those terms.
  */
 
-use crate::{GenerationHash, H256, H512};
 use crate::account::{Address, PublicAccount};
 use crate::network::NetworkType;
+use crate::{GenerationHash, H192, H256, H512};
 
 use super::BlockType;
 
 /// The block info structure describes basic information of a new gernated block (Websocket payload).
 ///
 #[derive(Debug, Deserialize, Serialize)]
-pub struct NewBlockInfo<H> {
+pub struct NewBlockInfo {
     /// The block hash.
     pub hash: H256,
 
@@ -33,7 +33,7 @@ pub struct NewBlockInfo<H> {
     pub signature: H512,
 
     /// The public account of block harvester.
-    pub signer: PublicAccount<H>,
+    pub signer: PublicAccount<H192>,
 
     /// The network type.
     pub network_type: NetworkType,
@@ -77,5 +77,5 @@ pub struct NewBlockInfo<H> {
 
     /// The beneficiary address.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub beneficiary_address: Option<Address<H>>,
+    pub beneficiary_address: Option<Address<H192>>,
 }

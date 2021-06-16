@@ -12,7 +12,7 @@ use std::fmt;
 
 use serde::Serialize;
 
-use crate::{AddressSchema, GenerationHash, H192, H256, H512};
+use crate::{GenerationHash, H192, H256, H512};
 use crate::account::{Address, PublicAccount};
 use crate::network::NetworkType;
 
@@ -21,7 +21,7 @@ use super::BlockType;
 /// The normal block info structure describes basic information of a block.
 ///
 #[derive(Debug, Deserialize, Serialize)]
-pub struct BlockInfo<H: AddressSchema> {
+pub struct BlockInfo {
     /// The block hash.
     pub hash: H256,
 
@@ -81,7 +81,7 @@ pub struct BlockInfo<H: AddressSchema> {
 
     /// The beneficiary address.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub beneficiary_address: Option<Address<H>>,
+    pub beneficiary_address: Option<Address<H192>>,
 
     /// The database record id.
     pub record_id: String,
@@ -108,7 +108,7 @@ pub struct BlockInfo<H: AddressSchema> {
     pub nemesis_importance_info: Option<NemesisImportanceBlockInfo>,
 }
 
-impl fmt::Display for BlockInfo<H192> {
+impl fmt::Display for BlockInfo {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,

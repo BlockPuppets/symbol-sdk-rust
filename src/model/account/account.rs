@@ -57,7 +57,7 @@ impl<Kp: KeyPairSchema, H: AddressSchema> Account<Kp, H> {
     ///  Account private key to hex String.
     ///
     pub fn private_key_to_hex(&self) -> String {
-        self.key_pair.private_key().encode_hex_upper::<String>()
+        self.key_pair.private_key().encode_hex::<String>()
     }
 
     /// Sign raw data.
@@ -353,7 +353,7 @@ impl<Kp: KeyPairSchema + serde::Serialize, H: AddressSchema + Serialize> Seriali
 
 // internal function.
 pub(crate) fn sign_data<Kp: KeyPairSchema>(kp: Kp, data: &str) -> Result<Signature> {
-    ensure!(!data.is_empty(), "data cannot be empty");
+    // ensure!(!data.is_empty(), "data cannot be empty");
 
     let data = if is_hex(data) {
         hex::decode(data)?
@@ -377,5 +377,149 @@ pub(crate) mod tests {
             NetworkType::PRIVATE_TEST
         )
         .unwrap();
+        pub static ref MULTISIG_ACCOUNT: Account<KpSym, H192> = AccountSym::from_hex_private_key(
+            "5edebfdbeb32e9146d05ffd232c8af2cf9f396caf9954289daa0362d097fff3b",
+            NetworkType::PRIVATE_TEST
+        )
+        .unwrap();
+        pub static ref COSIGNATORY_ACCOUNT: Account<KpSym, H192> =
+            AccountSym::from_hex_private_key(
+                "2a2b1f5d366a5dd5dc56c3c757cf4fe6c66e2787087692cf329d7a49a594658b",
+                NetworkType::PRIVATE_TEST
+            )
+            .unwrap();
+        pub static ref COSIGNATORY2_ACCOUNT: Account<KpSym, H192> =
+            AccountSym::from_hex_private_key(
+                "b8afae6f4ad13a1b8aad047b488e0738a437c7389d4ff30c359ac068910c1d59",
+                NetworkType::PRIVATE_TEST
+            )
+            .unwrap();
+        pub static ref COSIGNATORY3_ACCOUNT: Account<KpSym, H192> =
+            AccountSym::from_hex_private_key(
+                "111602be4d36f92dd60ca6a3c68478988578f26f6a02f8c72089839515ab603e",
+                NetworkType::PRIVATE_TEST
+            )
+            .unwrap();
+    }
+
+    #[cfg(test)]
+    mod tests_account {
+        use super::*;
+
+        const ADDRESS: &str = "VDLGYM2CBZKBDGK3VT6KFMUM6HE7LXL2WGA37KA";
+        const PUBLIC_KEY: &str = "9801508C58666C746F471538E43002B85B1CD542F9874B2861183919BA8787B6";
+        const PRIVATE_KEY: &str =
+            "26b64cb10f005e5988a36744ca19e20d835ccc7c105aaa5f3b212da593180930";
+
+        #[test]
+        fn test_should_create_from_private_key() {
+            let account = Account::<KpSym, H192>::from_hex_private_key(
+                PRIVATE_KEY,
+                NetworkType::PRIVATE_TEST,
+            )
+            .unwrap();
+            assert_eq!(account.public_key_to_hex(), PUBLIC_KEY.to_lowercase());
+            assert_eq!(account.private_key_to_hex(), PRIVATE_KEY.to_lowercase());
+
+            assert_eq!(account.address_str(), ADDRESS);
+        }
+
+        #[test]
+        fn test_should_return_error_when_the_private_key_is_not_valid() {
+            let account =
+                Account::<KpSym, H192>::from_hex_private_key("", NetworkType::PRIVATE_TEST);
+            assert!(account.is_err());
+        }
+
+        #[test]
+        fn test_should_generate_a_new_account() {
+            let account = Account::<KpSym, H192>::random(NetworkType::PRIVATE_TEST);
+
+            assert_ne!(account.private_key_to_hex(), "");
+            assert_ne!(account.public_key_to_hex(), "");
+            assert_ne!(account.address_str(), "");
+        }
+
+        #[test]
+        fn test_should_return_network_type() {
+            let account = Account::<KpSym, H192>::random(NetworkType::TEST_NET);
+            assert_eq!(account.network_type(), NetworkType::TEST_NET);
+        }
+    }
+
+    #[cfg(test)]
+    mod tests_sign_data {
+        use super::*;
+
+        const PRIVATE_KEY: &str =
+            "AB860ED1FE7C91C02F79C02225DAC708D7BD13369877C1F59E678CC587658C47";
+
+        #[test]
+        fn test_utf8_data() {
+            let account = Account::<KpSym, H192>::from_hex_private_key(
+                PRIVATE_KEY,
+                NetworkType::PRIVATE_TEST,
+            )
+            .unwrap();
+
+            let data = "catapult rocks!";
+
+            let public_account = account.public_account;
+            let signed = account.sign_data(data).unwrap();
+            assert!(public_account.verify_signature(data, signed).is_ok());
+        }
+
+        #[test]
+        fn test_hex_data() {
+            let account = Account::<KpSym, H192>::from_hex_private_key(
+                PRIVATE_KEY,
+                NetworkType::PRIVATE_TEST,
+            )
+            .unwrap();
+
+            let data = "0xAA";
+
+            let public_account = account.public_account;
+            let signed = account.sign_data(data).unwrap();
+            assert!(public_account.verify_signature(data, signed).is_ok());
+        }
+
+        #[test]
+        fn test_hexa_without_0x_prefix_should_be_the_same_as_with_0x() {
+            let account = Account::<KpSym, H192>::from_hex_private_key(
+                PRIVATE_KEY,
+                NetworkType::PRIVATE_TEST,
+            )
+            .unwrap();
+
+            let public_account = account.public_account;
+
+            let signed = account.sign_data("AA").unwrap();
+            let signed_with0x = account.sign_data("0xAA").unwrap();
+
+            assert!(public_account.verify_signature("AA", signed).is_ok());
+            assert!(public_account
+                .verify_signature("0xAA", signed_with0x)
+                .is_ok());
+        }
+
+        #[test]
+        fn test_sign_empty() {
+            let account = Account::<KpSym, H192>::from_hex_private_key(
+                PRIVATE_KEY,
+                NetworkType::PRIVATE_TEST,
+            )
+                .unwrap();
+
+            let public_account = account.public_account;
+
+            let signed = account.sign_data("").unwrap();
+            let signed_with0x = account.sign_data("0x").unwrap();
+
+            assert!(public_account.verify_signature("", signed).is_ok());
+            assert!(public_account
+                .verify_signature("0x", signed_with0x)
+                .is_ok());
+        }
     }
 }

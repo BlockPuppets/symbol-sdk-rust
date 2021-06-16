@@ -12,7 +12,6 @@ use anyhow::Result;
 
 use crate::blockchain::BlockInfo;
 use crate::clients::model_dto::{BlockInfoDto, Pagination};
-use crate::H192;
 
 #[derive(Serialize, Deserialize)]
 pub struct BlockPageDto {
@@ -22,7 +21,7 @@ pub struct BlockPageDto {
 }
 
 impl BlockPageDto {
-    pub fn to_compact(&self) -> Result<Vec<BlockInfo<H192>>> {
+    pub fn to_compact(&self) -> Result<Vec<BlockInfo>> {
         let mut block_info_vec = vec![];
 
         for info in self.data.iter() {

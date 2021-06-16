@@ -29,7 +29,7 @@ pub type AddressSym = Address<H192>;
 /// The `Address` struct describes an Symbol address with its network.
 ///
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Deserialize, Hash)]
-pub struct Address<H> {
+pub struct Address<H: AddressSchema> {
     /// The Symbol address in `H192`.
     pub address: H,
 
@@ -245,7 +245,7 @@ impl AddressSym {
     }
 }
 
-impl<H: Serialize> fmt::Display for Address<H> {
+impl<H: AddressSchema + Serialize> fmt::Display for Address<H> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
@@ -255,7 +255,7 @@ impl<H: Serialize> fmt::Display for Address<H> {
     }
 }
 
-impl<H: Serialize> Serialize for Address<H> {
+impl<H: AddressSchema + Serialize> Serialize for Address<H> {
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
     where
         S: Serializer,

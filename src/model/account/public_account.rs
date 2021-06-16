@@ -12,7 +12,7 @@ use std::fmt;
 use std::fmt::Debug;
 use std::str::FromStr;
 
-use anyhow::{ensure, Result};
+use anyhow::Result;
 use crypto::prelude::{KeyPairSchema, PublicKey};
 use hex::ToHex;
 use serde::Serialize;
@@ -26,7 +26,7 @@ pub type PublicAccountSym = PublicAccount<H192>;
 /// The `PublicAccount` struct contains account's Symbol `Address` and public key.
 ///
 #[derive(Debug, Clone, Copy, Deserialize, Serialize, Eq, PartialEq, Hash)]
-pub struct PublicAccount<H> {
+pub struct PublicAccount<H: AddressSchema> {
     /// the Symbol account's `Address`.
     pub address: Address<H>,
     /// the Symbol account public key in `crypto PublicKey`.
@@ -133,7 +133,7 @@ pub(crate) fn verify_signature<Kp: KeyPairSchema>(
     data: &str,
     signature: crypto::prelude::Signature,
 ) -> Result<()> {
-    ensure!(!data.is_empty(), "data cannot be empty");
+    // ensure!(!data.is_empty(), "data cannot be empty");
 
     let kp = <Kp>::from_null_private_key(public_key);
 
@@ -204,7 +204,7 @@ mod tests {
             "22816F825B4CACEA334723D51297D8582332D8B875A5829908AAE85831ABB508",
             NetworkType::PRIVATE_TEST,
         )
-            .unwrap();
+        .unwrap();
 
         let data = "I am so so so awesome as always";
         let signature = Signature::from_str("B01DCA6484026C2ECDF3C822E64DEAAFC15EBCCE337EEE209C28513CB5351CDED8863A8E7B855CD471B55C91FAE611C548625C9A5916A555A24F72F35a1wwwww").unwrap();
@@ -217,7 +217,7 @@ mod tests {
             "12816F825B4CACEA334723D51297D8582332D8B875A5829908AAE85831ABB509",
             NetworkType::PRIVATE_TEST,
         )
-            .unwrap();
+        .unwrap();
 
         let data = "I am so so so awesome as always";
         let signature = Signature::from_str("B01DCA6484026C2ECDF3C822E64DEAAFC15EBCCE337EEE209C28513CB5351CDED8863A8E7B855CD471B55C91FAE611C548625C9A5916A555A24F72F3526FA508").unwrap();
@@ -232,7 +232,7 @@ mod tests {
             "22816F825B4CACEA334723D51297D8582332D8B875A5829908AAE85831ABB508",
             NetworkType::PRIVATE_TEST,
         )
-            .unwrap();
+        .unwrap();
 
         let data = "I am awesome as always";
         let signature = Signature::from_str("B01DCA6484026C2ECDF3C822E64DEAAFC15EBCCE337EEE209C28513CB5351CDED8863A8E7B855CD471B55C91FAE611C548625C9A5916A555A24F72F3526FA508").unwrap();
@@ -247,7 +247,7 @@ mod tests {
             "22816F825B4CACEA334723D51297D8582332D8B875A5829908AAE85831ABB508",
             NetworkType::PRIVATE_TEST,
         )
-            .unwrap();
+        .unwrap();
 
         let data = "I am so so so awesome as always";
         let signature = Signature::from_str("A01DCA6484026C2ECDF3C822E64DEAAFC15EBCCE337EEE209C28513CB5351CDED8863A8E7B855CD471B55C91FAE611C548625C9A5916A555A24F72F3526FA509").unwrap();
