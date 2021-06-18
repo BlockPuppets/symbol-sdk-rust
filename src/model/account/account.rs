@@ -12,29 +12,30 @@ use std::fmt;
 use std::fmt::Debug;
 
 use anyhow::{ensure, Result};
-use crypto::prelude::{KeyPairSchema, PrivateKey, Signature};
+use crypto::{
+    prelude::{KeyPairSchema, PrivateKey, Signature},
+    sym::Keypair,
+};
 use hex::ToHex;
-use serde::ser::SerializeStruct;
 use serde::{Deserialize, Serialize, Serializer};
+use serde::ser::SerializeStruct;
 
+use crate::{GenerationHash, is_hex};
 use crate::account::PublicAccount;
 use crate::message::{EncryptedMessage, PlainMessage};
 use crate::network::NetworkType;
-use crate::{is_hex, AddressSchema, GenerationHash, KpSym, H192};
-
-pub type AccountSym = Account<KpSym, H192>;
 
 /// The `Account` struct contains account's `Keypair` and `PublicAccount`.
 ///
-#[derive(Debug, Clone, Deserialize, PartialEq, Hash)]
-pub struct Account<Kp: KeyPairSchema, H: AddressSchema> {
+#[derive(Debug, Clone, PartialEq, Hash)]
+pub struct Account {
     /// The keyPair containing the public and private key of this account.
-    pub key_pair: Kp,
+    pub key_pair: Keypair,
     /// The public account of this account.
-    pub public_account: PublicAccount<H>,
+    pub public_account: PublicAccount,
 }
 
-impl<Kp: KeyPairSchema, H: AddressSchema> Account<Kp, H> {
+impl Account {
     /// Get the `Address` in an raw address string format.
     ///
     /// For example: TATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA37JGO5Q
@@ -63,7 +64,7 @@ impl<Kp: KeyPairSchema, H: AddressSchema> Account<Kp, H> {
     /// Sign raw data.
     ///
     pub fn sign_data(&self, data: &str) -> Result<crypto::prelude::Signature> {
-        sign_data::<Kp>(self.key_pair, data)
+        sign_data(self.key_pair, data)
     }
 
     /// Creates an encrypted message from this account to the recipient PublicAccount.
@@ -81,13 +82,13 @@ impl<Kp: KeyPairSchema, H: AddressSchema> Account<Kp, H> {
     pub fn encrypt_message<S: AsRef<str>>(
         &self,
         message: S,
-        recipient_public_account: PublicAccount<H>,
+        recipient_public_account: PublicAccount,
     ) -> Result<EncryptedMessage> {
         let message = message.as_ref();
 
         ensure!(!message.is_empty(), "message must not be empty.");
 
-        EncryptedMessage::create::<Kp::Crypto>(
+        EncryptedMessage::create(
             &message.as_bytes(),
             &self.private_key_to_hex(),
             &recipient_public_account.public_key_to_hex(),
@@ -107,17 +108,14 @@ impl<Kp: KeyPairSchema, H: AddressSchema> Account<Kp, H> {
     pub fn decrypt_message(
         &self,
         encrypted_message: &EncryptedMessage,
-        signer_public_account: PublicAccount<H>,
+        signer_public_account: PublicAccount,
     ) -> Result<PlainMessage> {
-        EncryptedMessage::decrypt::<Kp::Crypto>(
+        EncryptedMessage::decrypt(
             encrypted_message,
             &self.private_key_to_hex(),
             &signer_public_account.public_key_to_hex(),
         )
     }
-}
-
-impl AccountSym {
     /// Creates an Symbol `Account` random.
     ///
     /// # Inputs
@@ -127,13 +125,13 @@ impl AccountSym {
     /// # Example
     ///
     /// ```
-    /// use symbol_sdk::account::AccountSym;
+    /// use symbol_sdk::account::Account;
     /// use symbol_sdk::network::NetworkType;
     ///
     /// #
     /// # fn main() {
     /// #
-    /// let account = AccountSym::random(NetworkType::TEST_NET);
+    /// let account = Account::random(NetworkType::TEST_NET);
     /// # println!("{}", account);
     /// # }
     /// ```
@@ -142,10 +140,9 @@ impl AccountSym {
     ///
     /// A Symbol `Account`.
     pub fn random(network_type: NetworkType) -> Self {
-        let key_pair = <KpSym>::random();
+        let key_pair = Keypair::random();
         let public_key = key_pair.public_key().encode_hex::<String>();
-        let public_account =
-            PublicAccount::<H192>::from_public_key(public_key, network_type).unwrap();
+        let public_account = PublicAccount::from_public_key(public_key, network_type).unwrap();
 
         Self {
             key_pair,
@@ -164,7 +161,6 @@ impl AccountSym {
     /// # Example
     ///
     /// ```
-    /// use symbol_sdk::{KpSym, H192};
     /// use symbol_sdk::account::Account;
     /// use symbol_sdk::network::NetworkType;
     ///
@@ -172,7 +168,7 @@ impl AccountSym {
     /// # fn main() {
     /// #
     /// let private_key: &str = "75027D85CE92E2C469297F4C91E4E88AE03868A91B23C835AEF7C5EFDAD0DBDB";
-    /// let account = Account::<KpSym, H192>::from_hex_private_key(private_key, NetworkType::TEST_NET).unwrap();
+    /// let account = Account::from_hex_private_key(private_key, NetworkType::TEST_NET).unwrap();
     /// # println!("{}", account);
     /// # }
     /// ```
@@ -187,10 +183,10 @@ impl AccountSym {
     ) -> Result<Self> {
         ensure!(is_hex(private_key.as_ref()), "private_key it's not hex.");
 
-        let key_pair = <KpSym>::from_hex_private_key(private_key.as_ref())?;
+        let key_pair = Keypair::from_hex_private_key(private_key.as_ref())?;
 
         let public_key = key_pair.public_key().encode_hex::<String>();
-        let public_account = PublicAccount::<H192>::from_public_key(public_key, network_type)?;
+        let public_account = PublicAccount::from_public_key(public_key, network_type)?;
 
         Ok(Self {
             key_pair,
@@ -210,14 +206,13 @@ impl AccountSym {
     /// # Example
     ///
     /// ```
-    /// use symbol_sdk::{KpSym, H192};
     /// use symbol_sdk::account::Account;
     /// use symbol_sdk::network::NetworkType;
     ///
     /// #
     /// # fn main() {
     /// #
-    /// let (account, mnemonic) = Account::<KpSym, H192>::create_with_mnemonic("any_password", NetworkType::TEST_NET).unwrap();
+    /// let (account, mnemonic) = Account::create_with_mnemonic("any_password", NetworkType::TEST_NET).unwrap();
     /// # println!("{}", account);
     /// # println!("{}", mnemonic);
     /// # }
@@ -249,7 +244,6 @@ impl AccountSym {
     /// # Example
     ///
     /// ```
-    /// use symbol_sdk::{KpSym, H192};
     /// use symbol_sdk::account::Account;
     /// use symbol_sdk::network::NetworkType;
     ///
@@ -259,7 +253,7 @@ impl AccountSym {
     /// let mnemonic: &str = r"force night tumble pole record inflict idea bone deal section
     ///                         essay razor hunt kiwi drill include rifle broken lucky infant
     ///                         satoshi sweet boss blue";
-    /// let account = Account::<KpSym, H192>::from_mnemonic(mnemonic , "any_password", NetworkType::TEST_NET).unwrap();
+    /// let account = Account::from_mnemonic(mnemonic , "any_password", NetworkType::TEST_NET).unwrap();
     /// # println!("{}", account);
     /// # }
     /// ```
@@ -301,7 +295,7 @@ impl AccountSym {
     pub fn sign_transaction_with_cosignatories(
         &self,
         _transaction: Vec<u8>,
-        _cosignatories: Vec<Account<KpSym, H192>>,
+        _cosignatories: Vec<Account>,
         _generation_hash: GenerationHash,
     ) -> Result<Vec<u8>> {
         unimplemented!()
@@ -325,7 +319,7 @@ impl AccountSym {
     }
 }
 
-impl<Kp: KeyPairSchema, H: AddressSchema + Serialize> fmt::Display for Account<Kp, H> {
+impl fmt::Display for Account {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         // Warn!
         // For security the keypair is not shown with Display.
@@ -337,22 +331,20 @@ impl<Kp: KeyPairSchema, H: AddressSchema + Serialize> fmt::Display for Account<K
     }
 }
 
-impl<Kp: KeyPairSchema + serde::Serialize, H: AddressSchema + Serialize> Serialize
-    for Account<Kp, H>
-{
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        let mut rgb = serializer.serialize_struct("Account", 2)?;
-        rgb.serialize_field("keypair", &self.key_pair)?;
-        rgb.serialize_field("public_account", &self.public_account)?;
-        rgb.end()
-    }
-}
+// impl Serialize for Account {
+//     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+//     where
+//         S: Serializer,
+//     {
+//         let mut rgb = serializer.serialize_struct("Account", 2)?;
+//         rgb.serialize_field("keypair", &self.key_pair)?;
+//         rgb.serialize_field("public_account", &self.public_account)?;
+//         rgb.end()
+//     }
+// }
 
 // internal function.
-pub(crate) fn sign_data<Kp: KeyPairSchema>(kp: Kp, data: &str) -> Result<Signature> {
+pub(crate) fn sign_data(kp: Keypair, data: &str) -> Result<Signature> {
     // ensure!(!data.is_empty(), "data cannot be empty");
 
     let data = if is_hex(data) {
@@ -367,39 +359,35 @@ pub(crate) fn sign_data<Kp: KeyPairSchema>(kp: Kp, data: &str) -> Result<Signatu
 
 #[cfg(test)]
 pub(crate) mod tests {
-    use crate::account::{Account, AccountSym};
+    use crate::account::Account;
     use crate::network::NetworkType;
-    use crate::{KpSym, H192};
 
     lazy_static! {
-        pub static ref TESTING_ACCOUNT: Account<KpSym, H192> = AccountSym::from_hex_private_key(
+        pub static ref TESTING_ACCOUNT: Account = Account::from_hex_private_key(
             "26b64cb10f005e5988a36744ca19e20d835ccc7c105aaa5f3b212da593180930",
             NetworkType::PRIVATE_TEST
         )
         .unwrap();
-        pub static ref MULTISIG_ACCOUNT: Account<KpSym, H192> = AccountSym::from_hex_private_key(
+        pub static ref MULTISIG_ACCOUNT: Account = Account::from_hex_private_key(
             "5edebfdbeb32e9146d05ffd232c8af2cf9f396caf9954289daa0362d097fff3b",
             NetworkType::PRIVATE_TEST
         )
         .unwrap();
-        pub static ref COSIGNATORY_ACCOUNT: Account<KpSym, H192> =
-            AccountSym::from_hex_private_key(
-                "2a2b1f5d366a5dd5dc56c3c757cf4fe6c66e2787087692cf329d7a49a594658b",
-                NetworkType::PRIVATE_TEST
-            )
-            .unwrap();
-        pub static ref COSIGNATORY2_ACCOUNT: Account<KpSym, H192> =
-            AccountSym::from_hex_private_key(
-                "b8afae6f4ad13a1b8aad047b488e0738a437c7389d4ff30c359ac068910c1d59",
-                NetworkType::PRIVATE_TEST
-            )
-            .unwrap();
-        pub static ref COSIGNATORY3_ACCOUNT: Account<KpSym, H192> =
-            AccountSym::from_hex_private_key(
-                "111602be4d36f92dd60ca6a3c68478988578f26f6a02f8c72089839515ab603e",
-                NetworkType::PRIVATE_TEST
-            )
-            .unwrap();
+        pub static ref COSIGNATORY_ACCOUNT: Account = Account::from_hex_private_key(
+            "2a2b1f5d366a5dd5dc56c3c757cf4fe6c66e2787087692cf329d7a49a594658b",
+            NetworkType::PRIVATE_TEST
+        )
+        .unwrap();
+        pub static ref COSIGNATORY2_ACCOUNT: Account = Account::from_hex_private_key(
+            "b8afae6f4ad13a1b8aad047b488e0738a437c7389d4ff30c359ac068910c1d59",
+            NetworkType::PRIVATE_TEST
+        )
+        .unwrap();
+        pub static ref COSIGNATORY3_ACCOUNT: Account = Account::from_hex_private_key(
+            "111602be4d36f92dd60ca6a3c68478988578f26f6a02f8c72089839515ab603e",
+            NetworkType::PRIVATE_TEST
+        )
+        .unwrap();
     }
 
     #[cfg(test)]
@@ -413,11 +401,8 @@ pub(crate) mod tests {
 
         #[test]
         fn test_should_create_from_private_key() {
-            let account = Account::<KpSym, H192>::from_hex_private_key(
-                PRIVATE_KEY,
-                NetworkType::PRIVATE_TEST,
-            )
-            .unwrap();
+            let account =
+                Account::from_hex_private_key(PRIVATE_KEY, NetworkType::PRIVATE_TEST).unwrap();
             assert_eq!(account.public_key_to_hex(), PUBLIC_KEY.to_lowercase());
             assert_eq!(account.private_key_to_hex(), PRIVATE_KEY.to_lowercase());
 
@@ -426,14 +411,13 @@ pub(crate) mod tests {
 
         #[test]
         fn test_should_return_error_when_the_private_key_is_not_valid() {
-            let account =
-                Account::<KpSym, H192>::from_hex_private_key("", NetworkType::PRIVATE_TEST);
+            let account = Account::from_hex_private_key("", NetworkType::PRIVATE_TEST);
             assert!(account.is_err());
         }
 
         #[test]
         fn test_should_generate_a_new_account() {
-            let account = Account::<KpSym, H192>::random(NetworkType::PRIVATE_TEST);
+            let account = Account::random(NetworkType::PRIVATE_TEST);
 
             assert_ne!(account.private_key_to_hex(), "");
             assert_ne!(account.public_key_to_hex(), "");
@@ -442,7 +426,7 @@ pub(crate) mod tests {
 
         #[test]
         fn test_should_return_network_type() {
-            let account = Account::<KpSym, H192>::random(NetworkType::TEST_NET);
+            let account = Account::random(NetworkType::TEST_NET);
             assert_eq!(account.network_type(), NetworkType::TEST_NET);
         }
     }
@@ -456,11 +440,8 @@ pub(crate) mod tests {
 
         #[test]
         fn test_utf8_data() {
-            let account = Account::<KpSym, H192>::from_hex_private_key(
-                PRIVATE_KEY,
-                NetworkType::PRIVATE_TEST,
-            )
-            .unwrap();
+            let account =
+                Account::from_hex_private_key(PRIVATE_KEY, NetworkType::PRIVATE_TEST).unwrap();
 
             let data = "catapult rocks!";
 
@@ -471,11 +452,8 @@ pub(crate) mod tests {
 
         #[test]
         fn test_hex_data() {
-            let account = Account::<KpSym, H192>::from_hex_private_key(
-                PRIVATE_KEY,
-                NetworkType::PRIVATE_TEST,
-            )
-            .unwrap();
+            let account =
+                Account::from_hex_private_key(PRIVATE_KEY, NetworkType::PRIVATE_TEST).unwrap();
 
             let data = "0xAA";
 
@@ -486,11 +464,8 @@ pub(crate) mod tests {
 
         #[test]
         fn test_hexa_without_0x_prefix_should_be_the_same_as_with_0x() {
-            let account = Account::<KpSym, H192>::from_hex_private_key(
-                PRIVATE_KEY,
-                NetworkType::PRIVATE_TEST,
-            )
-            .unwrap();
+            let account =
+                Account::from_hex_private_key(PRIVATE_KEY, NetworkType::PRIVATE_TEST).unwrap();
 
             let public_account = account.public_account;
 
@@ -505,11 +480,8 @@ pub(crate) mod tests {
 
         #[test]
         fn test_sign_empty() {
-            let account = Account::<KpSym, H192>::from_hex_private_key(
-                PRIVATE_KEY,
-                NetworkType::PRIVATE_TEST,
-            )
-                .unwrap();
+            let account =
+                Account::from_hex_private_key(PRIVATE_KEY, NetworkType::PRIVATE_TEST).unwrap();
 
             let public_account = account.public_account;
 
@@ -517,9 +489,7 @@ pub(crate) mod tests {
             let signed_with0x = account.sign_data("0x").unwrap();
 
             assert!(public_account.verify_signature("", signed).is_ok());
-            assert!(public_account
-                .verify_signature("0x", signed_with0x)
-                .is_ok());
+            assert!(public_account.verify_signature("0x", signed_with0x).is_ok());
         }
     }
 }

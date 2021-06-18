@@ -13,8 +13,8 @@ use crate::mosaic::MosaicId;
 /// Mosaic with linked names.
 ///
 pub struct MosaicNames {
-pub mosaic_id: MosaicId,
+    pub mosaic_id: MosaicId,
 
-  // todo: crate NamespaceName.
-  // pub names: Vec<NamespaceName>,
+    // todo: crate NamespaceName.
+    // pub names: Vec<NamespaceName>,
 }

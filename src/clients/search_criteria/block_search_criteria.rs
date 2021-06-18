@@ -8,7 +8,6 @@
  * // except according to those terms.
  */
 
-use crate::H192;
 use crate::account::{Address, PublicAccount};
 
 use super::block_order_by::BlockOrderBy;
@@ -20,11 +19,11 @@ use super::block_order_by::BlockOrderBy;
 pub struct BlockSearchCriteria {
     /// `PublicAccount` of the account signing the entity.
     /// Filter by `PublicAccount` of the account signing the entity.
-    pub signer_public_key: Option<PublicAccount<H192>>,
+    pub signer_public_key: Option<PublicAccount>,
 
     /// beneficiary `Address`.
     /// Filter by beneficiary Address.
-    pub beneficiary_address: Option<Address<H192>>,
+    pub beneficiary_address: Option<Address>,
 
     /// Order by block id or height.
     /// Sort responses by the property set.

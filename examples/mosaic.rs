@@ -1,4 +1,4 @@
-use symbol_sdk::mosaic::{MosaicFlags, Mosaic, MosaicId};
+use symbol_sdk::mosaic::{Mosaic, MosaicFlags, MosaicId};
 
 fn main() {
     let id = MosaicId::from_hex("85BBEA6CC462B244").unwrap();

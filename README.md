@@ -54,15 +54,10 @@ the [generate_accounts example](/examples/example_account.rs) file. This shows h
 keys using the Symbol SDK for Rust:
 
 ```rust
-use symbol_sdk::{H192, KpSym};
 use symbol_sdk::account::Account;
 use symbol_sdk::network::NetworkType;
 
 fn main() {
-    // if feature = "nis1" hash type must be specified.
-    // H192 = symbol.
-    // H200 = nis1.
-    // example: Account::<KpSym, H192>::random(NetworkType::TEST_NET);
     let account = Account::random(NetworkType::TEST_NET);
     println!("network_type: {}", account.network_type());
     println!("address: {}", account.address_str());

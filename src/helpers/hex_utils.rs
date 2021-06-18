@@ -30,11 +30,12 @@ pub fn hex_to_utf8(hex: &str) -> String {
     String::from_utf8(decode).unwrap()
 }
 
-// pub fn utf8_to_hex(txt: &str) -> String {
-//     use core::fmt::Write;
-//     let mut ret = String::with_capacity(2 * txt.len());
-//     for ch in txt.as_bytes() {
-//         write!(ret, "{:02x}", ch).expect("writing to string");
-//     }
-//     ret
-// }
+#[cfg(test)]
+pub fn utf8_to_hex(txt: &str) -> String {
+    use core::fmt::Write;
+    let mut ret = String::with_capacity(2 * txt.len());
+    for ch in txt.as_bytes() {
+        write!(ret, "{:02x}", ch).expect("writing to string");
+    }
+    ret
+}

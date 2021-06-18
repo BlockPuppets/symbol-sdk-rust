@@ -14,9 +14,9 @@ use std::ops::Deref;
 
 use anyhow::{ensure, Result};
 
-use crate::{H192, Uint64};
 use crate::account::Address;
 use crate::model::id::Id;
+use crate::Uint64;
 
 use super::{generate_mosaic_id, MosaicNonce};
 
@@ -47,7 +47,7 @@ impl MosaicId {
 
     /// Create a `MosaicId` for given `MosaicNonce` MosaicNonce and owner `Address`.
     ///
-    pub fn create_from_nonce(nonce: MosaicNonce, owner_address: Address<H192>) -> Self {
+    pub fn create_from_nonce(nonce: MosaicNonce, owner_address: Address) -> Self {
         generate_mosaic_id(nonce, owner_address)
     }
 }
@@ -103,7 +103,6 @@ impl Deref for MosaicId {
 #[cfg(test)]
 mod tests {
     use crate::account::Address;
-    use crate::H192;
     use crate::mosaic::{MosaicId, MosaicNonce};
     use crate::network::NetworkType;
 
@@ -124,7 +123,7 @@ mod tests {
     #[test]
     fn test_should_create_given_nonce_and_owner() {
         let owner =
-            Address::<H192>::from_public_key(PUBLIC_KEY, NetworkType::PRIVATE_TEST).unwrap();
+            Address::from_public_key(PUBLIC_KEY, NetworkType::PRIVATE_TEST).unwrap();
         let nonce = MosaicNonce::from(0);
 
         let mosaic_id = MosaicId::create_from_nonce(nonce, owner);
@@ -134,7 +133,7 @@ mod tests {
     #[test]
     fn test_should_create_twice_the_same_given_nonce_and_owner() {
         let owner =
-            Address::<H192>::from_public_key(PUBLIC_KEY, NetworkType::PRIVATE_TEST).unwrap();
+            Address::from_public_key(PUBLIC_KEY, NetworkType::PRIVATE_TEST).unwrap();
         let nonce = MosaicNonce::from(0);
 
         let mosaic_id_one = MosaicId::create_from_nonce(nonce, owner);

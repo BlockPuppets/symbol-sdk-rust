@@ -13,7 +13,7 @@ use std::str::FromStr;
 
 use anyhow::Result;
 
-use crate::{H192, H256, H512};
+use crate::{H256, H512};
 use crate::account::{Address, PublicAccount};
 use crate::blockchain::{BlockInfo, BlockType, NemesisImportanceBlockInfo};
 use crate::network::NetworkType;
@@ -32,10 +32,10 @@ impl BlockInfoDto {
     pub fn to_compat(&self) -> Result<BlockInfo> {
         let network_type = NetworkType::try_from(self.block.network)?;
         let signer =
-            PublicAccount::<H192>::from_public_key(&self.block.signer_public_key, network_type)?;
+            PublicAccount::from_public_key(&self.block.signer_public_key, network_type)?;
 
         let beneficiary_address = if !self.block.beneficiary_address.is_empty() {
-            Some(Address::<H192>::from_encoded(
+            Some(Address::from_encoded(
                 &self.block.beneficiary_address,
             )?)
         } else {

@@ -11,7 +11,7 @@
 
 use crate::account::Address;
 use crate::mosaic::{MosaicFlags, MosaicId};
-use crate::{Uint64, H192};
+use crate::Uint64;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -38,7 +38,7 @@ pub struct MosaicInfo {
 
     /// The mosaic owner address.
     ///
-    pub owner_address: Address<H192>,
+    pub owner_address: Address,
 
     /// The mosaic revision.
     ///

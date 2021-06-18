@@ -12,7 +12,7 @@ use std::fmt;
 
 use serde::Serialize;
 
-use crate::{GenerationHash, H192, H256, H512};
+use crate::{GenerationHash, H256, H512};
 use crate::account::{Address, PublicAccount};
 use crate::network::NetworkType;
 
@@ -37,7 +37,7 @@ pub struct BlockInfo {
     pub signature: H512,
 
     /// The public account of block harvester.
-    pub signer: PublicAccount<H192>,
+    pub signer: PublicAccount,
 
     /// The network type.
     pub network_type: NetworkType,
@@ -81,7 +81,7 @@ pub struct BlockInfo {
 
     /// The beneficiary address.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub beneficiary_address: Option<Address<H192>>,
+    pub beneficiary_address: Option<Address>,
 
     /// The database record id.
     pub record_id: String,

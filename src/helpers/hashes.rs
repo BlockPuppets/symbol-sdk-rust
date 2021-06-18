@@ -10,13 +10,10 @@
 
 use std::str::FromStr;
 
+use crate::core::format::{decode_base32, encode_base32};
 use hex::ToHex;
 use serde::de::Error;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-
-use crate::account::AddressSym;
-use crate::core::format::encode_base32;
-use crate::AddressNis1;
 
 pub type GenerationHash = H256;
 
@@ -63,8 +60,29 @@ impl Serialize for H512 {
 
 construct_fixed_hash! {
     /// Symbol 192 bit hash type.
-    #[derive(Deserialize)]
     pub struct H192(24);
+}
+
+impl H192 {
+    pub fn as_base32(&self) -> String {
+        encode_base32(*self)
+    }
+
+    pub fn from_base32(data: &str) -> Self {
+        let mut address = H192::zero();
+        decode_base32(address.as_mut(), &data);
+        address
+    }
+}
+
+impl<'de> Deserialize<'de> for H192 {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let string = String::deserialize(deserializer)?;
+        Ok(H192::from_base32(string.as_ref()))
+    }
 }
 
 impl Serialize for H192 {
@@ -72,59 +90,6 @@ impl Serialize for H192 {
     where
         S: Serializer,
     {
-        serializer.serialize_str(&self.to_base32())
-    }
-}
-
-impl AddressSchema for H192 {
-    type Hash = H192;
-
-    fn as_bytes(&self) -> &[u8] {
-        self.as_bytes()
-    }
-    fn size_suffix(&self) -> usize {
-        AddressSym::CHECKSUM_SIZE
-    }
-    fn to_base32(&self) -> String {
-        encode_base32(&self.as_bytes(), AddressSym::LENGTH_IN_BASE32)
-    }
-}
-
-pub trait AddressSchema {
-    type Hash;
-    fn as_bytes(&self) -> &[u8];
-    fn size_suffix(&self) -> usize;
-    fn to_base32(&self) -> String;
-}
-
-#[cfg(feature = "nis1")]
-construct_fixed_hash! {
-    /// Nis1 200 bit hash type.
-    #[derive(Deserialize)]
-    pub struct H200(25);
-}
-
-#[cfg(feature = "nis1")]
-impl Serialize for H200 {
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        serializer.serialize_str(&self.to_base32())
-    }
-}
-
-#[cfg(feature = "nis1")]
-impl AddressSchema for H200 {
-    type Hash = H200;
-
-    fn as_bytes(&self) -> &[u8] {
-        self.as_bytes()
-    }
-    fn size_suffix(&self) -> usize {
-        AddressNis1::CHECKSUM_SIZE
-    }
-    fn to_base32(&self) -> String {
-        encode_base32(&self.as_bytes(), AddressNis1::LENGTH_IN_BASE32)
+        serializer.serialize_str(&self.as_base32())
     }
 }

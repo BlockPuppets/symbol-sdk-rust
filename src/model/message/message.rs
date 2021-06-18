@@ -102,3 +102,21 @@ pub(crate) fn create_message_from_buffer(payload: &[u8]) -> Option<Box<dyn Messa
         None
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::message::{EncryptedMessage, Message, MessageType, PlainMessage};
+    use crate::utf8_to_hex;
+
+    #[test]
+    fn test_should_create_an_plain_message_dto_struct() {
+        let message = PlainMessage::create("test");
+        assert_eq!(message.to_dto(), format!("00{}", utf8_to_hex("test")));
+    }
+
+    #[test]
+    fn test_should_create_an_encrypted_message_dto_struct() {
+        let message = EncryptedMessage { r#type: MessageType::SecureMessageType, payload: "test".to_string() };
+        assert_eq!(message.to_dto(), format!("01{}", utf8_to_hex("test")));
+    }
+}
