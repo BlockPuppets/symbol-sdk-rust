@@ -17,8 +17,6 @@ use crypto::{
     sym::Keypair,
 };
 use hex::ToHex;
-use serde::{Deserialize, Serialize, Serializer};
-use serde::ser::SerializeStruct;
 
 use crate::{GenerationHash, is_hex};
 use crate::account::PublicAccount;
@@ -27,7 +25,7 @@ use crate::network::NetworkType;
 
 /// The `Account` struct contains account's `Keypair` and `PublicAccount`.
 ///
-#[derive(Debug, Clone, PartialEq, Hash)]
+#[derive(Debug, Clone, PartialEq, Hash, Serialize, Deserialize)]
 pub struct Account {
     /// The keyPair containing the public and private key of this account.
     pub key_pair: Keypair,
@@ -330,18 +328,6 @@ impl fmt::Display for Account {
         )
     }
 }
-
-// impl Serialize for Account {
-//     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-//     where
-//         S: Serializer,
-//     {
-//         let mut rgb = serializer.serialize_struct("Account", 2)?;
-//         rgb.serialize_field("keypair", &self.key_pair)?;
-//         rgb.serialize_field("public_account", &self.public_account)?;
-//         rgb.end()
-//     }
-// }
 
 // internal function.
 pub(crate) fn sign_data(kp: Keypair, data: &str) -> Result<Signature> {

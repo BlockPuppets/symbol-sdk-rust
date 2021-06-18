@@ -49,15 +49,6 @@ impl<'de> Deserialize<'de> for H512 {
     }
 }
 
-impl Serialize for H512 {
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        serializer.serialize_str(&self.encode_hex_upper::<String>())
-    }
-}
-
 construct_fixed_hash! {
     /// Symbol 192 bit hash type.
     pub struct H192(24);
@@ -65,7 +56,7 @@ construct_fixed_hash! {
 
 impl H192 {
     pub fn as_base32(&self) -> String {
-        encode_base32(*self)
+        encode_base32(self.as_bytes())
     }
 
     pub fn from_base32(data: &str) -> Self {

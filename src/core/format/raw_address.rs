@@ -12,14 +12,11 @@ use base32::Alphabet::RFC4648;
 use ripemd160::Ripemd160;
 use sha3::{Digest, Sha3_256};
 
-use crate::{H256, H192};
-use crate::network::NetworkType;
 use crate::account::Address;
+use crate::network::NetworkType;
+use crate::H256;
 
-pub fn public_key_to_address(
-    public_key: H256,
-    network_type: NetworkType,
-) -> Vec<u8> {
+pub fn public_key_to_address(public_key: H256, network_type: NetworkType) -> Vec<u8> {
     // step 1: sha3 hash of the public key
     let public_key_hash = sha3::Sha3_256::digest(public_key.as_bytes());
 
@@ -43,8 +40,8 @@ pub fn decode_base32(bytes: &mut [u8], data: &str) {
     bytes.copy_from_slice(&add_decode[..length])
 }
 
-pub fn encode_base32(data: H192) -> String {
-    let mut encode_address = base32::encode(RFC4648 { padding: true }, data.as_bytes());
+pub fn encode_base32(data: &[u8]) -> String {
+    let mut encode_address = base32::encode(RFC4648 { padding: true }, data);
     encode_address.truncate(Address::LENGTH_IN_BASE32);
     encode_address.to_uppercase()
 }

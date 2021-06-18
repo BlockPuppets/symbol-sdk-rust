@@ -47,7 +47,7 @@ impl Address {
     ///
     /// For example: TATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA37JGO5Q
     pub fn address_str(&self) -> String {
-        encode_base32(self.address)
+        encode_base32(self.address.as_bytes())
     }
 
     /// Converts `Address` String into a more readable/pretty format,
@@ -190,7 +190,7 @@ impl Address {
         let address =
             H192::from_str(encoded.as_ref()).map_err(|e| anyhow!("encoded address {}", e))?;
 
-        Self::from_raw(encode_base32(address))
+        Self::from_raw(encode_base32(address.as_bytes()))
     }
 
     /// Determines the validity of an raw address string.
