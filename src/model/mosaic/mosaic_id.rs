@@ -26,11 +26,11 @@ use super::{generate_mosaic_id, MosaicNonce};
 pub struct MosaicId(Uint64);
 
 impl MosaicId {
-    /// The length of the `MosaicNonce` in bytes.
+    /// The length of the `MosaicId` in bytes.
     ///
     const LENGTH_IN_BYTES: usize = 8;
 
-    /// The length of the `MosaicNonce` in hex string.
+    /// The length of the `MosaicId` in hex string.
     ///
     pub const LENGTH_IN_HEX: usize = Self::LENGTH_IN_BYTES * 2;
 

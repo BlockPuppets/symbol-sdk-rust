@@ -16,6 +16,7 @@ pub mod blockchain;
 mod id;
 pub mod message;
 pub mod mosaic;
+pub mod namespace;
 pub mod network;
 pub mod state;
 mod uint64;

@@ -14,7 +14,7 @@ use sha3::{Digest, Sha3_256};
 
 use crate::account::Address;
 use crate::network::NetworkType;
-use crate::H256;
+use crate::{H256, Uint64};
 
 pub fn public_key_to_address(public_key: H256, network_type: NetworkType) -> Vec<u8> {
     // step 1: sha3 hash of the public key
@@ -67,4 +67,16 @@ pub fn is_valid_address(decoded: &[u8], sizes_decoded: usize, checksum_size: usi
     let mut checksum = Vec::with_capacity(checksum_size);
     checksum.append(&mut hash[..checksum_size].to_vec());
     checksum == &decoded[checksum_begin..]
+}
+
+/// Format a namespaceId *alias* into a valid recipient field value.
+///
+pub fn alias_to_recipient(namespace_id: Uint64, network_type: NetworkType) -> Vec<u8> {
+    // 0x91 | namespaceId on 8 bytes | 15 bytes 0-pad = 24 bytes
+    let mut padded: Vec<u8> = vec![];
+    padded.push(network_type.value() | 0x01);
+    namespace_id.to_le_bytes().reverse();
+    padded.append(&mut namespace_id.to_le_bytes().to_vec());
+    padded.append(&mut hex::decode("00".repeat(15)).unwrap());
+    padded
 }

@@ -12,10 +12,10 @@ pub(crate) use self::bytes_utils::*;
 pub use self::hashes::*;
 pub(crate) use self::hex_utils::*;
 pub(crate) use self::int_utils::*;
-pub(crate) use self::serializer_utils::*;
+pub(crate) use self::ser_der_utils::*;
 
 mod hashes;
 mod hex_utils;
 mod int_utils;
 mod bytes_utils;
-mod serializer_utils;
+mod ser_der_utils;
