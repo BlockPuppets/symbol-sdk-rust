@@ -19,7 +19,7 @@ impl MosaicInfoDto {
             record_id: self.id.clone(),
             id: MosaicId::from_hex(&dto.id)?,
             supply: u64::from_str(&dto.supply)?,
-            start_height: Default::default(),
+            start_height: u64::from_str(&dto.start_height)?.into(),
             owner_address: Address::from_encoded(dto.owner_address)?,
             revision: dto.revision,
             flags: MosaicFlags::from(dto.flags),
