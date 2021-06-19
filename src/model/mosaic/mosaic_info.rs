@@ -12,6 +12,7 @@
 use crate::account::Address;
 use crate::mosaic::{MosaicFlags, MosaicId};
 use crate::Uint64;
+use std::fmt;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -30,7 +31,7 @@ pub struct MosaicInfo {
 
     /// The mosaic supply.
     ///
-    pub supply: Uint64,
+    pub supply: u64,
 
     /// The block height were mosaic was created.
     ///
@@ -80,5 +81,15 @@ impl MosaicInfo {
     ///
     pub fn serialize() -> Vec<u8> {
         todo!()
+    }
+}
+
+impl fmt::Display for MosaicInfo {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(&self).unwrap_or_default()
+        )
     }
 }

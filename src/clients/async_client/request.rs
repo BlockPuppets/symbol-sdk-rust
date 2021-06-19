@@ -14,8 +14,9 @@ use hex::ToHex;
 use reqwest::Method;
 use serde_json::json;
 
-use crate::{H256, Order};
 use crate::clients::search_criteria::BlockSearchCriteria;
+use crate::mosaic::MosaicId;
+use crate::{MosaicIds, Order, H256};
 
 /// Type alias to improve readability.
 pub(crate) type RoutePathName = &'static str;
@@ -25,21 +26,60 @@ pub struct Request {
     pub(crate) base_path: &'static str,
     pub(crate) query_params: HashMap<&'static str, String>,
     pub(crate) path_params: HashMap<&'static str, String>,
+    pub(crate) serialized_body: Option<String>,
     pub(crate) method: Method,
 }
 
 impl Request {
-    fn new(
+    fn new_path(
+        base_path: &'static str,
+    ) -> Self {
+        Request {
+            base_path,
+            query_params: Default::default(),
+            path_params: Default::default(),
+            serialized_body: None,
+            method: Default::default()
+        }
+    }
+
+    fn from_path_params(
         base_path: &'static str,
         path_params: HashMap<&'static str, String>,
+        method: Method,
+    ) -> Self {
+        Request {
+            base_path,
+            query_params: Default::default(),
+            path_params,
+            serialized_body: None,
+            method,
+        }
+    }
+
+    fn from_query_params(
+        base_path: &'static str,
         query_params: HashMap<&'static str, String>,
         method: Method,
     ) -> Self {
         Request {
             base_path,
             query_params,
-            path_params,
+            path_params: Default::default(),
+            serialized_body: None,
             method,
+        }
+    }
+
+    fn from_serialized_body<T: serde::Serialize>(base_path: &'static str, body: T) -> Self {
+        let serialized_body = Some(serde_json::to_string(&body).unwrap());
+
+        Request {
+            base_path,
+            query_params: Default::default(),
+            path_params: Default::default(),
+            serialized_body,
+            method: Method::POST,
         }
     }
 
@@ -61,10 +101,9 @@ impl Request {
         let mut path_params = HashMap::new();
         path_params.insert("height", height.to_string());
 
-        Self::new(
+        Self::from_path_params(
             Self::BLOCKS_HEIGHT_PATH,
             path_params,
-            Default::default(),
             Method::GET,
         )
     }
@@ -74,10 +113,10 @@ impl Request {
         path_params.insert("height", height.to_string());
         path_params.insert("hash", hash.encode_hex_upper::<String>());
 
-        Self::new(
+        Self::from_path_params(
             Self::BLOCKS_MERKLE_RECEIPTS_PATH,
             path_params,
-            Default::default(),
+
             Method::GET,
         )
     }
@@ -87,10 +126,9 @@ impl Request {
         path_params.insert("height", height.to_string());
         path_params.insert("hash", hash.encode_hex_upper::<String>());
 
-        Self::new(
+        Self::from_path_params(
             Self::BLOCKS_MERKLE_TRANSACTION_PATH,
             path_params,
-            Default::default(),
             Method::GET,
         )
     }
@@ -129,25 +167,42 @@ impl Request {
             query_params.insert("order", value.to_string());
         }
 
-        Self::new(
+        Self::from_query_params(
             Self::BLOCKS_SEARCH_PATH,
-            Default::default(),
             query_params,
             Method::GET,
         )
     }
 }
 
-// Blocks requests
+// Chain requests
 impl Request {
     pub const CHAIN_INFO_PATH: RoutePathName = "/chain/info";
 
     pub fn get_chain_info() -> Self {
-        Self::new(
+        Self::new_path(
             Self::CHAIN_INFO_PATH,
-            Default::default(),
-            Default::default(),
+        )
+    }
+}
+
+// Chain requests
+impl Request {
+    pub const MOSAIC_INFO_PATH: RoutePathName = "/mosaics/{mosaicId}";
+
+    pub const MOSAICS_INFO_PATH: RoutePathName = "/mosaics";
+
+    pub fn get_mosaic(mosaic_id: MosaicId) -> Self {
+        let mut path_params = HashMap::new();
+        path_params.insert("mosaicId", mosaic_id.to_hex());
+        Self::from_path_params(
+            Self::MOSAIC_INFO_PATH,
+            path_params,
             Method::GET,
         )
+    }
+
+    pub fn get_mosaics(mosaic_ids: MosaicIds) -> Self {
+        Self::from_serialized_body(Self::MOSAICS_INFO_PATH, mosaic_ids)
     }
 }

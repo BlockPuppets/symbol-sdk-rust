@@ -14,11 +14,11 @@ use std::sync::Arc;
 use serde::de::DeserializeOwned;
 use serde::Deserialize;
 
-use crate::{BlockApi, ChainApi, GenerationHash};
-use crate::clients::{Error, model_dto::BlockInfoDto, retry::RetryStrategy, SymbolResponse};
+use crate::clients::{model_dto::BlockInfoDto, retry::RetryStrategy, Error, SymbolResponse};
 use crate::network::NetworkType;
+use crate::{BlockApi, ChainApi, GenerationHash, NetworkApi, MosaicApi};
 
-use super::{HttpClient, request::Request, Response, SimpleHttpClient};
+use super::{request::Request, HttpClient, Response, SimpleHttpClient};
 
 #[derive(Clone)]
 pub struct Client<R> {
@@ -119,8 +119,8 @@ impl<R: RetryStrategy> Client<R> {
     }
 
     /// Symbol client network routes api.
-    pub fn network_routes(&self) {
-        todo!()
+    pub fn network_routes(&self) -> NetworkApi<R> {
+        NetworkApi(self.clone())
     }
 
     /// Symbol client node routes api.
@@ -134,8 +134,8 @@ impl<R: RetryStrategy> Client<R> {
     }
 
     /// Symbol client mosaic routes api.
-    pub fn mosaic_routes(&self) {
-        todo!()
+    pub fn mosaic_routes(&self) -> MosaicApi<R> {
+        MosaicApi(self.clone())
     }
 
     /// Symbol client account routes api.
