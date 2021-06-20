@@ -16,13 +16,13 @@ use std::str::FromStr;
 use anyhow::{anyhow, ensure, Result};
 use hex::ToHex;
 
+use crate::{H256, hex_decode};
 use crate::core::format::{
     decode_base32, encode_base32, is_valid_address, public_key_to_address, raw_prettify,
 };
-use crate::helpers::is_hex;
 use crate::helpers::H192;
+use crate::helpers::is_hex;
 use crate::network::NetworkType;
-use crate::{hex_decode, H256};
 
 /// The `Address` struct describes an Symbol address with its network.
 ///
@@ -345,7 +345,7 @@ mod tests {
 
     #[test]
     #[should_panic(
-        expected = "Address ZCTVW234AQ4TZIDZENGNOZXPRPSDRSFRF has to be 39 characters long"
+    expected = "Address ZCTVW234AQ4TZIDZENGNOZXPRPSDRSFRF has to be 39 characters long"
     )]
     fn test_should_panic_when_the_address_is_not_valid_in_length() {
         Address::from_raw("ZCTVW234AQ4TZIDZENGNOZXPRPSDRSFRF").unwrap();

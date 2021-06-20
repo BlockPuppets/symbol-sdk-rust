@@ -12,16 +12,16 @@ use base32::Alphabet::RFC4648;
 use ripemd160::Ripemd160;
 use sha3::{Digest, Sha3_256};
 
+use crate::{H256, Uint64};
 use crate::account::Address;
 use crate::network::NetworkType;
-use crate::{H256, Uint64};
 
 pub fn public_key_to_address(public_key: H256, network_type: NetworkType) -> Vec<u8> {
     // step 1: sha3 hash of the public key
     let public_key_hash = sha3::Sha3_256::digest(public_key.as_bytes());
 
     // step 2: ripemd160 hash of (1)
-    let ripemd_hash = Ripemd160::digest(&public_key_hash);
+    let ripemd_hash = Ripemd160::digest(public_key_hash.as_ref());
 
     // step 3: add network identifier byte in front of (2)
     let mut decoded_address = Vec::with_capacity(Address::LENGTH_IN_DECODED);
@@ -29,7 +29,7 @@ pub fn public_key_to_address(public_key: H256, network_type: NetworkType) -> Vec
     decoded_address.append(&mut ripemd_hash.to_vec());
 
     // step 4: concatenate (3) and the checksum of (3)
-    let hash = sha3::Sha3_256::digest(&decoded_address[..21]);
+    let hash = sha3::Sha3_256::digest(decoded_address[..21].as_ref());
     decoded_address.append(&mut hash[..Address::CHECKSUM_SIZE].to_vec());
     decoded_address
 }

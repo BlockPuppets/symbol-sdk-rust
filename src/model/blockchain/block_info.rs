@@ -12,11 +12,12 @@ use std::fmt;
 
 use serde::Serialize;
 
-use super::BlockType;
+use crate::{GenerationHash, H256, H512};
 use crate::account::{Address, PublicAccount};
 use crate::network::NetworkType;
 use crate::ser_to_hex_upper;
-use crate::{GenerationHash, H256, H512};
+
+use super::BlockType;
 
 /// The normal block info structure describes basic information of a block.
 ///

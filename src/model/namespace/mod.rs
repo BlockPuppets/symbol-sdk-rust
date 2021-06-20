@@ -45,10 +45,10 @@ pub(crate) fn generate_namespace_id(parent_id: Uint64, name: &str) -> Result<Uin
 
     let fixed_bytes = parent_id.to_le_bytes();
 
-    hash.input(fixed_bytes);
-    hash.input(name);
+    hash.update(fixed_bytes);
+    hash.update(name);
 
-    let bytes = hash.result();
+    let bytes = hash.finalize();
 
     let mut cursor = Cursor::new(bytes[..].as_ref());
     let value = cursor.read_u64::<LittleEndian>().unwrap();

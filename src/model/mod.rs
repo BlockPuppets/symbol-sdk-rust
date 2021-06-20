@@ -9,8 +9,8 @@
  */
 
 pub use self::id::Id;
-pub use self::uint64::*;
 pub use self::node_identity_equality_strategy::*;
+pub use self::uint64::*;
 
 pub mod account;
 pub mod blockchain;

@@ -13,14 +13,14 @@ use std::fmt;
 use std::ops::Deref;
 
 use anyhow::{ensure, Result};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use serde::de::Error;
 
 use crate::account::Address;
 use crate::model::id::Id;
 use crate::Uint64;
 
 use super::{generate_mosaic_id, MosaicNonce};
-use serde::{Deserialize, Deserializer, Serializer, Serialize};
-use serde::de::Error;
 
 /// The `MosaicId` structure describes mosaic id.
 ///

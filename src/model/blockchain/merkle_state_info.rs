@@ -8,8 +8,9 @@
  * // except according to those terms.
  */
 
-use crate::state::MerkleTree;
 use std::fmt;
+
+use crate::state::MerkleTree;
 
 /// The merkle path information clients can use to proof the state of the given entity.
 ///

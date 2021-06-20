@@ -1,6 +1,6 @@
+use symbol_sdk::{Client, MosaicSearchCriteria, Retry};
 use symbol_sdk::account::Address;
 use symbol_sdk::mosaic::MosaicId;
-use symbol_sdk::{Client, MosaicSearchCriteria, Retry};
 
 #[tokio::main]
 async fn main() {
@@ -8,8 +8,8 @@ async fn main() {
         "http://ngl-dual-101.testnet.symboldev.network:3000",
         Retry::default(),
     )
-    .await
-    .unwrap();
+        .await
+        .unwrap();
 
     println!("Network_type: {}", client.network_type);
     println!("Generation_hash: {:X}", client.generation_hash);

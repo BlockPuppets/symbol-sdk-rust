@@ -36,10 +36,10 @@ mod mosaic_supply_change_action;
 fn generate_mosaic_id(nonce: MosaicNonce, owner_address: Address) -> MosaicId {
     let mut hash = Sha3_256::default();
 
-    hash.input(*nonce);
-    hash.input(owner_address.address);
+    hash.update(*nonce);
+    hash.update(owner_address.address);
 
-    let bytes = hash.result();
+    let bytes = hash.finalize();
 
     let mut cursor = Cursor::new(bytes[..].as_ref());
     let value = cursor.read_u64::<LittleEndian>().unwrap();

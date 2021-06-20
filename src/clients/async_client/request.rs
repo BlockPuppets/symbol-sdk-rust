@@ -12,11 +12,10 @@ use std::collections::HashMap;
 
 use hex::ToHex;
 use reqwest::Method;
-use serde_json::json;
 
+use crate::{H256, MosaicIds, MosaicSearchCriteria};
 use crate::clients::search_criteria::BlockSearchCriteria;
 use crate::mosaic::MosaicId;
-use crate::{MosaicIds, MosaicSearchCriteria, H256};
 
 /// Type alias to improve readability.
 pub(crate) type RoutePathName = &'static str;
@@ -79,10 +78,6 @@ impl Request {
             serialized_body,
             method: Method::POST,
         }
-    }
-
-    pub fn to_json(&self, id: usize) -> serde_json::Value {
-        json!({"jsonrpc": "2.0", "id": id, "method": self.method.as_str()})
     }
 }
 
@@ -193,7 +188,6 @@ impl Request {
 impl Request {
     pub const MOSAIC_INFO_PATH: RoutePathName = "/mosaics/{mosaicId}";
     pub const MOSAIC_INFO_MERKLE_PATH: RoutePathName = "/mosaics/{mosaicId}/merkle";
-
     pub const MOSAICS_INFO_PATH: RoutePathName = "/mosaics";
 
     pub fn get_mosaic(mosaic_id: MosaicId) -> Self {

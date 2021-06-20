@@ -9,10 +9,11 @@
  */
 
 
+use std::fmt;
+
 use crate::account::Address;
 use crate::mosaic::{MosaicFlags, MosaicId};
 use crate::Uint64;
-use std::fmt;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

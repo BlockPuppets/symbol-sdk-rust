@@ -8,9 +8,11 @@
  * // except according to those terms.
  */
 
-use crate::network::RentalFees;
-use anyhow::Result;
 use std::str::FromStr;
+
+use anyhow::Result;
+
+use crate::network::RentalFees;
 
 #[serde(rename_all = "camelCase")]
 #[derive(Clone, Debug, Serialize, Deserialize)]

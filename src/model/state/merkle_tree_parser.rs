@@ -12,7 +12,7 @@ use anyhow::{bail, Result};
 use hex::ToHex;
 use sha3::{Digest, Sha3_256};
 
-use crate::{hex_decode, parse_u64, H256};
+use crate::{H256, hex_decode, parse_u64};
 
 use super::{
     MerkleTreeBranch, MerkleTreeBranchLink, MerkleTreeLeaf, MerkleTreeNodeType, MerkleTreeTrait,
@@ -201,19 +201,19 @@ impl MerkleTreeParser {
 
         let mut hash = Sha3_256::new();
 
-        hash.input(&hex_decode(&(encoded_path + &branch_links.join(""))));
+        hash.update(&hex_decode(&(encoded_path + &branch_links.join(""))));
 
-        H256::from_slice(hash.result().as_slice())
+        H256::from_slice(hash.finalize().as_slice())
     }
 
     /// Calculate leaf hash. Hash(encoded_path + leaf value).
     ///
     fn get_leaf_hash(encoded_path: String, leaf_value: H256) -> H256 {
         let mut hash = Sha3_256::new();
-        hash.input(&hex_decode(
+        hash.update(&hex_decode(
             &(encoded_path + &leaf_value.encode_hex::<String>()),
         ));
 
-        H256::from_slice(hash.result().as_slice())
+        H256::from_slice(hash.finalize().as_ref())
     }
 }

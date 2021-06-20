@@ -61,7 +61,7 @@ impl<R: RetryStrategy> MosaicApi<R> {
             .await?;
 
         let mut mosaics = vec![];
-        for mosaic in resp.result {
+        for mosaic in &*resp {
             mosaics.push(
                 mosaic
                     .to_compact()

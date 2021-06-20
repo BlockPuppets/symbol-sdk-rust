@@ -32,7 +32,7 @@ async fn main() {
         signer_public_key: None,
         beneficiary_address: Some(beneficiary_address),
         order_by: None,
-        param: None
+        param: None,
     };
 
     match client
