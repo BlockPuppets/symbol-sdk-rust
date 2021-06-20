@@ -8,18 +8,13 @@
  * // except according to those terms.
  */
 
-pub use self::id::Id;
-pub use self::node_identity_equality_strategy::*;
-pub use self::uint64::*;
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct ServerInfo {
+    /// catapult-rest component version.
+    #[serde(rename = "restVersion")]
+    pub rest_version: String,
+    /// catapult-sdk component version.
+    #[serde(rename = "sdkVersion")]
+    pub sdk_version: String,
+}
 
-pub mod account;
-pub mod blockchain;
-mod id;
-pub mod message;
-pub mod mosaic;
-pub mod namespace;
-pub mod network;
-pub mod node;
-mod node_identity_equality_strategy;
-pub mod state;
-mod uint64;

@@ -14,6 +14,7 @@ pub use self::client::*;
 pub use self::http_client::*;
 pub use self::mosaic_routes::*;
 pub use self::network_routes::*;
+pub use self::node_routes::*;
 
 mod block_routes;
 mod chain_routes;
@@ -21,4 +22,5 @@ mod client;
 mod http_client;
 mod mosaic_routes;
 mod network_routes;
+mod node_routes;
 pub(crate) mod request;

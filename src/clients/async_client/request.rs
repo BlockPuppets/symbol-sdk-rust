@@ -233,3 +233,42 @@ impl Request {
         Self::from_path_params(Self::MOSAIC_INFO_MERKLE_PATH, path_params, Method::GET)
     }
 }
+
+// Node requests
+impl Request {
+    pub const NODE_HEALTH_PATH: RoutePathName = "/node/health";
+    pub const NODE_INFO_PATH: RoutePathName = "/node/info";
+    pub const NODE_PEERS_PATH: RoutePathName = "/node/peers";
+    pub const NODE_STORAGE_INFO_PATH: RoutePathName = "/node/storage";
+    pub const NODE_NODE_TIME_PATH: RoutePathName = "/node/time";
+    pub const NODE_SERVER_INFO_PATH: RoutePathName = "/node/server";
+    pub const NODE_UNLOCKED_ACCOUNTS_PATH: RoutePathName = "/node/unlockedaccount";
+
+    pub fn get_node_health() -> Self {
+        Self::new_path(Self::NODE_HEALTH_PATH)
+    }
+
+    pub fn get_node_info() -> Self {
+        Self::new_path(Self::NODE_INFO_PATH)
+    }
+
+    pub fn get_node_peers() -> Self {
+        Self::new_path(Self::NODE_PEERS_PATH)
+    }
+
+    pub fn get_storage_info() -> Self {
+        Self::new_path(Self::NODE_STORAGE_INFO_PATH)
+    }
+
+    pub fn get_node_time() -> Self {
+        Self::new_path(Self::NODE_NODE_TIME_PATH)
+    }
+
+    pub fn get_server_info() -> Self {
+        Self::new_path(Self::NODE_SERVER_INFO_PATH)
+    }
+
+    pub fn get_unlocked_accounts() -> Self {
+        Self::new_path(Self::NODE_UNLOCKED_ACCOUNTS_PATH)
+    }
+}

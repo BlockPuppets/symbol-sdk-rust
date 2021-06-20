@@ -77,5 +77,8 @@ default_features = false
 version = "1.7"
 features = ["macros", "rt-multi-thread"]
 
+[dependencies.chrono]
+version = "0.4"
+
 [dev-dependencies]
 lazy_static = "1.4"
