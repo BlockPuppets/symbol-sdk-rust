@@ -15,26 +15,21 @@ use crate::state::{MerkleTreeBranch, MerkleTreeNodeType};
 
 /// MerkleTreeBranchDto : Merkle tree branch node.
 ///
+#[serde(rename_all = "camelCase")]
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct MerkleTreeBranchDto {
     #[serde(rename = "type")]
     pub _type: u8,
     /// Branch link path.
-    #[serde(rename = "path")]
     pub path: String,
     /// Encoded branch link path.
-    #[serde(rename = "encodedPath")]
     pub encoded_path: String,
     /// Nibble count.
-    #[serde(rename = "nibbleCount")]
     pub nibble_count: usize,
     /// Branch link bitmask.
-    #[serde(rename = "linkMask")]
     pub link_mask: String,
     /// Branch links (max 16).
-    #[serde(rename = "links")]
     pub links: Vec<MerkleTreeBranchLinkDto>,
-    #[serde(rename = "branchHash")]
     pub branch_hash: String,
 }
 

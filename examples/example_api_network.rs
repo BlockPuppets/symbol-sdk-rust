@@ -26,4 +26,22 @@ async fn main() {
             println!("{}", err)
         }
     };
+
+    match client.network_routes().get_rental_fees().await {
+        Ok(rental_fees) => {
+            println!("{}", rental_fees)
+        }
+        Err(err) => {
+            println!("{}", err)
+        }
+    };
+
+    match client.network_routes().get_transaction_fees().await {
+        Ok(transaction_fees) => {
+            println!("{}", transaction_fees)
+        }
+        Err(err) => {
+            println!("{}", err)
+        }
+    };
 }

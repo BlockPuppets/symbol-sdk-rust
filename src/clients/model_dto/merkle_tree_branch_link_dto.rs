@@ -17,9 +17,7 @@ use crate::state::MerkleTreeBranchLink;
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct MerkleTreeBranchLinkDto {
     /// Branch link nibble bit index (hexadecimal).
-    #[serde(rename = "bit")]
     pub bit: String,
-    #[serde(rename = "link")]
     pub link: String,
 }
 

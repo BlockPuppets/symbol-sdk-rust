@@ -9,7 +9,8 @@
  */
 
 use crate::clients::request::Request;
-use crate::network::{NetworkConfiguration, NetworkName};
+use crate::model_dto::RentalFeesDto;
+use crate::network::{NetworkConfiguration, NetworkName, RentalFees, TransactionFees};
 use crate::{Client, Error, Response, RetryStrategy};
 
 pub struct NetworkApi<R: RetryStrategy>(pub(crate) Client<R>);
@@ -45,6 +46,39 @@ impl<R: RetryStrategy> NetworkApi<R> {
             .as_ref()
             .send(Request::get_network_properties())
             .await?;
+        Ok((*resp).clone())
+    }
+
+    /// Get rental fees information.
+    ///
+    /// # Info
+    /// This endpoint is only available if the REST instance has access to catapult-server resources/config-network.properties file.
+    /// To activate this feature, add the setting "network.propertiesFilePath" in the configuration file (rest/resources/rest.json).
+    ///
+    /// # Returns
+    ///
+    /// Returns the estimated effective rental fees for namespaces and mosaics.
+    /// A `Result` whose okay value is an `RentalFees` or whose error value
+    /// is an `Error` describing the error that occurred.
+    ///
+    pub async fn get_rental_fees(&self) -> Result<RentalFees, Error> {
+        let resp: Response<RentalFeesDto> = self.as_ref().send(Request::get_rental_fees()).await?;
+        resp.to_compact()
+            .map_err(|e| Error::unexpected_uncategorized(e.to_string()))
+    }
+
+    /// Get transaction fees information.
+    ///
+    /// # Returns
+    ///
+    /// Returns the average, median, highest and lower fee multiplier over the last "numBlocksTransactionFeeStats".
+    /// The setting "numBlocksTransactionFeeStats" is adjustable via the configuration file (rest/resources/rest.json) per REST instance.
+    /// A `Result` whose okay value is an `TransactionFees` or whose error value
+    /// is an `Error` describing the error that occurred.
+    ///
+    pub async fn get_transaction_fees(&self) -> Result<TransactionFees, Error> {
+        let resp: Response<TransactionFees> =
+            self.as_ref().send(Request::get_transaction_fees()).await?;
         Ok((*resp).clone())
     }
 }

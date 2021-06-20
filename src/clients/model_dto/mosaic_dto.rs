@@ -1,3 +1,14 @@
+/*
+ * // Copyright 2021 Developers of the Symbol sdk Rust project.
+ * //
+ * // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+ * // https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+ * // <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
+ * // option. This file may not be copied, modified, or distributed
+ * // except according to those terms.
+ */
+
+#[serde(rename_all = "camelCase")]
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct MosaicDto {
     /// The version of the state
@@ -7,10 +18,8 @@ pub struct MosaicDto {
     /// Absolute amount. An amount of 123456789 (absolute) for a mosaic with divisibility 6 means 123.456789 (relative).
     pub supply: String,
     /// Height of the blockchain.
-    #[serde(rename = "startHeight")]
     pub start_height: String,
     /// Address expressed in hexadecimal base.
-    #[serde(rename = "ownerAddress")]
     pub owner_address: String,
     /// A number that allows uint 32 values.
     pub revision: u16,

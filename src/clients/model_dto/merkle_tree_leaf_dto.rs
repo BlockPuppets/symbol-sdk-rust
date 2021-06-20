@@ -14,23 +14,19 @@ use crate::state::{MerkleTreeLeaf, MerkleTreeNodeType};
 
 /// MerkleTreeLeafDto : Merkle tree leaf node.
 ///
+#[serde(rename_all = "camelCase")]
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct MerkleTreeLeafDto {
     #[serde(rename = "type")]
     pub _type: u8,
     /// Leaf path.
-    #[serde(rename = "path")]
     pub path: String,
     /// Encoded leaf path.
-    #[serde(rename = "encodedPath")]
     pub encoded_path: String,
     /// Nibble count.
-    #[serde(rename = "nibbleCount")]
     pub nibble_count: usize,
     /// Leaf value (sha256 hash).
-    #[serde(rename = "value")]
     pub value: String,
-    #[serde(rename = "leafHash")]
     pub leaf_hash: String,
 }
 

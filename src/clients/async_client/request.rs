@@ -14,9 +14,9 @@ use hex::ToHex;
 use reqwest::Method;
 use serde_json::json;
 
-use crate::{H256, MosaicIds, MosaicSearchCriteria};
 use crate::clients::search_criteria::BlockSearchCriteria;
 use crate::mosaic::MosaicId;
+use crate::{MosaicIds, MosaicSearchCriteria, H256};
 
 /// Type alias to improve readability.
 pub(crate) type RoutePathName = &'static str;
@@ -122,9 +122,7 @@ impl Request {
         )
     }
 
-    pub fn search_blocks(
-        criteria: Option<BlockSearchCriteria>,
-    ) -> Self {
+    pub fn search_blocks(criteria: Option<BlockSearchCriteria>) -> Self {
         let mut query_params = HashMap::new();
 
         if let Some(c) = criteria {
@@ -171,6 +169,8 @@ impl Request {
 impl Request {
     pub const NETWORK_NAME_PATH: RoutePathName = "/network";
     pub const NETWORK_PROPERTIES_PATH: RoutePathName = "/network/properties";
+    pub const NETWORK_RENTAL_FEES_PATH: RoutePathName = "/network/fees/rental";
+    pub const NETWORK_TRANSACTION_FEES_PATH: RoutePathName = "/network/fees/transaction";
 
     pub fn get_network_name() -> Self {
         Self::new_path(Self::NETWORK_NAME_PATH)
@@ -178,6 +178,14 @@ impl Request {
 
     pub fn get_network_properties() -> Self {
         Self::new_path(Self::NETWORK_PROPERTIES_PATH)
+    }
+
+    pub fn get_rental_fees() -> Self {
+        Self::new_path(Self::NETWORK_RENTAL_FEES_PATH)
+    }
+
+    pub fn get_transaction_fees() -> Self {
+        Self::new_path(Self::NETWORK_TRANSACTION_FEES_PATH)
     }
 }
 

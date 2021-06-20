@@ -24,6 +24,7 @@ pub use self::mosaic_dto::*;
 pub use self::mosaic_info_dto::*;
 pub use self::mosaic_page::*;
 pub use self::pagination::*;
+pub use self::rental_fees_dto::*;
 
 mod block_dto;
 mod block_info_dto;
@@ -41,3 +42,4 @@ mod mosaic_dto;
 mod mosaic_info_dto;
 mod mosaic_page;
 mod pagination;
+mod rental_fees_dto;
