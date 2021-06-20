@@ -167,7 +167,21 @@ impl Request {
     }
 }
 
-// Chain requests
+// Network requests
+impl Request {
+    pub const NETWORK_NAME_PATH: RoutePathName = "/network";
+    pub const NETWORK_PROPERTIES_PATH: RoutePathName = "/network/properties";
+
+    pub fn get_network_name() -> Self {
+        Self::new_path(Self::NETWORK_NAME_PATH)
+    }
+
+    pub fn get_network_properties() -> Self {
+        Self::new_path(Self::NETWORK_PROPERTIES_PATH)
+    }
+}
+
+// Mosaic requests
 impl Request {
     pub const MOSAIC_INFO_PATH: RoutePathName = "/mosaics/{mosaicId}";
     pub const MOSAIC_INFO_MERKLE_PATH: RoutePathName = "/mosaics/{mosaicId}/merkle";

@@ -39,10 +39,10 @@ impl MerkleStateInfoDto {
 
             for tree in self.clone().tree.into_iter() {
                 if tree["type"].as_u64().unwrap() as u8 == MerkleTreeNodeType::Branch as u8 {
-                    let branch: MerkleTreeBranchDto = serde_json::from_value(tree).unwrap();
+                    let branch: MerkleTreeBranchDto = serde_json::from_value(tree)?;
                     branches.push(branch.to_compact()?);
                 } else {
-                    let leaf_dto: MerkleTreeLeafDto = serde_json::from_value(tree).unwrap();
+                    let leaf_dto: MerkleTreeLeafDto = serde_json::from_value(tree)?;
                     leaf = Some(leaf_dto.to_compact()?);
                 }
             }

@@ -16,6 +16,7 @@ use super::{MerkleTreeNodeType, MerkleTreeTrait};
 
 /// Merkle tree leaf node.
 ///
+#[serde(rename_all = "camelCase")]
 #[derive(Debug, Deserialize, Serialize)]
 pub struct MerkleTreeLeaf {
     /// Merkle tree node type.

@@ -8,9 +8,9 @@
  * // except according to those terms.
  */
 
-use crate::{Client, Error, Response, RetryStrategy};
 use crate::clients::request::Request;
-use crate::network::NetworkName;
+use crate::network::{NetworkConfiguration, NetworkName};
+use crate::{Client, Error, Response, RetryStrategy};
 
 pub struct NetworkApi<R: RetryStrategy>(pub(crate) Client<R>);
 
@@ -23,7 +23,7 @@ impl<R: RetryStrategy> NetworkApi<R> {
     /// is an `Error` describing the error that occurred.
     ///
     pub async fn get_network_name(&self) -> Result<NetworkName, Error> {
-        let resp: Response<NetworkName> = self.as_ref().send(Request::get_chain_info()).await?;
+        let resp: Response<NetworkName> = self.as_ref().send(Request::get_network_name()).await?;
         Ok((*resp).clone())
     }
 
@@ -40,8 +40,11 @@ impl<R: RetryStrategy> NetworkApi<R> {
     /// A `Result` whose okay value is an `NetworkName` or whose error value
     /// is an `Error` describing the error that occurred.
     ///
-    pub async fn get_network_properties(&self) -> Result<NetworkName, Error> {
-        let resp: Response<NetworkName> = self.as_ref().send(Request::get_chain_info()).await?;
+    pub async fn get_network_properties(&self) -> Result<NetworkConfiguration, Error> {
+        let resp: Response<NetworkConfiguration> = self
+            .as_ref()
+            .send(Request::get_network_properties())
+            .await?;
         Ok((*resp).clone())
     }
 }
