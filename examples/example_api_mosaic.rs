@@ -1,5 +1,6 @@
+use symbol_sdk::account::Address;
 use symbol_sdk::mosaic::MosaicId;
-use symbol_sdk::{Client, Retry};
+use symbol_sdk::{Client, MosaicSearchCriteria, Retry};
 
 #[tokio::main]
 async fn main() {
@@ -29,6 +30,29 @@ async fn main() {
     ];
 
     match client.mosaic_routes().get_mosaics(mosaic_ids).await {
+        Ok(mosaics) => mosaics
+            .into_iter()
+            .for_each(|mosaic_info| println!("{}\n", mosaic_info)),
+        Err(err) => {
+            println!("{}", err)
+        }
+    };
+
+    match client.mosaic_routes().get_mosaic_merkle(mosaic_id).await {
+        Ok(mosaic_info) => {
+            println!("{}\n", mosaic_info)
+        }
+        Err(err) => {
+            println!("{}", err)
+        }
+    };
+
+    let criteria = MosaicSearchCriteria {
+        owner_address: Some(Address::from_raw("TCMIVBYRZH7KWYNHGZFX2O2SG5XNLDVMZZ45INQ").unwrap()),
+        param: None,
+    };
+
+    match client.mosaic_routes().search_mosaics(Some(criteria)).await {
         Ok(mosaics) => mosaics
             .into_iter()
             .for_each(|mosaic_info| println!("{}\n", mosaic_info)),

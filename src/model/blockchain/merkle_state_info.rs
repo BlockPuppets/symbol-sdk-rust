@@ -9,6 +9,7 @@
  */
 
 use crate::state::MerkleTree;
+use std::fmt;
 
 /// The merkle path information clients can use to proof the state of the given entity.
 ///
@@ -19,4 +20,14 @@ pub struct MerkleStateInfo {
     pub raw: String,
     /// The merkle tree object parsed from raw.
     pub tree: MerkleTree,
+}
+
+impl fmt::Display for MerkleStateInfo {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(&self).unwrap_or_default()
+        )
+    }
 }

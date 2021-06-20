@@ -32,11 +32,12 @@ async fn main() {
         signer_public_key: None,
         beneficiary_address: Some(beneficiary_address),
         order_by: None,
+        param: None
     };
 
     match client
         .block_routes()
-        .search_blocks(Some(criteria), None, None, None, None)
+        .search_blocks(Some(criteria))
         .await
     {
         Ok(block_info) => block_info.iter().for_each(|info| println!("{}", info)),

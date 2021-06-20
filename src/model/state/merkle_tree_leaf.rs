@@ -21,9 +21,9 @@ pub struct MerkleTreeLeaf {
     /// Merkle tree node type.
     pub r#type: MerkleTreeNodeType,
     /// Leaf node path.
-    pub path: H256,
+    pub path: String,
     /// Leaf node path encoded.
-    pub encoded_path: H256,
+    pub encoded_path: String,
     /// Leaf nibble count.
     pub nibble_count: usize,
     /// Leaf node value hash.

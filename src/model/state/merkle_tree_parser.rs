@@ -8,13 +8,11 @@
  * // except according to those terms.
  */
 
-use std::str::FromStr;
-
 use anyhow::{bail, Result};
 use hex::ToHex;
 use sha3::{Digest, Sha3_256};
 
-use crate::{H256, hex_decode, parse_u64};
+use crate::{hex_decode, parse_u64, H256};
 
 use super::{
     MerkleTreeBranch, MerkleTreeBranchLink, MerkleTreeLeaf, MerkleTreeNodeType, MerkleTreeTrait,
@@ -143,9 +141,9 @@ impl MerkleTreeParser {
 
         let leaf = MerkleTreeLeaf {
             r#type: MerkleTreeNodeType::Leaf,
-            path: H256::from_slice(path),
+            path: hex::encode(path),
             leaf_hash: Self::get_leaf_hash(encoded_path.to_owned(), value),
-            encoded_path: H256::from_str(encoded_path.as_str()).unwrap(),
+            encoded_path,
             nibble_count,
             value,
         };
@@ -212,7 +210,9 @@ impl MerkleTreeParser {
     ///
     fn get_leaf_hash(encoded_path: String, leaf_value: H256) -> H256 {
         let mut hash = Sha3_256::new();
-        hash.input(&hex_decode(&(encoded_path + &leaf_value.encode_hex::<String>())));
+        hash.input(&hex_decode(
+            &(encoded_path + &leaf_value.encode_hex::<String>()),
+        ));
 
         H256::from_slice(hash.result().as_slice())
     }

@@ -8,14 +8,31 @@
  * // except according to those terms.
  */
 
+use crate::{Client, Error, MosaicSearchCriteria, Response, RetryStrategy};
+use crate::blockchain::MerkleStateInfo;
 use crate::clients::request::Request;
-use crate::model_dto::MosaicInfoDto;
+use crate::model_dto::{MerkleStateInfoDto, MosaicInfoDto, MosaicPageDto};
 use crate::mosaic::{MosaicId, MosaicInfo};
-use crate::{Client, Error, Response, RetryStrategy};
 
 pub struct MosaicApi<R: RetryStrategy>(pub(crate) Client<R>);
 
 impl<R: RetryStrategy> MosaicApi<R> {
+    /// Gets the MosaicInfo for a given mosaicId.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` whose okay value is an `MosaicInfo` or whose error value
+    /// is an `Error` describing the error that occurred.
+    ///
+    pub async fn get_mosaic_merkle(&self, mosaic_id: MosaicId) -> Result<MerkleStateInfo, Error> {
+        let resp: Response<MerkleStateInfoDto> = self
+            .as_ref()
+            .send(Request::get_mosaic_merkle(mosaic_id))
+            .await?;
+        resp.to_compact()
+            .map_err(|e| Error::unexpected_uncategorized(e.to_string()))
+    }
+
     /// Gets the MosaicInfo for a given mosaicId.
     ///
     /// # Returns
@@ -52,6 +69,29 @@ impl<R: RetryStrategy> MosaicApi<R> {
             )
         }
         Ok(mosaics)
+    }
+
+    /// Gets an vec of `MosaicInfo`.
+    ///
+    /// # Inputs
+    ///
+    /// * `criteria`: Defines the params used to search blocks.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` whose okay value is an `Vec<BlockInfo>` or whose error value
+    /// is an `Error` describing the error that occurred.
+    ///
+    pub async fn search_mosaics(
+        &self,
+        criteria: Option<MosaicSearchCriteria>,
+    ) -> Result<Vec<MosaicInfo>, Error> {
+        let resp: Response<MosaicPageDto> = self
+            .as_ref()
+            .send(Request::search_mosaics(criteria))
+            .await?;
+        resp.to_compact()
+            .map_err(|e| Error::unexpected_uncategorized(e.to_string()))
     }
 }
 

@@ -14,11 +14,11 @@ use std::sync::Arc;
 use serde::de::DeserializeOwned;
 use serde::Deserialize;
 
-use crate::clients::{model_dto::BlockInfoDto, retry::RetryStrategy, Error, SymbolResponse};
+use crate::{BlockApi, ChainApi, GenerationHash, MosaicApi, NetworkApi};
+use crate::clients::{Error, model_dto::BlockInfoDto, retry::RetryStrategy, SymbolResponse};
 use crate::network::NetworkType;
-use crate::{BlockApi, ChainApi, GenerationHash, NetworkApi, MosaicApi};
 
-use super::{request::Request, HttpClient, Response, SimpleHttpClient};
+use super::{HttpClient, request::Request, Response, SimpleHttpClient};
 
 #[derive(Clone)]
 pub struct Client<R> {
@@ -42,7 +42,7 @@ impl<R: RetryStrategy> Client<R> {
             .map_err(Error::DeserializeResponseJsonError)?;
 
         let info = info
-            .to_compat()
+            .to_compact()
             .map_err(|e| Error::unexpected_uncategorized(e.to_string()))?;
 
         Ok(Self {

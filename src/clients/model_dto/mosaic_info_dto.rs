@@ -1,8 +1,10 @@
+use std::str::FromStr;
+
+use anyhow::Result;
+
 use crate::account::Address;
 use crate::model_dto::MosaicDto;
 use crate::mosaic::{MosaicFlags, MosaicId, MosaicInfo};
-use anyhow::Result;
-use std::str::FromStr;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct MosaicInfoDto {

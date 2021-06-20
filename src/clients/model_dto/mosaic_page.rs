@@ -10,18 +10,18 @@
 
 use anyhow::Result;
 
-use crate::blockchain::BlockInfo;
-use crate::clients::model_dto::{BlockInfoDto, Pagination};
+use crate::model_dto::{MosaicInfoDto, Pagination};
+use crate::mosaic::MosaicInfo;
 
 #[derive(Serialize, Deserialize)]
-pub struct BlockPageDto {
+pub struct MosaicPageDto {
     /// Array of blocks.
-    pub data: Vec<BlockInfoDto>,
+    pub data: Vec<MosaicInfoDto>,
     pub pagination: Pagination,
 }
 
-impl BlockPageDto {
-    pub fn to_compact(&self) -> Result<Vec<BlockInfo>> {
+impl MosaicPageDto {
+    pub fn to_compact(&self) -> Result<Vec<MosaicInfo>> {
         let mut block_info_vec = vec![];
 
         for info in self.data.iter() {

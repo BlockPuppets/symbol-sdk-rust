@@ -85,11 +85,11 @@ mod tests {
                 dto["tree"][1]["leafHash"].as_str().unwrap()
             );
             assert_eq!(
-                leaf.encoded_path.encode_hex_upper::<String>(),
+                leaf.encoded_path,
                 dto["tree"][1]["encodedPath"].as_str().unwrap()
             );
             assert_eq!(
-                leaf.path.encode_hex_upper::<String>(),
+                leaf.path.to_uppercase(),
                 dto["tree"][1]["path"].as_str().unwrap()
             );
             assert_eq!(

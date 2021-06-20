@@ -14,9 +14,9 @@ use hex::ToHex;
 use reqwest::Method;
 use serde_json::json;
 
+use crate::{H256, MosaicIds, MosaicSearchCriteria};
 use crate::clients::search_criteria::BlockSearchCriteria;
 use crate::mosaic::MosaicId;
-use crate::{MosaicIds, Order, H256};
 
 /// Type alias to improve readability.
 pub(crate) type RoutePathName = &'static str;
@@ -31,15 +31,13 @@ pub struct Request {
 }
 
 impl Request {
-    fn new_path(
-        base_path: &'static str,
-    ) -> Self {
+    fn new_path(base_path: &'static str) -> Self {
         Request {
             base_path,
             query_params: Default::default(),
             path_params: Default::default(),
             serialized_body: None,
-            method: Default::default()
+            method: Default::default(),
         }
     }
 
@@ -101,11 +99,7 @@ impl Request {
         let mut path_params = HashMap::new();
         path_params.insert("height", height.to_string());
 
-        Self::from_path_params(
-            Self::BLOCKS_HEIGHT_PATH,
-            path_params,
-            Method::GET,
-        )
+        Self::from_path_params(Self::BLOCKS_HEIGHT_PATH, path_params, Method::GET)
     }
 
     pub fn get_merkle_receipts(height: u64, hash: H256) -> Self {
@@ -113,12 +107,7 @@ impl Request {
         path_params.insert("height", height.to_string());
         path_params.insert("hash", hash.encode_hex_upper::<String>());
 
-        Self::from_path_params(
-            Self::BLOCKS_MERKLE_RECEIPTS_PATH,
-            path_params,
-
-            Method::GET,
-        )
+        Self::from_path_params(Self::BLOCKS_MERKLE_RECEIPTS_PATH, path_params, Method::GET)
     }
 
     pub fn get_merkle_transaction(height: u64, hash: H256) -> Self {
@@ -135,10 +124,6 @@ impl Request {
 
     pub fn search_blocks(
         criteria: Option<BlockSearchCriteria>,
-        page_size: Option<i32>,
-        page_number: Option<i32>,
-        offset: Option<&str>,
-        order: Option<Order>,
     ) -> Self {
         let mut query_params = HashMap::new();
 
@@ -152,26 +137,24 @@ impl Request {
             if let Some(value) = c.order_by {
                 query_params.insert("orderBy", value.to_string());
             }
+
+            if let Some(param) = c.param {
+                if let Some(value) = param.page_size {
+                    query_params.insert("pageSize", value.to_string());
+                }
+                if let Some(value) = param.page_number {
+                    query_params.insert("pageNumber", value.to_string());
+                }
+                if let Some(value) = param.offset {
+                    query_params.insert("offset", value.to_string());
+                }
+                if let Some(value) = param.order {
+                    query_params.insert("order", value.to_string());
+                }
+            }
         }
 
-        if let Some(value) = page_size {
-            query_params.insert("pageSize", value.to_string());
-        }
-        if let Some(value) = page_number {
-            query_params.insert("pageNumber", value.to_string());
-        }
-        if let Some(value) = offset {
-            query_params.insert("offset", value.to_string());
-        }
-        if let Some(value) = order {
-            query_params.insert("order", value.to_string());
-        }
-
-        Self::from_query_params(
-            Self::BLOCKS_SEARCH_PATH,
-            query_params,
-            Method::GET,
-        )
+        Self::from_query_params(Self::BLOCKS_SEARCH_PATH, query_params, Method::GET)
     }
 }
 
@@ -180,29 +163,57 @@ impl Request {
     pub const CHAIN_INFO_PATH: RoutePathName = "/chain/info";
 
     pub fn get_chain_info() -> Self {
-        Self::new_path(
-            Self::CHAIN_INFO_PATH,
-        )
+        Self::new_path(Self::CHAIN_INFO_PATH)
     }
 }
 
 // Chain requests
 impl Request {
     pub const MOSAIC_INFO_PATH: RoutePathName = "/mosaics/{mosaicId}";
+    pub const MOSAIC_INFO_MERKLE_PATH: RoutePathName = "/mosaics/{mosaicId}/merkle";
 
     pub const MOSAICS_INFO_PATH: RoutePathName = "/mosaics";
 
     pub fn get_mosaic(mosaic_id: MosaicId) -> Self {
         let mut path_params = HashMap::new();
         path_params.insert("mosaicId", mosaic_id.to_hex());
-        Self::from_path_params(
-            Self::MOSAIC_INFO_PATH,
-            path_params,
-            Method::GET,
-        )
+        Self::from_path_params(Self::MOSAIC_INFO_PATH, path_params, Method::GET)
     }
 
     pub fn get_mosaics(mosaic_ids: MosaicIds) -> Self {
         Self::from_serialized_body(Self::MOSAICS_INFO_PATH, mosaic_ids)
+    }
+
+    pub fn search_mosaics(criteria: Option<MosaicSearchCriteria>) -> Self {
+        let mut query_params = HashMap::new();
+
+        if let Some(c) = criteria {
+            if let Some(value) = c.owner_address {
+                query_params.insert("ownerAddress", value.address_str());
+            }
+
+            if let Some(param) = c.param {
+                if let Some(value) = param.page_size {
+                    query_params.insert("pageSize", value.to_string());
+                }
+                if let Some(value) = param.page_number {
+                    query_params.insert("pageNumber", value.to_string());
+                }
+                if let Some(value) = param.offset {
+                    query_params.insert("offset", value.to_string());
+                }
+                if let Some(value) = param.order {
+                    query_params.insert("order", value.to_string());
+                }
+            }
+        }
+
+        Self::from_query_params(Self::MOSAICS_INFO_PATH, query_params, Method::GET)
+    }
+
+    pub fn get_mosaic_merkle(mosaic_id: MosaicId) -> Self {
+        let mut path_params = HashMap::new();
+        path_params.insert("mosaicId", mosaic_id.to_hex());
+        Self::from_path_params(Self::MOSAIC_INFO_MERKLE_PATH, path_params, Method::GET)
     }
 }

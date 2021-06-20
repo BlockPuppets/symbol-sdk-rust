@@ -12,12 +12,12 @@ use std::convert::TryFrom;
 use std::fmt::Debug;
 
 use async_trait::async_trait;
-
-use crate::clients::async_client::request::Request;
-use crate::clients::{consts::HTTP_REQUEST_TIMEOUT, Error, SymbolResponse};
-use crate::SymbolError;
-use reqwest::header::{CONTENT_TYPE, CONTENT_LENGTH};
+use reqwest::header::{CONTENT_LENGTH, CONTENT_TYPE};
 use serde_json::Value;
+
+use crate::clients::{consts::HTTP_REQUEST_TIMEOUT, Error, SymbolResponse};
+use crate::clients::async_client::request::Request;
+use crate::SymbolError;
 
 #[derive(Debug)]
 pub struct Response<R> {
@@ -138,7 +138,7 @@ impl HttpClient for SimpleHttpClient {
         let url = self.url.join(&uri_str).unwrap();
 
         let rpc_resp: Value =
-            send_json_request(self.http_client.clone(), url, request ).await?;
-        Ok(SymbolResponse{result: Some(rpc_resp)})
+            send_json_request(self.http_client.clone(), url, request).await?;
+        Ok(SymbolResponse { result: Some(rpc_resp) })
     }
 }
