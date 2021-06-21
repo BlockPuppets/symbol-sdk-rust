@@ -25,7 +25,7 @@ impl BlockPageDto {
         let mut block_info_vec = vec![];
 
         for info in self.data.iter() {
-            block_info_vec.push(info.to_compat()?)
+            block_info_vec.push(info.to_compact()?)
         }
 
         Ok(block_info_vec)

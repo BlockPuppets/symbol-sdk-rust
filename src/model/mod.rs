@@ -9,6 +9,7 @@
  */
 
 pub use self::id::Id;
+pub use self::node_identity_equality_strategy::*;
 pub use self::uint64::*;
 
 pub mod account;
@@ -16,6 +17,9 @@ pub mod blockchain;
 mod id;
 pub mod message;
 pub mod mosaic;
+pub mod namespace;
 pub mod network;
+pub mod node;
+mod node_identity_equality_strategy;
 pub mod state;
 mod uint64;

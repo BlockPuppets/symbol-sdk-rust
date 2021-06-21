@@ -1,4 +1,4 @@
-use symbol_sdk::mosaic::{MosaicFlags, Mosaic, MosaicId};
+use symbol_sdk::mosaic::{Mosaic, MosaicFlags, MosaicId};
 
 fn main() {
     let id = MosaicId::from_hex("85BBEA6CC462B244").unwrap();
@@ -10,7 +10,7 @@ fn main() {
     let mosaic_absolute = Mosaic::create(id, 10_000);
     match mosaic_absolute {
         Ok(mosaic) => {
-            println!("{:?}", mosaic)
+            println!("{}", mosaic)
         }
         Err(err) => {
             panic!("{:?}", err)

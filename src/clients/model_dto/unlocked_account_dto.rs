@@ -8,4 +8,9 @@
  * // except according to those terms.
  */
 
-mod network_type;
+#[derive(Clone, Serialize, Deserialize)]
+pub struct UnlockedAccountDto {
+    #[serde(rename = "unlockedAccount")]
+    pub unlocked_account: Vec<String>,
+}
+

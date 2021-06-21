@@ -8,7 +8,7 @@
  * // except according to those terms.
  */
 
-use crate::{BlockSearchCriteria, H256, Order, RetryStrategy};
+use crate::{BlockSearchCriteria, H256, RetryStrategy};
 use crate::blockchain::{BlockInfo, MerkleProofInfo};
 use crate::clients::{
     Error,
@@ -35,7 +35,7 @@ impl<R: RetryStrategy> BlockApi<R> {
             .as_ref()
             .send(Request::get_block_by_height(height))
             .await?;
-        resp.to_compat()
+        resp.to_compact()
             .map_err(|e| Error::unexpected_uncategorized(e.to_string()))
     }
 
@@ -108,13 +108,6 @@ impl<R: RetryStrategy> BlockApi<R> {
     /// # Inputs
     ///
     /// * `criteria`: Defines the params used to search blocks.
-    /// * `pageSize`: Select the number of entries to return, (Default = 10).
-    /// * `pageNumber`: Filter by page number, (Default = 1).
-    /// * `offset`: Entry id at which to start pagination.
-    ///     If the ordering parameter is set to -id, the elements returned precede the identifier.
-    ///     Otherwise, newer elements with respect to the id are returned, (Default = "desc")
-    /// * `order`: Sort responses in ascending or descending order based on the collection property set on the param orderBy.
-    ///     If the request does not specify orderBy, REST returns the collection ordered by id, (Default: "desc").
     ///
     /// # Returns
     ///
@@ -124,19 +117,11 @@ impl<R: RetryStrategy> BlockApi<R> {
     pub async fn search_blocks(
         &self,
         criteria: Option<BlockSearchCriteria>,
-        page_size: Option<i32>,
-        page_number: Option<i32>,
-        offset: Option<&str>,
-        order: Option<Order>,
     ) -> Result<Vec<BlockInfo>, Error> {
         let resp: Response<BlockPageDto> = self
             .as_ref()
             .send(Request::search_blocks(
                 criteria,
-                page_size,
-                page_number,
-                offset,
-                order,
             ))
             .await?;
         resp.to_compact()

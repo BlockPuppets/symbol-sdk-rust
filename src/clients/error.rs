@@ -18,7 +18,7 @@ use super::SymbolResponse;
 pub enum Error {
     // Error when send http request failed
     NetworkError(reqwest::Error),
-    // Error when Symbol node Response http status is 409
+    // Error when Symbol node Response http status is 409 or 404
     SymbolError(SymbolError),
     // Response http status is not 200
     InvalidHTTPStatus(String, reqwest::StatusCode),

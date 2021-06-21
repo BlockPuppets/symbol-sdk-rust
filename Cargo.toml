@@ -5,7 +5,7 @@ authors = ["Puppet Black <blockpuppetblack0@gmail.com>"]
 readme = "README.md"
 license = "Apache-2.0"
 repository = "https://github.com/BlockPuppets/symbol-sdk-rust"
-keywords = ["symbol", "nis1", "nem"]
+keywords = ["symbol", "nem"]
 categories = ["blockchain", "sdk"]
 exclude = [".gitignore"]
 edition = "2018"
@@ -15,35 +15,34 @@ name = "symbol_sdk"
 crate-type = ["lib"]
 
 [dependencies.symbol-crypto-core]
-version = "^0.1.1-alpha.1"
+git = "https://github.com/BlockPuppets/symbol-crypto-core"
 features = ['serde', 'with_mnemonic']
-optional = true
 
 [dependencies.serde]
-version = "1.0"
+version = "^1.0"
 features = ["derive"]
-
-[dependencies.typetag]
-version = "^0.1"
 
 [dependencies.serde_json]
 version = "^1.0"
 
+[dependencies.typetag]
+version = "^0.1"
+
 [dependencies.hex]
 version = "^0.4"
+
+[dependencies.sha3]
+version = "^0.9"
+default-features = false
 
 [dependencies.base32]
 version = "^0.4"
 
-[dependencies.sha3]
-version = "^0.8"
-default-features = false
-
 [dependencies.ripemd160]
-version = "^0.8"
+version = "^0.9"
 
 [dependencies.fixed-hash]
-version = "0.3"
+version = "0.7"
 
 [dependencies.anyhow]
 version = "1.0"
@@ -52,36 +51,34 @@ version = "1.0"
 version = "^1"
 
 [dependencies.rand]
-version = "0.7"
+version = "0.8"
+features = ["std_rng"]
 default-features = false
 
 [dependencies.byteorder]
-version = "^1"
+version = "^1.4"
+default-features = false
 
 [dependencies.round]
-version = "0.1.0"
+version = "0.1"
 
 [dependencies.async-trait]
-version = "0.1.50"
+version = "0.1"
 
 [dependencies.url]
 version = "2.2"
 
 [dependencies.reqwest]
-version = "0.11.3"
-features = ["blocking", "json"]
+version = "0.11"
+features = ["json"]
 default_features = false
 
 [dependencies.tokio]
-version = "1.6.0"
-features = ["full"]
+version = "1.7"
+features = ["macros", "rt-multi-thread"]
 
-[features]
-default = ['sym']  # default support for symbol blockchain
-nis1 = ['symbol-crypto-core/nis1'] # support for nem nis1 blockchain
-sym = ['symbol-crypto-core/sym']
-full = ['sym', 'nis1']
+[dependencies.chrono]
+version = "0.4"
 
 [dev-dependencies]
-symbol-sdk = { path = ".", features = ['full'] }
-lazy_static = "1.4.0"
+lazy_static = "1.4"

@@ -8,16 +8,29 @@
  * // except according to those terms.
  */
 
+use std::fmt;
+
 /// The blockchain storage info structure describes stored data.
 ///
-#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct StorageInfo {
     /// The number of confirmed blocks.
-    pub num_blocks: usize,
+    pub num_blocks: u64,
 
     /// The number of confirmed transactions.
-    pub num_transactions: usize,
+    pub num_transactions: u64,
 
     /// The number accounts published in the blockchain.
-    pub num_accounts: usize,
+    pub num_accounts: u64,
+}
+
+impl fmt::Display for StorageInfo {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(&self).unwrap_or_default()
+        )
+    }
 }

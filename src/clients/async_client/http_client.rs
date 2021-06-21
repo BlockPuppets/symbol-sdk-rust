@@ -12,7 +12,8 @@ use std::convert::TryFrom;
 use std::fmt::Debug;
 
 use async_trait::async_trait;
-use reqwest::Method;
+use reqwest::header::{CONTENT_LENGTH, CONTENT_TYPE};
+use serde_json::Value;
 
 use crate::clients::{consts::HTTP_REQUEST_TIMEOUT, Error, SymbolResponse};
 use crate::clients::async_client::request::Request;
@@ -48,15 +49,30 @@ impl<R> std::ops::Deref for Response<R> {
 async fn send_json_request<T: for<'de> serde::Deserialize<'de>>(
     client: reqwest::Client,
     url: reqwest::Url,
-    method: Method,
+    request: &Request,
 ) -> Result<T, Error> {
-    let resp = client
-        .request(method, url)
-        .send()
-        .await
-        .map_err(Error::NetworkError)?;
+    let builder = client.request(request.method.clone(), url.as_str()).body(
+        request
+            .serialized_body
+            .clone()
+            .unwrap_or_else(|| "".to_owned()),
+    );
 
-    if resp.status().as_u16() == 409 {
+    let mut req = builder.build().map_err(Error::NetworkError)?;
+
+    if let Some(ref body) = request.serialized_body {
+        req.headers_mut()
+            .insert(CONTENT_TYPE, "application/json".parse().unwrap());
+
+        req.headers_mut().insert(CONTENT_LENGTH, body.len().into());
+    }
+
+    let resp = client.execute(req).await.map_err(Error::NetworkError)?;
+
+    if resp.status().as_u16() == 409
+        || resp.status().as_u16() == 404
+        || resp.status().as_u16() == 503
+    {
         let err: SymbolError = resp.json().await.map_err(Error::InvalidHTTPResponse)?;
         return Err(Error::SymbolError(err));
     }
@@ -122,8 +138,9 @@ impl HttpClient for SimpleHttpClient {
 
         let url = self.url.join(&uri_str).unwrap();
 
-        let rpc_resp: SymbolResponse =
-            send_json_request(self.http_client.clone(), url, request.method.clone()).await?;
-        Ok(rpc_resp)
+        let rpc_resp: Value = send_json_request(self.http_client.clone(), url, request).await?;
+        Ok(SymbolResponse {
+            result: Some(rpc_resp),
+        })
     }
 }

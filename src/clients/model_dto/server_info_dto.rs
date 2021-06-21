@@ -8,6 +8,12 @@
  * // except according to those terms.
  */
 
-pub use self::model::*;
+use crate::node::ServerInfo;
 
-mod model;
+#[derive(Clone, Serialize, Deserialize)]
+pub struct ServerInfoDto {
+    #[serde(rename = "serverInfo")]
+    pub server_info: ServerInfo,
+}
+
+

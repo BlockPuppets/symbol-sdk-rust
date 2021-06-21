@@ -14,7 +14,6 @@ use byteorder::{LittleEndian, ReadBytesExt};
 use sha3::{Digest, Sha3_256};
 
 use crate::account::Address;
-use crate::H192;
 
 pub use self::mosaic::*;
 pub use self::mosaic_flags::*;
@@ -34,13 +33,13 @@ mod mosaic_supply_change_action;
 
 /// Generates a `MosaicId` given a `MosaicNonce` and a `Address`.
 ///
-fn generate_mosaic_id(nonce: MosaicNonce, owner_address: Address<H192>) -> MosaicId {
+fn generate_mosaic_id(nonce: MosaicNonce, owner_address: Address) -> MosaicId {
     let mut hash = Sha3_256::default();
 
-    hash.input(*nonce);
-    hash.input(owner_address.address);
+    hash.update(*nonce);
+    hash.update(owner_address.address);
 
-    let bytes = hash.result();
+    let bytes = hash.finalize();
 
     let mut cursor = Cursor::new(bytes[..].as_ref());
     let value = cursor.read_u64::<LittleEndian>().unwrap();

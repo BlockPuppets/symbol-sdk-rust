@@ -11,6 +11,7 @@
 use std::str::FromStr;
 
 use anyhow::{ensure, Result};
+use crypto::prelude;
 
 use crate::is_hex;
 use crate::message::{Message, MessageType, PlainMessage};
@@ -28,17 +29,17 @@ pub struct EncryptedMessage {
 impl EncryptedMessage {
     /// Create a new `EncryptedMessage`.
     ///
-    pub fn create<C: crypto::prelude::BlockCipher>(
+    pub fn create(
         message: &[u8],
         signer_private_key: &str,
         recipient_public_key: &str,
     ) -> Result<Self> {
         ensure!(!message.is_empty(), "message must not be empty.");
 
-        let signer_private_key = crypto::prelude::PrivateKey::from_str(signer_private_key)?;
-        let recipient_public_key = crypto::prelude::PublicKey::from_str(recipient_public_key)?;
+        let signer_private_key = prelude::PrivateKey::from_str(signer_private_key)?;
+        let recipient_public_key = prelude::PublicKey::from_str(recipient_public_key)?;
 
-        let encrypt_message = signer_private_key.encrypt_message::<C>(
+        let encrypt_message = signer_private_key.encrypt_message::<prelude::CryptoSym>(
             recipient_public_key.as_fixed_bytes(),
             message,
         )?;
@@ -69,7 +70,7 @@ impl EncryptedMessage {
     }
 
     /// Encrypted message to be decrypted
-    pub fn decrypt<C: crypto::prelude::BlockCipher>(
+    pub fn decrypt(
         &self,
         recipient_private_key: &str,
         signer_public_key: &str,
@@ -77,11 +78,10 @@ impl EncryptedMessage {
         let recipient_private_key = crypto::prelude::PrivateKey::from_str(recipient_private_key)?;
         let signer_public_key = crypto::prelude::PublicKey::from_str(signer_public_key)?;
 
-        let decrypted_message = recipient_private_key
-            .decrypt_message::<C>(
-                signer_public_key.as_fixed_bytes(),
-                &self.payload_to_vec(),
-            )?;
+        let decrypted_message = recipient_private_key.decrypt_message::<prelude::CryptoSym>(
+            signer_public_key.as_fixed_bytes(),
+            &self.payload_to_vec(),
+        )?;
 
         PlainMessage::from_bytes(&decrypted_message)
     }
@@ -99,8 +99,7 @@ impl Message for EncryptedMessage {
 
 #[cfg(test)]
 pub mod tests {
-    use crate::{AccountNis1, H192, H200, KpNis1, KpSym};
-    use crate::account::{Account, AccountSym};
+    use crate::account::Account;
     use crate::message::EncryptedMessage;
     use crate::network::NetworkType;
 
@@ -110,16 +109,10 @@ pub mod tests {
         "B72F2950498111BADF276D6D9D5E345F04E0D5C9B8342DA983C3395B4CF18F08";
 
     lazy_static! {
-        static ref SENDER: Account<KpSym, H192> =
-            AccountSym::from_hex_private_key(SENDER_PRIVATE_KEY, NetworkType::PRIVATE_TEST)
-                .unwrap();
-        static ref RECIPIENT: Account<KpSym, H192> =
-            AccountSym::from_hex_private_key(RECIPIENT_PRIVATE_KEY, NetworkType::PRIVATE_TEST)
-                .unwrap();
-        static ref SENDER_NIS: Account<KpNis1, H200> =
-            AccountNis1::from_hex_private_key(SENDER_PRIVATE_KEY, NetworkType::TEST_NET).unwrap();
-        static ref RECIPIENT_NIS: Account<KpNis1, H200> =
-            AccountNis1::from_hex_private_key(RECIPIENT_PRIVATE_KEY, NetworkType::TEST_NET)
+        static ref SENDER: Account =
+            Account::from_hex_private_key(SENDER_PRIVATE_KEY, NetworkType::PRIVATE_TEST).unwrap();
+        static ref RECIPIENT: Account =
+            Account::from_hex_private_key(RECIPIENT_PRIVATE_KEY, NetworkType::PRIVATE_TEST)
                 .unwrap();
     }
 
@@ -152,20 +145,6 @@ pub mod tests {
             EncryptedMessage::from_payload(&encrypted_message.payload).unwrap();
         let plain_message = RECIPIENT
             .decrypt_message(&encrypted_message_from_payload, SENDER.public_account)
-            .unwrap();
-
-        assert_eq!(plain_message.payload, "Testing simple transfer");
-    }
-
-    #[test]
-    fn test_should_encrypt_and_decrypt_message_using_nis1_schema() {
-        let encrypted_message = SENDER_NIS
-            .encrypt_message("Testing simple transfer", RECIPIENT_NIS.public_account)
-            .unwrap();
-
-        println!("{}", encrypted_message.payload);
-        let plain_message = RECIPIENT_NIS
-            .decrypt_message(&encrypted_message, SENDER_NIS.public_account)
             .unwrap();
 
         assert_eq!(plain_message.payload, "Testing simple transfer");

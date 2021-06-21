@@ -10,28 +10,18 @@
 
 #[macro_use]
 extern crate fixed_hash;
+#[cfg(test)]
+#[macro_use]
+extern crate lazy_static;
 #[macro_use]
 extern crate serde;
 extern crate symbol_crypto_core as crypto;
 
-#[cfg(test)]
-#[macro_use]
-extern crate lazy_static;
-
 pub use self::clients::*;
-#[cfg(feature = "nis1")]
-pub use self::crypto::prelude::KpNis1;
-pub use self::crypto::prelude::KpSym;
 pub use self::helpers::*;
 pub use self::model::*;
-#[cfg(feature = "nis1")]
-pub use self::nis1::*;
-pub use self::sym::*;
 
 mod clients;
 mod core;
 mod helpers;
 mod model;
-#[cfg(feature = "nis1")]
-mod nis1;
-mod sym;

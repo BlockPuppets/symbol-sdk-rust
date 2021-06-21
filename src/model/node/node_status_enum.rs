@@ -8,6 +8,11 @@
  * // except according to those terms.
  */
 
-pub use self::account::*;
-
-mod account;
+///
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
+pub enum NodeStatusEnum {
+    #[serde(rename = "up")]
+    Up,
+    #[serde(rename = "down")]
+    Down,
+}

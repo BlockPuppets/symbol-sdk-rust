@@ -1,37 +1,27 @@
-use symbol_sdk::{H192, H200, KpNis1, KpSym};
 use symbol_sdk::account::Account;
 use symbol_sdk::network::NetworkType;
 
 fn main() {
-    let account_one = Account::<KpNis1, H200>::random(NetworkType::TEST_NET);
+    let account_one = Account::random(NetworkType::TEST_NET);
     println!("network_type:\t{}", account_one);
 
     let private_key: &str = "75027D85CE92E2C469297F4C91E4E88AE03868A91B23C835AEF7C5EFDAD0DBDB";
-    let account_two =
-        Account::<KpNis1, H200>::from_hex_private_key(private_key, NetworkType::TEST_NET).unwrap();
+    let account_two = Account::from_hex_private_key(private_key, NetworkType::TEST_NET).unwrap();
     println!("account_two: {}", account_two);
 
-    let account_two = Account::<KpSym, H192>::random(NetworkType::TEST_NET);
-    println!("network_type:\t{}", account_two);
-
-    let private_key: &str = "75027D85CE92E2C469297F4C91E4E88AE03868A91B23C835AEF7C5EFDAD0DBDB";
-    let account_three =
-        Account::<KpSym, H192>::from_hex_private_key(private_key, NetworkType::TEST_NET).unwrap();
-    println!("account_two: {}", account_three);
-
     let data = "Symbol is wonderful";
-    let signature = account_three.sign_data(data).unwrap();
+    let signature = account_two.sign_data(data).unwrap();
     println!("signature: {:X}", signature);
 
-    let verify = account_three.verify_signature(data.as_ref(), signature);
+    let verify = account_two.verify_signature(data.as_ref(), signature);
     println!("Verify: {}\n", verify.is_ok());
 
-    let (account_four, mnemonic) =
-        Account::<KpSym, H192>::create_with_mnemonic("any_password", NetworkType::TEST_NET).unwrap();
-    println!("Account Three: {}", account_four);
+    let (account_three, mnemonic) =
+        Account::create_with_mnemonic("any_password", NetworkType::TEST_NET).unwrap();
+    println!("Account Three: {}", account_three);
     println!("Mnemonic Three: {}\n", mnemonic);
 
     let account_five =
-        Account::<KpSym, H192>::from_mnemonic(&mnemonic, "any_password", NetworkType::TEST_NET).unwrap();
+        Account::from_mnemonic(&mnemonic, "any_password", NetworkType::TEST_NET).unwrap();
     println!("Account Four: {}", account_five);
 }
