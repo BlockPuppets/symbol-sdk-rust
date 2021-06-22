@@ -8,7 +8,6 @@
  * // except according to those terms.
  */
 
-use crate::{Client, Error, Response, RetryStrategy};
 use crate::account::PublicAccount;
 use crate::blockchain::StorageInfo;
 use crate::clients::request::Request;
@@ -16,6 +15,7 @@ use crate::model_dto::{
     NodeHealthInfoDto, NodeInfoDto, NodeTimeDto, ServerInfoDto, UnlockedAccountDto,
 };
 use crate::node::{NodeHealth, NodeInfo, NodeTime, ServerInfo};
+use crate::{Client, Error, Response, RetryStrategy};
 
 pub struct NodeApi<R: RetryStrategy>(pub(crate) Client<R>);
 
@@ -48,8 +48,7 @@ impl<R: RetryStrategy> NodeApi<R> {
     ///
     pub async fn get_node_info(&self) -> Result<NodeInfo, Error> {
         let resp: Response<NodeInfoDto> = self.as_ref().send(Request::get_node_info()).await?;
-        resp.to_compact()
-            .map_err(|e| Error::unexpected_uncategorized(e.to_string()))
+        resp.to_compact().map_err(Into::into)
     }
 
     /// Get peers information.
@@ -101,8 +100,7 @@ impl<R: RetryStrategy> NodeApi<R> {
     ///
     pub async fn get_node_time(&self) -> Result<NodeTime, Error> {
         let resp: Response<NodeTimeDto> = self.as_ref().send(Request::get_node_time()).await?;
-        resp.to_compact()
-            .map_err(|e| Error::unexpected_uncategorized(e.to_string()))
+        resp.to_compact().map_err(Into::into)
     }
 
     /// Get the version of the running REST component.

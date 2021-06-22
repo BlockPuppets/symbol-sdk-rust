@@ -10,6 +10,8 @@ fn main() {
     let mosaic_absolute = Mosaic::create(id, 10_000);
     match mosaic_absolute {
         Ok(mosaic) => {
+            println!("signature: {:?}", bcs::to_bytes(&mosaic).unwrap());
+
             println!("{}", mosaic)
         }
         Err(err) => {

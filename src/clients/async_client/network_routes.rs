@@ -70,7 +70,7 @@ impl<R: RetryStrategy> NetworkApi<R> {
     pub async fn get_rental_fees(&self) -> Result<RentalFees, Error> {
         let resp: Response<RentalFeesDto> = self.as_ref().send(Request::get_rental_fees()).await?;
         resp.to_compact()
-            .map_err(|e| Error::unexpected_uncategorized(e.to_string()))
+            .map_err(Into::into)
     }
 
     /// Get transaction fees information.
