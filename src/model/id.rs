@@ -14,11 +14,15 @@ use crate::Uint64;
 
 /// An `trait` is used to define mosaicIds and namespaceIds
 #[typetag::serde]
-pub trait Id: Send + Sync
-{
+pub trait Id: Send + Sync {
     fn to_uint64(&self) -> Uint64;
-
     fn box_clone(&self) -> Box<dyn Id>;
+}
+
+impl dyn Id {
+    fn as_bytes(&self) -> [u8; 8] {
+        self.to_uint64().to_fixed_bytes()
+    }
 }
 
 impl Clone for Box<dyn Id + 'static> {

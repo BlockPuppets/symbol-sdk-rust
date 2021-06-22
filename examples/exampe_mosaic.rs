@@ -13,17 +13,17 @@ fn main() {
             println!("{}", mosaic)
         }
         Err(err) => {
-            panic!("{:?}", err)
+            panic!("{}", err)
         }
     }
 
     let mosaic_relative = Mosaic::create_relative(id, 10_000, 6);
     match mosaic_relative {
         Ok(mosaic) => {
-            println!("{:?}", mosaic)
+            println!("{}", mosaic)
         }
         Err(err) => {
-            panic!("{:?}", err)
+            panic!("{}", err)
         }
     }
 }

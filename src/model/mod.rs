@@ -14,7 +14,10 @@ pub use self::uint64::*;
 
 pub mod account;
 pub mod blockchain;
+#[allow(dead_code)]
 mod id;
+
+#[allow(dead_code)]
 pub mod message;
 pub mod mosaic;
 pub mod namespace;

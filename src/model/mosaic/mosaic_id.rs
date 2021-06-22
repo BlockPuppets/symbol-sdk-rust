@@ -89,9 +89,9 @@ impl From<u64> for MosaicId {
 
 /// Creates a `MosaicId` from the given low and high bits.
 ///
-impl From<(u32, u32)> for MosaicId {
-    fn from(lo_hi: (u32, u32)) -> Self {
-        Self(Uint64::from_bits(lo_hi.0, lo_hi.1))
+impl From<[u32; 2]> for MosaicId {
+    fn from(lo_hi: [u32; 2]) -> Self {
+        Self(Uint64::from_bits(lo_hi[0], lo_hi[1]))
     }
 }
 
