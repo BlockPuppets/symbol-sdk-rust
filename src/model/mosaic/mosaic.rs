@@ -12,7 +12,7 @@ use std::fmt;
 
 use anyhow::{ensure, Result};
 
-use crate::{Id, Uint64};
+use crate::{ser_to_id, Id, Uint64};
 
 /// A `Mosaic` describes an instance of a mosaic definition.
 /// Mosaics can be transferred by means of a transfer transaction.
@@ -23,6 +23,7 @@ pub struct Mosaic {
     /// The mosaic id.
     /// This can either be of type `MosaicId` or `NamespaceId`.
     ///
+    #[serde(serialize_with = "ser_to_id")]
     pub id: Box<dyn Id + 'static>,
     /// The mosaic amount.
     /// The quantity is always given in smallest units for the mosaic
@@ -43,8 +44,7 @@ impl Mosaic {
 
     /// Create `Mosaic` with absolute amount.
     ///
-    pub fn create<I: 'static + Id>(id: I, amount: u64) -> Result<Self>
-    {
+    pub fn create<I: 'static + Id>(id: I, amount: u64) -> Result<Self> {
         ensure!(
             amount <= Self::MAX_AMOUNT_ABSOLUTE,
             format!(
@@ -93,15 +93,18 @@ impl Mosaic {
 
         Self::create(id, amount * pow_divisibility)
     }
+
+    pub fn to_bytes(&self) -> Vec<u8> {
+        bcs::to_bytes(&self).unwrap()
+    }
 }
 
 impl fmt::Display for Mosaic {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "{{ \"id\": \"{}\", \"amount\": {} }}",
-            self.id, *self.amount
-        )
+        writeln!(f, "{}", "{")?;
+        writeln!(f, "  \"id\": \"{}\",", self.id)?;
+        writeln!(f, "  \"amount\": {}", *self.amount)?;
+        writeln!(f, "{}", "}")
     }
 }
 
@@ -109,7 +112,7 @@ impl fmt::Display for Mosaic {
 mod tests {
     use crate::mosaic::{Mosaic, MosaicId};
 
-    const LO_HI: (u32, u32) = (3646934825, 3576016193);
+    const LO_HI: [u32; 2] = [3646934825, 3576016193];
 
     #[test]
     fn test_should_create_with_absolute_amount() {
@@ -130,7 +133,9 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "Invalid divisibility 8, the divisibility must be in the range of 0 and 6.")]
+    #[should_panic(
+        expected = "Invalid divisibility 8, the divisibility must be in the range of 0 and 6."
+    )]
     fn test_try_create_with_relative_should_return_panic() {
         let id = MosaicId::from(LO_HI);
         Mosaic::create_relative(id, 1, 8).unwrap();

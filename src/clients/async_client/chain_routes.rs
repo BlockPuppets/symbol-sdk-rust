@@ -33,7 +33,7 @@ impl<R: RetryStrategy> ChainApi<R> {
     pub async fn get_chain_info(&self) -> Result<ChainInfo, Error> {
         let resp: Response<ChainInfoDto> = self.as_ref().send(Request::get_chain_info()).await?;
         resp.to_compact()
-            .map_err(|e| Error::unexpected_uncategorized(e.to_string()))
+            .map_err(Into::into)
     }
 }
 

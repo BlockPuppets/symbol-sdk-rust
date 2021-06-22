@@ -34,6 +34,12 @@ pub enum Error {
     UnexpectedError(UnexpectedError),
 }
 
+impl From<anyhow::Error> for Error {
+    fn from(e: anyhow::Error) -> Self {
+        Error::unexpected_uncategorized(e.to_string())
+    }
+}
+
 impl Error {
     pub fn unexpected_no_response(req: serde_json::Value) -> Self {
         Error::UnexpectedError(UnexpectedError::NoResponse(req))

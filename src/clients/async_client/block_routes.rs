@@ -8,14 +8,14 @@
  * // except according to those terms.
  */
 
-use crate::{BlockSearchCriteria, H256, RetryStrategy};
 use crate::blockchain::{BlockInfo, MerkleProofInfo};
 use crate::clients::{
-    Error,
     model_dto::{BlockInfoDto, BlockPageDto, MerkleProofInfoDto},
+    Error,
 };
+use crate::{BlockSearchCriteria, RetryStrategy, H256};
 
-use super::{Client, request::Request, Response};
+use super::{request::Request, Client, Response};
 
 pub struct BlockApi<R: RetryStrategy>(pub(crate) Client<R>);
 
@@ -35,8 +35,7 @@ impl<R: RetryStrategy> BlockApi<R> {
             .as_ref()
             .send(Request::get_block_by_height(height))
             .await?;
-        resp.to_compact()
-            .map_err(|e| Error::unexpected_uncategorized(e.to_string()))
+        resp.to_compact().map_err(Into::into)
     }
 
     /// Get the merkle path for a given a receipt statement hash and block.
@@ -67,8 +66,7 @@ impl<R: RetryStrategy> BlockApi<R> {
             .as_ref()
             .send(Request::get_merkle_receipts(height, hash))
             .await?;
-        resp.to_compact()
-            .map_err(|e| Error::unexpected_uncategorized(e.to_string()))
+        resp.to_compact().map_err(Into::into)
     }
 
     /// Get the merkle path for a given a transaction and block.
@@ -99,8 +97,7 @@ impl<R: RetryStrategy> BlockApi<R> {
             .as_ref()
             .send(Request::get_merkle_transaction(height, hash))
             .await?;
-        resp.to_compact()
-            .map_err(|e| Error::unexpected_uncategorized(e.to_string()))
+        resp.to_compact().map_err(Into::into)
     }
 
     /// Gets an vec of blocks.
@@ -118,14 +115,9 @@ impl<R: RetryStrategy> BlockApi<R> {
         &self,
         criteria: Option<BlockSearchCriteria>,
     ) -> Result<Vec<BlockInfo>, Error> {
-        let resp: Response<BlockPageDto> = self
-            .as_ref()
-            .send(Request::search_blocks(
-                criteria,
-            ))
-            .await?;
-        resp.to_compact()
-            .map_err(|e| Error::unexpected_uncategorized(e.to_string()))
+        let resp: Response<BlockPageDto> =
+            self.as_ref().send(Request::search_blocks(criteria)).await?;
+        resp.to_compact().map_err(Into::into)
     }
 }
 

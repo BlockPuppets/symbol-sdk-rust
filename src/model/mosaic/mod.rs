@@ -47,5 +47,5 @@ fn generate_mosaic_id(nonce: MosaicNonce, owner_address: Address) -> MosaicId {
     let lower = value as u32;
     let higher = (value >> 32) as u32;
 
-    (lower, higher).into()
+    [lower, higher].into()
 }

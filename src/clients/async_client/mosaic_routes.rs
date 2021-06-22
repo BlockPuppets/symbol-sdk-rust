@@ -8,11 +8,11 @@
  * // except according to those terms.
  */
 
-use crate::{Client, Error, MosaicSearchCriteria, Response, RetryStrategy};
 use crate::blockchain::MerkleStateInfo;
 use crate::clients::request::Request;
 use crate::model_dto::{MerkleStateInfoDto, MosaicInfoDto, MosaicPageDto};
 use crate::mosaic::{MosaicId, MosaicInfo};
+use crate::{Client, Error, MosaicSearchCriteria, Response, RetryStrategy};
 
 pub struct MosaicApi<R: RetryStrategy>(pub(crate) Client<R>);
 
@@ -29,8 +29,7 @@ impl<R: RetryStrategy> MosaicApi<R> {
             .as_ref()
             .send(Request::get_mosaic_merkle(mosaic_id))
             .await?;
-        resp.to_compact()
-            .map_err(|e| Error::unexpected_uncategorized(e.to_string()))
+        resp.to_compact().map_err(Into::into)
     }
 
     /// Gets the MosaicInfo for a given mosaicId.
@@ -43,8 +42,7 @@ impl<R: RetryStrategy> MosaicApi<R> {
     pub async fn get_mosaic(&self, mosaic_id: MosaicId) -> Result<MosaicInfo, Error> {
         let resp: Response<MosaicInfoDto> =
             self.as_ref().send(Request::get_mosaic(mosaic_id)).await?;
-        resp.to_compact()
-            .map_err(|e| Error::unexpected_uncategorized(e.to_string()))
+        resp.to_compact().map_err(Into::into)
     }
 
     /// Gets the MosaicInfo for a given mosaicId.
@@ -90,8 +88,7 @@ impl<R: RetryStrategy> MosaicApi<R> {
             .as_ref()
             .send(Request::search_mosaics(criteria))
             .await?;
-        resp.to_compact()
-            .map_err(|e| Error::unexpected_uncategorized(e.to_string()))
+        resp.to_compact().map_err(Into::into)
     }
 }
 
