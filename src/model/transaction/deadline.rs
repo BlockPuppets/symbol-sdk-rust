@@ -22,7 +22,6 @@ pub struct DeadLine(u64);
 
 impl DeadLine {
     /// Create DeadLine.
-    /// * Default to 2 hours in advance.
     ///
     /// # Inputs
     ///
