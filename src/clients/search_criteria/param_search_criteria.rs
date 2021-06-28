@@ -1,5 +1,5 @@
 /*
- * // Copyright 2021 Developers of the Symbol sdk Rust project.
+ * // Copyright 2021 BlockPuppets developers.
  * //
  * // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
  * // https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -17,12 +17,12 @@ use crate::Order;
 #[derive(Clone, Serialize, Deserialize)]
 pub struct ParamSearchCriteria {
     /// Select the number of entries to return.
-    /// Default: 10
+    /// * Default: 10
     #[serde(skip_serializing_if = "Option::is_none")]
     pub page_size: Option<u8>,
 
     /// Filter by page number.
-    /// Default: 1
+    /// * Default: 1
     #[serde(skip_serializing_if = "Option::is_none")]
     pub page_number: Option<u8>,
 
@@ -34,8 +34,8 @@ pub struct ParamSearchCriteria {
 
     /// Sort responses in ascending or descending order based on the collection property set on the param orderBy.
     /// If the request does not specify orderBy, REST returns the collection ordered by id.
-    /// Default: "desc"
-    ///  Enum: "asc" "desc"
+    /// * Default: "desc"
+    /// * Enum: "asc" "desc"
     #[serde(skip_serializing_if = "Option::is_none")]
     pub order: Option<Order>,
 }

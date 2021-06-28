@@ -1,6 +1,25 @@
+/*
+ * // Copyright 2021 BlockPuppets developers.
+ * //
+ * // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+ * // https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+ * // <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
+ * // option. This file may not be copied, modified, or distributed
+ * // except according to those terms.
+ */
+
 use std::fmt;
 use std::ops::Deref;
 
+/// `TransactionVersion` struct containing transaction version constants.
+///
+/// Transaction format versions are defined in catapult-server in each transaction's plugin source code.
+///
+/// In [catapult-server](https://github.com/nemtech/catapult-server), the `DEFINE_TRANSACTION_CONSTANTS` macro
+/// is used to define the `TYPE` and `VERSION` of the transaction format.
+///
+/// @see https://github.com/nemtech/catapult-server/blob/main/plugins/txes/transfer/src/model/TransferTransaction.h#L37
+///
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize, Hash)]
 pub struct TransactionVersion(u8);
 
