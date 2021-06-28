@@ -25,4 +25,5 @@ pub mod network;
 pub mod node;
 mod node_identity_equality_strategy;
 pub mod state;
+pub mod transaction;
 mod uint64;
