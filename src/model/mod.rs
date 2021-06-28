@@ -1,5 +1,5 @@
 /*
- * // Copyright 2021 Developers of the Symbol sdk Rust project.
+ * // Copyright 2021 BlockPuppets developers.
  * //
  * // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
  * // https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -10,6 +10,7 @@
 
 pub use self::id::Id;
 pub use self::node_identity_equality_strategy::*;
+pub use self::transaction::DeadLine;
 pub use self::uint64::*;
 
 pub mod account;
@@ -25,4 +26,5 @@ pub mod network;
 pub mod node;
 mod node_identity_equality_strategy;
 pub mod state;
+pub mod transaction;
 mod uint64;

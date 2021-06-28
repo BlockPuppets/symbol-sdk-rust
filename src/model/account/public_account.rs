@@ -1,5 +1,5 @@
 /*
- * // Copyright 2021 Developers of the Symbol sdk Rust project.
+ * // Copyright 2021 BlockPuppets developers.
  * //
  * // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
  * // https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -74,7 +74,7 @@ impl PublicAccount {
     /// #
     /// let public_key: &str = "2E834140FD66CF87B254A693A2C7862C819217B676D3943267156625E816EC6F";
     /// let public_account = PublicAccount::from_public_key(public_key,
-    /// NetworkType::TEST_NET)
+    /// NetworkType::TestNet)
     /// .unwrap();
     /// # println!("{}", public_account);
     /// # }
@@ -161,7 +161,7 @@ mod tests {
     #[test]
     fn test_should_create_from_public_key() {
         let public_account =
-            PublicAccount::from_public_key(PUBLIC_KEY, NetworkType::PRIVATE_TEST).unwrap();
+            PublicAccount::from_public_key(PUBLIC_KEY, NetworkType::PrivateTest).unwrap();
         assert_eq!(public_account.public_key_to_hex(), PUBLIC_KEY);
         assert_eq!(
             public_account.address_str(),
@@ -187,7 +187,7 @@ mod tests {
     fn test_return_panic_if_signature_hash_invalid_length() {
         let signer_public_account = PublicAccount::from_public_key(
             "22816F825B4CACEA334723D51297D8582332D8B875A5829908AAE85831ABB508",
-            NetworkType::PRIVATE_TEST,
+            NetworkType::PrivateTest,
         )
             .unwrap();
 
@@ -201,7 +201,7 @@ mod tests {
     fn test_return_panic_if_is_not_strictly_hexadecimal() {
         let signer_public_account = PublicAccount::from_public_key(
             "22816F825B4CACEA334723D51297D8582332D8B875A5829908AAE85831ABB508",
-            NetworkType::PRIVATE_TEST,
+            NetworkType::PrivateTest,
         )
             .unwrap();
 
@@ -214,7 +214,7 @@ mod tests {
     fn test_return_false_if_wrong_public_key_provided() {
         let signer_public_account = PublicAccount::from_public_key(
             "12816F825B4CACEA334723D51297D8582332D8B875A5829908AAE85831ABB509",
-            NetworkType::PRIVATE_TEST,
+            NetworkType::PrivateTest,
         )
             .unwrap();
 
@@ -229,7 +229,7 @@ mod tests {
     fn test_return_false_if_data_is_not_corresponding_to_signature_provided() {
         let signer_public_account = PublicAccount::from_public_key(
             "22816F825B4CACEA334723D51297D8582332D8B875A5829908AAE85831ABB508",
-            NetworkType::PRIVATE_TEST,
+            NetworkType::PrivateTest,
         )
             .unwrap();
 
@@ -244,7 +244,7 @@ mod tests {
     fn test_return_false_if_signature_is_not_corresponding_to_data_provided() {
         let signer_public_account = PublicAccount::from_public_key(
             "22816F825B4CACEA334723D51297D8582332D8B875A5829908AAE85831ABB508",
-            NetworkType::PRIVATE_TEST,
+            NetworkType::PrivateTest,
         )
             .unwrap();
 

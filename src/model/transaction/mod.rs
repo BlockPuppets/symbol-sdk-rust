@@ -8,9 +8,10 @@
  * // except according to those terms.
  */
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Deserialize, Serialize)]
-#[repr(u8)]
-pub enum MerkleTreeNodeType {
-    Branch = 0x00,
-    Leaf = 0xff,
-}
+pub use self::deadline::*;
+pub use self::transaction_type::*;
+pub use self::transaction_version::*;
+
+mod deadline;
+mod transaction_type;
+mod transaction_version;
