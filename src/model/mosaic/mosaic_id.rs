@@ -144,7 +144,7 @@ mod tests {
     #[test]
     fn test_should_create_given_nonce_and_owner() {
         let owner =
-            Address::from_public_key(PUBLIC_KEY, NetworkType::PRIVATE_TEST).unwrap();
+            Address::from_public_key(PUBLIC_KEY, NetworkType::PrivateTest).unwrap();
         let nonce = MosaicNonce::from(0);
 
         let mosaic_id = MosaicId::create_from_nonce(nonce, owner);
@@ -154,7 +154,7 @@ mod tests {
     #[test]
     fn test_should_create_twice_the_same_given_nonce_and_owner() {
         let owner =
-            Address::from_public_key(PUBLIC_KEY, NetworkType::PRIVATE_TEST).unwrap();
+            Address::from_public_key(PUBLIC_KEY, NetworkType::PrivateTest).unwrap();
         let nonce = MosaicNonce::from(0);
 
         let mosaic_id_one = MosaicId::create_from_nonce(nonce, owner);

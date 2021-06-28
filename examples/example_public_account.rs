@@ -9,7 +9,7 @@ fn main() {
     let data = "Symbol is wonderful";
     let public_key: &str = "758E6754F6B9C611F1DC78A2AAAAB756F500CD77232DD187E5EA3DA10E382A5B";
 
-    let public_account = PublicAccount::from_public_key(public_key, NetworkType::TEST_NET)
+    let public_account = PublicAccount::from_public_key(public_key, NetworkType::TestNet)
         .unwrap();
     println!("{}", public_account);
 

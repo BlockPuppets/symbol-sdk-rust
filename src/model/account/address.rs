@@ -85,7 +85,7 @@ impl Address {
     /// # fn main() {
     /// #
     /// let public_key: &str = "2E834140FD66CF87B254A693A2C7862C819217B676D3943267156625E816EC6F";
-    /// let address = Address::from_public_key(public_key, NetworkType::TEST_NET).unwrap();
+    /// let address = Address::from_public_key(public_key, NetworkType::TestNet).unwrap();
     /// # println!("{}", address);
     /// # }
     /// ```
@@ -256,17 +256,17 @@ mod tests {
 
     #[test]
     fn test_should_create_given_public_key_with_network_type_private_test() {
-        let address = Address::from_public_key(PUBLIC_KEY, NetworkType::PRIVATE_TEST).unwrap();
+        let address = Address::from_public_key(PUBLIC_KEY, NetworkType::PrivateTest).unwrap();
         assert_eq!(
             address.address_str(),
             "VATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA35C4KNQ"
         );
-        assert_eq!(address.network_type, NetworkType::PRIVATE_TEST);
+        assert_eq!(address.network_type, NetworkType::PrivateTest);
     }
 
     #[test]
     fn test_should_print_the_address_in_pretty_format() {
-        let address = Address::from_public_key(PUBLIC_KEY, NetworkType::PRIVATE_TEST).unwrap();
+        let address = Address::from_public_key(PUBLIC_KEY, NetworkType::PrivateTest).unwrap();
         assert_eq!(
             address.prettify(),
             "VATNE7-Q5BITM-UTRRN6-IB4I7F-LSDRDW-ZA35C4-KNQ"
@@ -275,62 +275,62 @@ mod tests {
 
     #[test]
     fn test_should_create_given_public_key_with_network_type_private() {
-        let address = Address::from_public_key(PUBLIC_KEY, NetworkType::PRIVATE).unwrap();
+        let address = Address::from_public_key(PUBLIC_KEY, NetworkType::Private).unwrap();
         assert_eq!(
             address.address_str(),
             "PATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA35OETNI"
         );
-        assert_eq!(address.network_type, NetworkType::PRIVATE);
+        assert_eq!(address.network_type, NetworkType::Private);
     }
 
     #[test]
     fn test_should_create_given_public_key_with_network_type_main_net() {
-        let address = Address::from_public_key(PUBLIC_KEY, NetworkType::MAIN_NET).unwrap();
+        let address = Address::from_public_key(PUBLIC_KEY, NetworkType::MainNet).unwrap();
         assert_eq!(
             address.address_str(),
             "NATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA34SQ33Y"
         );
-        assert_eq!(address.network_type, NetworkType::MAIN_NET);
+        assert_eq!(address.network_type, NetworkType::MainNet);
     }
 
     #[test]
     fn test_should_create_given_public_key_with_network_type_test_net() {
-        let address = Address::from_public_key(PUBLIC_KEY, NetworkType::TEST_NET).unwrap();
+        let address = Address::from_public_key(PUBLIC_KEY, NetworkType::TestNet).unwrap();
         assert_eq!(
             address.address_str(),
             "TATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA37JGO5Q"
         );
-        assert_eq!(address.network_type, NetworkType::TEST_NET);
+        assert_eq!(address.network_type, NetworkType::TestNet);
     }
 
     #[test]
     fn test_should_create_given_vatne7q5bitmutrrn6ib4i7flsdrdwza35c4knq() {
         let address = Address::from_raw("VATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA35C4KNQ").unwrap();
-        assert_eq!(address.network_type, NetworkType::PRIVATE_TEST);
+        assert_eq!(address.network_type, NetworkType::PrivateTest);
     }
 
     #[test]
     fn test_should_create_given_patne7q5bitmutrrn6ib4i7flsdrdwza35oetni() {
         let address = Address::from_raw("PATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA35OETNI").unwrap();
-        assert_eq!(address.network_type, NetworkType::PRIVATE);
+        assert_eq!(address.network_type, NetworkType::Private);
     }
 
     #[test]
     fn test_should_create_given_natne7q5bitmutrrn6ib4i7flsdrdwza34sq33y() {
         let address = Address::from_raw("NATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA34SQ33Y").unwrap();
-        assert_eq!(address.network_type, NetworkType::MAIN_NET);
+        assert_eq!(address.network_type, NetworkType::MainNet);
     }
 
     #[test]
     fn test_should_create_given_tatne7q5bitmutrrn6ib4i7flsdrdwza37jgo5q() {
         let address = Address::from_raw("TATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA37JGO5Q").unwrap();
-        assert_eq!(address.network_type, NetworkType::TEST_NET);
+        assert_eq!(address.network_type, NetworkType::TestNet);
     }
 
     #[test]
     fn test_should_create_given_vatne7_q5bitm_utrrn6_ib4i7f_lsdrdw_za35c4_knq() {
         let address = Address::from_raw("VATNE7-Q5BITM-UTRRN6-IB4I7F-LSDRDW-ZA35C4-KNQ").unwrap();
-        assert_eq!(address.network_type, NetworkType::PRIVATE_TEST);
+        assert_eq!(address.network_type, NetworkType::PrivateTest);
         assert_eq!(
             address.prettify(),
             "VATNE7-Q5BITM-UTRRN6-IB4I7F-LSDRDW-ZA35C4-KNQ"
@@ -390,16 +390,16 @@ mod tests {
         #[test]
         fn test_returns_true_for_valid_address_when_generated() {
             assert!(Address::is_valid_raw_address(
-                Account::random(NetworkType::PRIVATE_TEST).address_str()
+                Account::random(NetworkType::PrivateTest).address_str()
             ));
             assert!(Address::is_valid_raw_address(
-                Account::random(NetworkType::MAIN_NET).address_str()
+                Account::random(NetworkType::MainNet).address_str()
             ));
             assert!(Address::is_valid_raw_address(
-                Account::random(NetworkType::PRIVATE).address_str()
+                Account::random(NetworkType::Private).address_str()
             ));
             assert!(Address::is_valid_raw_address(
-                Account::random(NetworkType::TEST_NET).address_str()
+                Account::random(NetworkType::TestNet).address_str()
             ));
         }
 
@@ -458,25 +458,25 @@ mod tests {
         #[test]
         fn test_returns_true_for_valid_address_when_generated() {
             assert!(Address::is_valid_encoded_address(
-                Account::random(NetworkType::PRIVATE_TEST)
+                Account::random(NetworkType::PrivateTest)
                     .public_account
                     .address
                     .address_encoded()
             ));
             assert!(Address::is_valid_encoded_address(
-                Account::random(NetworkType::MAIN_NET)
+                Account::random(NetworkType::MainNet)
                     .public_account
                     .address
                     .address_encoded()
             ));
             assert!(Address::is_valid_encoded_address(
-                Account::random(NetworkType::PRIVATE)
+                Account::random(NetworkType::Private)
                     .public_account
                     .address
                     .address_encoded()
             ));
             assert!(Address::is_valid_encoded_address(
-                Account::random(NetworkType::TEST_NET)
+                Account::random(NetworkType::TestNet)
                     .public_account
                     .address
                     .address_encoded()

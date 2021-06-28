@@ -7,7 +7,7 @@ fn main() {
     let address_sym = Address::from_raw("TBJSRVRYE2EPT33F5PHDRBLZCDMKMQBRW6CLYFY").unwrap();
     println!("Sym from_raw: {}\n", address_sym.prettify());
 
-    let address_sym = Address::from_public_key(public_key, NetworkType::TEST_NET).unwrap();
+    let address_sym = Address::from_public_key(public_key, NetworkType::TestNet).unwrap();
     println!("Sym from_public_key: {}\n", address_sym);
 
     let address_sym =

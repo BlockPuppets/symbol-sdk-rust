@@ -9,40 +9,47 @@
  */
 
 use std::fmt;
+use std::convert::TryFrom;
 
 #[allow(non_camel_case_types)]
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize, Hash)]
 #[repr(u8)]
 pub enum NetworkType {
     /// The Public test net network identifier.
-    /// Decimal value = 152.
+    /// Decimal value = 152
+    /// Hex value = 0x98
     ///
-    TEST_NET = 0x98,
+    TestNet = 0x98,
 
     /// The public main net network identifier.
-    /// Decimal value = 104.
+    /// Decimal value = 104
+    /// Hex value = 0x68
     ///
-    MAIN_NET = 0x68,
+    MainNet = 0x68,
 
     /// The Private net network identifier.
-    /// Decimal value = 120.
+    /// Decimal value = 120
+    /// Hex value = 0x78
     ///
-    PRIVATE = 0x78,
+    Private = 0x78,
 
     /// The Private test net network identifier.
-    /// Decimal value = 168.
+    /// Decimal value = 168
+    /// Hex value = 0xa8
     ///
-    PRIVATE_TEST = 0xa8,
+    PrivateTest = 0xa8,
 
     /// Mijin private test network identifier.
-    /// Decimal value = 144.
+    /// Decimal value = 144
+    /// Hex value = 0x90
     ///
-    MIJIN_TEST = 0x90,
+    MijinTest = 0x90,
 
     /// Mijin private network identifier.
-    /// Decimal value = 96.
+    /// Decimal value = 96
+    /// Hex value = 0x60
     ///
-    MIJIN = 0x60,
+    Mijin = 0x60,
 }
 
 impl NetworkType {
@@ -62,45 +69,41 @@ impl NetworkType {
     pub fn prefix(&self) -> char {
         use NetworkType::*;
         match *self {
-            TEST_NET => Self::PREFIX_TEST_NET,
-            MAIN_NET => Self::PREFIX_MAIN_NET,
-            PRIVATE_TEST => Self::PREFIX_PRIVATE_TEST,
-            PRIVATE => Self::PREFIX_PRIVATE,
-            MIJIN_TEST => Self::PREFIX_MIJIN_TEST,
-            MIJIN => Self::PREFIX_MIJIN,
+            TestNet => Self::PREFIX_TEST_NET,
+            MainNet => Self::PREFIX_MAIN_NET,
+            PrivateTest => Self::PREFIX_PRIVATE_TEST,
+            Private => Self::PREFIX_PRIVATE,
+            MijinTest => Self::PREFIX_MIJIN_TEST,
+            Mijin => Self::PREFIX_MIJIN,
         }
+    }
+
+    pub fn to_bytes(&self) -> [u8; 1] {
+        self.value().to_le_bytes()
     }
 }
 
 impl fmt::Display for NetworkType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        use NetworkType::*;
-        match *self {
-            MAIN_NET => write!(f, "MainNet"),
-            TEST_NET => write!(f, "TestNet"),
-            PRIVATE => write!(f, "Private"),
-            PRIVATE_TEST => write!(f, "PrivateTest"),
-            MIJIN => write!(f, "Mijin"),
-            MIJIN_TEST => write!(f, "MijinTest"),
-        }
+        write!(f, "{:?}", &self)
     }
 }
 
 /// Returns a 'NetworkType' for the given u8 value.
 ///
 /// Throws an Err UNKNOWN_NETWORK_TYPE when the type is unknown.
-impl std::convert::TryFrom<u8> for NetworkType {
+impl TryFrom<u8> for NetworkType {
     type Error = anyhow::Error;
 
     fn try_from(v: u8) -> Result<Self, Self::Error> {
         use NetworkType::*;
         match v {
-            x if x == MAIN_NET as u8 => Ok(MAIN_NET),
-            x if x == TEST_NET as u8 => Ok(TEST_NET),
-            x if x == PRIVATE as u8 => Ok(PRIVATE),
-            x if x == PRIVATE_TEST as u8 => Ok(PRIVATE_TEST),
-            x if x == MIJIN as u8 => Ok(MIJIN),
-            x if x == MIJIN_TEST as u8 => Ok(MIJIN_TEST),
+            x if x == MainNet as u8 => Ok(MainNet),
+            x if x == TestNet as u8 => Ok(TestNet),
+            x if x == Private as u8 => Ok(Private),
+            x if x == PrivateTest as u8 => Ok(PrivateTest),
+            x if x == Mijin as u8 => Ok(Mijin),
+            x if x == MijinTest as u8 => Ok(MijinTest),
             _ => Err(anyhow::anyhow!(Self::UNKNOWN_NETWORK_TYPE)),
         }
     }
@@ -109,18 +112,18 @@ impl std::convert::TryFrom<u8> for NetworkType {
 /// Returns a 'NetworkType' for the given char value.
 ///
 /// Throws an Err UNKNOWN_NETWORK_TYPE when the type is unknown.
-impl std::convert::TryFrom<char> for NetworkType {
+impl TryFrom<char> for NetworkType {
     type Error = anyhow::Error;
 
     fn try_from(ch: char) -> Result<Self, Self::Error> {
         use NetworkType::*;
         match ch {
-            Self::PREFIX_TEST_NET => Ok(TEST_NET),
-            Self::PREFIX_MAIN_NET => Ok(MAIN_NET),
-            Self::PREFIX_PRIVATE_TEST => Ok(PRIVATE_TEST),
-            Self::PREFIX_PRIVATE => Ok(PRIVATE),
-            Self::PREFIX_MIJIN_TEST => Ok(MIJIN_TEST),
-            Self::PREFIX_MIJIN => Ok(MIJIN),
+            Self::PREFIX_TEST_NET => Ok(TestNet),
+            Self::PREFIX_MAIN_NET => Ok(MainNet),
+            Self::PREFIX_PRIVATE_TEST => Ok(PrivateTest),
+            Self::PREFIX_PRIVATE => Ok(Private),
+            Self::PREFIX_MIJIN_TEST => Ok(MijinTest),
+            Self::PREFIX_MIJIN => Ok(Mijin),
             _ => Err(anyhow::anyhow!(Self::UNKNOWN_NETWORK_TYPE)),
         }
     }
@@ -130,7 +133,7 @@ impl std::convert::TryFrom<char> for NetworkType {
 ///
 impl Default for NetworkType {
     fn default() -> Self {
-        NetworkType::TEST_NET
+        NetworkType::TestNet
     }
 }
 
@@ -146,37 +149,37 @@ mod tests {
 
     #[test]
     fn test_main_net_is_0x68() {
-        assert_eq!(NetworkType::MAIN_NET as u8, 0x68);
-        assert_eq!(NetworkType::MAIN_NET as u8, 104);
+        assert_eq!(NetworkType::MainNet as u8, 0x68);
+        assert_eq!(NetworkType::MainNet as u8, 104);
     }
 
     #[test]
     fn test_test_net_is_0x98() {
-        assert_eq!(NetworkType::TEST_NET as u8, 0x98);
-        assert_eq!(NetworkType::TEST_NET as u8, 152);
+        assert_eq!(NetworkType::TestNet as u8, 0x98);
+        assert_eq!(NetworkType::TestNet as u8, 152);
     }
 
     #[test]
     fn test_private_test_is_0xa8() {
-        assert_eq!(NetworkType::PRIVATE_TEST as u8, 0xa8);
-        assert_eq!(NetworkType::PRIVATE_TEST as u8, 168);
+        assert_eq!(NetworkType::PrivateTest as u8, 0xa8);
+        assert_eq!(NetworkType::PrivateTest as u8, 168);
     }
 
     #[test]
     fn test_private_is_0x78() {
-        assert_eq!(NetworkType::PRIVATE as u8, 0x78);
-        assert_eq!(NetworkType::PRIVATE as u8, 120);
+        assert_eq!(NetworkType::Private as u8, 0x78);
+        assert_eq!(NetworkType::Private as u8, 120);
     }
 
     #[test]
     fn test_mijin_is_0x60() {
-        assert_eq!(NetworkType::MIJIN as u8, 0x60);
-        assert_eq!(NetworkType::MIJIN as u8, 96);
+        assert_eq!(NetworkType::Mijin as u8, 0x60);
+        assert_eq!(NetworkType::Mijin as u8, 96);
     }
 
     #[test]
     fn test_mijin_test_is_0x90() {
-        assert_eq!(NetworkType::MIJIN_TEST as u8, 0x90);
-        assert_eq!(NetworkType::MIJIN_TEST as u8, 144);
+        assert_eq!(NetworkType::MijinTest as u8, 0x90);
+        assert_eq!(NetworkType::MijinTest as u8, 144);
     }
 }

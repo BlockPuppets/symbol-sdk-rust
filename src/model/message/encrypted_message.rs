@@ -110,9 +110,9 @@ pub mod tests {
 
     lazy_static! {
         static ref SENDER: Account =
-            Account::from_hex_private_key(SENDER_PRIVATE_KEY, NetworkType::PRIVATE_TEST).unwrap();
+            Account::from_hex_private_key(SENDER_PRIVATE_KEY, NetworkType::PrivateTest).unwrap();
         static ref RECIPIENT: Account =
-            Account::from_hex_private_key(RECIPIENT_PRIVATE_KEY, NetworkType::PRIVATE_TEST)
+            Account::from_hex_private_key(RECIPIENT_PRIVATE_KEY, NetworkType::PrivateTest)
                 .unwrap();
     }
 

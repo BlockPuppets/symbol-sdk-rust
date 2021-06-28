@@ -3,7 +3,7 @@ use symbol_sdk::message::EncryptedMessage;
 use symbol_sdk::network::NetworkType;
 
 fn main() {
-    let network_type = NetworkType::TEST_NET;
+    let network_type = NetworkType::TestNet;
     let sender = Account::from_hex_private_key(
         "2602F4236B199B3DF762B2AAB46FC3B77D8DDB214F0B62538D3827576C46C108",
         network_type,
