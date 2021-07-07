@@ -1,5 +1,5 @@
 /*
- * // Copyright 2021 BlockPuppets developers.
+ * // Copyright 2021 BlockPuppets.
  * //
  * // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
  * // https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -8,10 +8,11 @@
  * // except according to those terms.
  */
 
-use anyhow::{ensure, Result};
-use chrono::{DateTime, Duration, Local, TimeZone};
 use std::ops::{AddAssign, Deref};
 use std::time::UNIX_EPOCH;
+
+use anyhow::{ensure, Result};
+use chrono::{DateTime, Duration, Local, TimeZone};
 
 /// The deadline of the transaction.
 /// The deadline is given as the number of seconds elapsed since the creation of the nemesis block.
@@ -98,8 +99,9 @@ impl core::fmt::Display for DeadLine {
 
 #[cfg(test)]
 mod tests {
-    use crate::DeadLine;
     use chrono::{Datelike, Duration, Local};
+
+    use crate::DeadLine;
 
     const EPOCH_ADJUSTMENT: u64 = 1573430400;
 
