@@ -60,6 +60,12 @@ version = "^0.7"
 version = "^1.4"
 default-features = false
 
+[dependencies.chrono]
+version = "0.4"
+
+[dependencies.bcs]
+version = "0.1"
+
 [dependencies.async-trait]
 version = "0.1"
 
@@ -71,15 +77,12 @@ version = "0.11"
 features = ["json"]
 default_features = false
 
-[dependencies.chrono]
-version = "0.4"
-
-[dependencies.bcs]
-version = "0.1"
+[dependencies.tokio]
+version = "1.8"
+features = ["rt"]
+default_features = false
 
 [dev-dependencies]
 lazy_static = "1.4"
 
-[dependencies.tokio]
-version = "1.8"
-features = ["macros", "rt-multi-thread"]
+tokio = { version = "1.8", features = ["macros", "rt-multi-thread"] }
