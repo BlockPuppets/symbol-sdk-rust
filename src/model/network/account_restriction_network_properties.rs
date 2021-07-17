@@ -13,7 +13,10 @@ use std::fmt;
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct AccountRestrictionNetworkProperties {
     /// Maximum number of account restriction values.
-    #[serde(rename = "maxAccountRestrictionValues", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "maxAccountRestrictionValues",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub max_account_restriction_values: Option<String>,
 }
 

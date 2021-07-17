@@ -40,6 +40,9 @@ impl MessageType {
     pub fn value(self) -> i16 {
         self as i16
     }
+    pub fn to_bytes(&self) -> [u8; 2] {
+        self.value().to_le_bytes()
+    }
 }
 
 impl fmt::Display for MessageType {

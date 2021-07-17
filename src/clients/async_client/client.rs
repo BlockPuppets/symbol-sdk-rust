@@ -14,11 +14,11 @@ use std::sync::Arc;
 use serde::de::DeserializeOwned;
 use serde::Deserialize;
 
-use crate::{BlockApi, ChainApi, GenerationHash, MosaicApi, NetworkApi, NodeApi};
-use crate::clients::{Error, model_dto::BlockInfoDto, retry::RetryStrategy, SymbolResponse};
+use crate::clients::{model_dto::BlockInfoDto, retry::RetryStrategy, Error, SymbolResponse};
 use crate::network::NetworkType;
+use crate::{BlockApi, ChainApi, GenerationHash, MosaicApi, NetworkApi, NodeApi};
 
-use super::{HttpClient, request::Request, Response, SimpleHttpClient};
+use super::{request::Request, HttpClient, Response, SimpleHttpClient};
 
 #[derive(Clone)]
 pub struct Client<R> {

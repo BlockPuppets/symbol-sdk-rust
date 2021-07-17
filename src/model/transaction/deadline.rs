@@ -18,11 +18,11 @@ use chrono::{DateTime, Duration, Local, TimeZone};
 /// The deadline is given as the number of seconds elapsed since the creation of the nemesis block.
 /// If a transaction does not get included in a block before the deadline is reached, it is deleted.
 ///
-#[derive(Clone, Debug, Default, Serialize, Deserialize)]
-pub struct DeadLine(u64);
+#[derive(Clone, Debug, Default, Serialize, Deserialize, Eq, PartialEq)]
+pub struct Deadline(u64);
 
-impl DeadLine {
-    /// Create DeadLine.
+impl Deadline {
+    /// Create Deadline.
     ///
     /// # Inputs
     ///
@@ -33,12 +33,12 @@ impl DeadLine {
     ///
     /// ```
     /// use chrono::Duration;
-    /// use symbol_sdk::DeadLine;
+    /// use symbol_sdk::Deadline;
     ///
     /// #
     /// # fn main() {
     /// #
-    /// let deadline = DeadLine::create(1573430400, Duration::hours(2)).unwrap();
+    /// let deadline = Deadline::create(1573430400, Duration::hours(2)).unwrap();
     /// # println!("{}", deadline);
     /// # }
     /// ```
@@ -84,14 +84,14 @@ impl DeadLine {
     }
 }
 
-impl Deref for DeadLine {
+impl Deref for Deadline {
     type Target = u64;
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
 
-impl core::fmt::Display for DeadLine {
+impl core::fmt::Display for Deadline {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         write!(f, "{}", self.deref())
     }
@@ -101,13 +101,13 @@ impl core::fmt::Display for DeadLine {
 mod tests {
     use chrono::{Datelike, Duration, Local};
 
-    use crate::DeadLine;
+    use crate::Deadline;
 
     const EPOCH_ADJUSTMENT: u64 = 1573430400;
 
     #[test]
     fn test_should_create_timestamp_today() {
-        let deadline = DeadLine::create(EPOCH_ADJUSTMENT, Duration::hours(2)).unwrap();
+        let deadline = Deadline::create(EPOCH_ADJUSTMENT, Duration::hours(2)).unwrap();
 
         // avoid SYSTEM and UTC differences
         let mut network_time_stamp = Local::now();

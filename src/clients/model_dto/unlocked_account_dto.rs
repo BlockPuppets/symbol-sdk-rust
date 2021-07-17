@@ -13,4 +13,3 @@ pub struct UnlockedAccountDto {
     #[serde(rename = "unlockedAccount")]
     pub unlocked_account: Vec<String>,
 }
-

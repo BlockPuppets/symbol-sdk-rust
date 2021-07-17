@@ -34,8 +34,6 @@ pub struct SymbolResponse {
 
 impl SymbolResponse {
     pub fn new() -> Self {
-        Self {
-            result: None,
-        }
+        Self { result: None }
     }
 }

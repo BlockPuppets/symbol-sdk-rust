@@ -10,7 +10,7 @@
 
 pub use self::id::Id;
 pub use self::node_identity_equality_strategy::*;
-pub use self::transaction::DeadLine;
+pub use self::transaction::Deadline;
 pub use self::uint64::*;
 
 pub mod account;

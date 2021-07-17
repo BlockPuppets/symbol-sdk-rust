@@ -14,5 +14,3 @@ pub struct CommunicationTimestampsDto {
     pub send_timestamp: String,
     pub receive_timestamp: String,
 }
-
-

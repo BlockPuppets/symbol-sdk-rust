@@ -8,10 +8,10 @@
  * // except according to those terms.
  */
 
-use crate::{Client, Error, Response, RetryStrategy};
 use crate::blockchain::ChainInfo;
 use crate::clients::model_dto::ChainInfoDto;
 use crate::clients::request::Request;
+use crate::{Client, Error, Response, RetryStrategy};
 
 pub struct ChainApi<R: RetryStrategy>(pub(crate) Client<R>);
 
@@ -32,8 +32,7 @@ impl<R: RetryStrategy> ChainApi<R> {
     ///
     pub async fn get_chain_info(&self) -> Result<ChainInfo, Error> {
         let resp: Response<ChainInfoDto> = self.as_ref().send(Request::get_chain_info()).await?;
-        resp.to_compact()
-            .map_err(Into::into)
+        resp.to_compact().map_err(Into::into)
     }
 }
 

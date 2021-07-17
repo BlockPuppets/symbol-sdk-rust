@@ -18,10 +18,10 @@ use crypto::{
 };
 use hex::ToHex;
 
-use crate::{GenerationHash, is_hex};
 use crate::account::PublicAccount;
 use crate::message::{EncryptedMessage, PlainMessage};
 use crate::network::NetworkType;
+use crate::{is_hex, GenerationHash};
 
 /// The `Account` struct contains account's `Keypair` and `PublicAccount`.
 ///
@@ -344,7 +344,7 @@ pub(crate) fn sign_data(kp: Keypair, data: &str) -> Result<Signature> {
 }
 
 #[cfg(test)]
-pub(crate) mod tests {
+pub mod tests {
     use crate::account::Account;
     use crate::network::NetworkType;
 

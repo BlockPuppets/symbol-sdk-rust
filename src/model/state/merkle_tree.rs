@@ -42,10 +42,7 @@ impl MerkleTree {
             }
         }
 
-        Ok(Self {
-            branches,
-            leaf,
-        })
+        Ok(Self { branches, leaf })
     }
 }
 

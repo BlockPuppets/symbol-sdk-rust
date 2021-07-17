@@ -8,10 +8,10 @@
  * // except according to those terms.
  */
 
-use crate::{GenerationHash, H256, H512};
 use crate::account::{Address, PublicAccount};
 use crate::network::NetworkType;
 use crate::ser_to_hex_upper;
+use crate::{GenerationHash, H256, H512};
 
 use super::BlockType;
 

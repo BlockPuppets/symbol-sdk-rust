@@ -15,7 +15,7 @@ pub use self::node_time::*;
 pub use self::server_info::*;
 
 mod node_health;
-mod node_status_enum;
 mod node_info;
+mod node_status_enum;
 mod node_time;
 mod server_info;

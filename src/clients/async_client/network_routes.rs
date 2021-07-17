@@ -8,10 +8,10 @@
  * // except according to those terms.
  */
 
-use crate::{Client, Error, Response, RetryStrategy};
 use crate::clients::request::Request;
 use crate::model_dto::RentalFeesDto;
 use crate::network::{NetworkConfiguration, NetworkName, NetworkType, RentalFees, TransactionFees};
+use crate::{Client, Error, Response, RetryStrategy};
 
 pub struct NetworkApi<R: RetryStrategy>(pub(crate) Client<R>);
 
@@ -69,8 +69,7 @@ impl<R: RetryStrategy> NetworkApi<R> {
     ///
     pub async fn get_rental_fees(&self) -> Result<RentalFees, Error> {
         let resp: Response<RentalFeesDto> = self.as_ref().send(Request::get_rental_fees()).await?;
-        resp.to_compact()
-            .map_err(Into::into)
+        resp.to_compact().map_err(Into::into)
     }
 
     /// Get transaction fees information.

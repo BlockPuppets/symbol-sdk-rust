@@ -8,6 +8,8 @@
  * // except according to those terms.
  */
 
+//! The `account` module provides functions for creating `Address`, `PublicAccount` and `Account`.
+
 pub use self::account::*;
 pub use self::address::*;
 pub use self::public_account::*;

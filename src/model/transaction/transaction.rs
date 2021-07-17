@@ -8,10 +8,13 @@
  * // except according to those terms.
  */
 
-use crate::node::ServerInfo;
+use std::fmt;
 
-#[derive(Clone, Serialize, Deserialize)]
-pub struct ServerInfoDto {
-    #[serde(rename = "serverInfo")]
-    pub server_info: ServerInfo,
+/// An abstract transaction trait that serves as the base of all transaction types.
+///
+#[typetag::serde]
+pub trait Transaction: Sync + Send
+where
+    Self: fmt::Debug,
+{
 }

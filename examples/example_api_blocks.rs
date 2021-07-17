@@ -1,8 +1,8 @@
 use std::str::FromStr;
 
-use symbol_sdk::{Client, H256, Retry};
 use symbol_sdk::account::Address;
 use symbol_sdk::BlockSearchCriteria;
+use symbol_sdk::{Client, Retry, H256};
 
 #[tokio::main]
 async fn main() {
@@ -10,8 +10,8 @@ async fn main() {
         "http://ngl-dual-101.testnet.symboldev.network:3000",
         Retry::default(),
     )
-        .await
-        .unwrap();
+    .await
+    .unwrap();
 
     println!("Network_type: {}", client.network_type);
     println!("Generation_hash: {:X}", client.generation_hash);
@@ -25,8 +25,7 @@ async fn main() {
         }
     };
 
-    let beneficiary_address =
-        Address::from_raw("TBGMAET6V4Q6CKO5R44C25UUPCAUEXES4QVSKXY").unwrap();
+    let beneficiary_address = Address::from_raw("TBGMAET6V4Q6CKO5R44C25UUPCAUEXES4QVSKXY").unwrap();
 
     let criteria = BlockSearchCriteria {
         signer_public_key: None,
@@ -35,11 +34,7 @@ async fn main() {
         param: None,
     };
 
-    match client
-        .block_routes()
-        .search_blocks(Some(criteria))
-        .await
-    {
+    match client.block_routes().search_blocks(Some(criteria)).await {
         Ok(block_info) => block_info.iter().for_each(|info| println!("{}", info)),
         Err(err) => {
             println!("{}", err)

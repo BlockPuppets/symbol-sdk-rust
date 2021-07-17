@@ -25,7 +25,9 @@ impl NodeTimeDto {
     pub fn to_compact(&self) -> Result<NodeTime> {
         Ok(NodeTime {
             send_timestamp: u64::from_str(self.communication_timestamps.send_timestamp.as_str())?,
-            receive_timestamp: u64::from_str(self.communication_timestamps.receive_timestamp.as_str())?,
+            receive_timestamp: u64::from_str(
+                self.communication_timestamps.receive_timestamp.as_str(),
+            )?,
         })
     }
 }

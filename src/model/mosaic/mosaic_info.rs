@@ -8,7 +8,6 @@
  * // except according to those terms.
  */
 
-
 use std::fmt;
 
 use crate::account::Address;

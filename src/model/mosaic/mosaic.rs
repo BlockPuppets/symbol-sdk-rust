@@ -12,7 +12,7 @@ use std::fmt;
 
 use anyhow::{ensure, Result};
 
-use crate::{Id, ser_to_id, Uint64};
+use crate::{ser_to_id, Id, Uint64};
 
 /// A `Mosaic` describes an instance of a mosaic definition.
 /// Mosaics can be transferred by means of a transfer transaction.
@@ -94,7 +94,7 @@ impl Mosaic {
         Self::create(id, amount * pow_divisibility)
     }
 
-    pub fn to_bytes(&self) -> Vec<u8> {
+    pub fn to_vec(&self) -> Vec<u8> {
         bcs::to_bytes(&self).unwrap()
     }
 }
@@ -134,7 +134,7 @@ mod tests {
 
     #[test]
     #[should_panic(
-    expected = "Invalid divisibility 8, the divisibility must be in the range of 0 and 6."
+        expected = "Invalid divisibility 8, the divisibility must be in the range of 0 and 6."
     )]
     fn test_try_create_with_relative_should_return_panic() {
         let id = MosaicId::from(LO_HI);

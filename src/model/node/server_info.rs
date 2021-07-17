@@ -17,4 +17,3 @@ pub struct ServerInfo {
     #[serde(rename = "sdkVersion")]
     pub sdk_version: String,
 }
-

@@ -8,7 +8,6 @@
  * // except according to those terms.
  */
 
-use crate::{Client, Error, Response, RetryStrategy};
 use crate::account::PublicAccount;
 use crate::blockchain::StorageInfo;
 use crate::clients::request::Request;
@@ -16,6 +15,7 @@ use crate::model_dto::{
     NodeHealthInfoDto, NodeInfoDto, NodeTimeDto, ServerInfoDto, UnlockedAccountDto,
 };
 use crate::node::{NodeHealth, NodeInfo, NodeTime, ServerInfo};
+use crate::{Client, Error, Response, RetryStrategy};
 
 pub struct NodeApi<R: RetryStrategy>(pub(crate) Client<R>);
 

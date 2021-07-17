@@ -14,5 +14,3 @@ use crate::node::NodeHealth;
 pub struct NodeHealthInfoDto {
     pub status: NodeHealth,
 }
-
-

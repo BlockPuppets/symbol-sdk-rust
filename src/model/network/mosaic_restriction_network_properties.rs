@@ -13,7 +13,10 @@ use std::fmt;
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct MosaicRestrictionNetworkProperties {
     /// Maximum number of mosaic restriction values.
-    #[serde(rename = "maxMosaicRestrictionValues", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "maxMosaicRestrictionValues",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub max_mosaic_restriction_values: Option<String>,
 }
 

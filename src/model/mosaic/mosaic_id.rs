@@ -13,8 +13,8 @@ use std::fmt;
 use std::ops::Deref;
 
 use anyhow::{ensure, Result};
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde::de::Error;
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 use crate::account::Address;
 use crate::model::id::Id;
@@ -104,8 +104,8 @@ impl Deref for MosaicId {
 
 impl<'de> Deserialize<'de> for MosaicId {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where
-            D: Deserializer<'de>,
+    where
+        D: Deserializer<'de>,
     {
         let string = String::deserialize(deserializer)?;
         MosaicId::from_hex(string.as_ref()).map_err(|e| D::Error::custom(e))
@@ -114,8 +114,8 @@ impl<'de> Deserialize<'de> for MosaicId {
 
 impl Serialize for MosaicId {
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-        where
-            S: Serializer,
+    where
+        S: Serializer,
     {
         serializer.serialize_str(&self.to_hex())
     }
@@ -143,8 +143,7 @@ mod tests {
 
     #[test]
     fn test_should_create_given_nonce_and_owner() {
-        let owner =
-            Address::from_public_key(PUBLIC_KEY, NetworkType::PrivateTest).unwrap();
+        let owner = Address::from_public_key(PUBLIC_KEY, NetworkType::PrivateTest).unwrap();
         let nonce = MosaicNonce::from(0);
 
         let mosaic_id = MosaicId::create_from_nonce(nonce, owner);
@@ -153,8 +152,7 @@ mod tests {
 
     #[test]
     fn test_should_create_twice_the_same_given_nonce_and_owner() {
-        let owner =
-            Address::from_public_key(PUBLIC_KEY, NetworkType::PrivateTest).unwrap();
+        let owner = Address::from_public_key(PUBLIC_KEY, NetworkType::PrivateTest).unwrap();
         let nonce = MosaicNonce::from(0);
 
         let mosaic_id_one = MosaicId::create_from_nonce(nonce, owner);

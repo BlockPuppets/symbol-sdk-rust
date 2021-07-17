@@ -27,5 +27,3 @@ impl fmt::Display for BlockOrderBy {
         )
     }
 }
-
-

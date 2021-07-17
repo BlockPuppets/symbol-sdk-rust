@@ -39,10 +39,16 @@ impl Message for RawMessage {
     fn payload(&self) -> String {
         self.payload.to_owned()
     }
+    fn box_clone(&self) -> Box<dyn Message + 'static> {
+        Box::new((*self).clone())
+    }
 }
 
 impl Default for RawMessage {
     fn default() -> Self {
-        Self { r#type: MessageType::RawMessageType, payload: "".to_string() }
+        Self {
+            r#type: MessageType::RawMessageType,
+            payload: "".to_string(),
+        }
     }
 }

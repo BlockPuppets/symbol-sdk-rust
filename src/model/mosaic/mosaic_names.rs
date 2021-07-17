@@ -14,7 +14,6 @@ use crate::mosaic::MosaicId;
 ///
 pub struct MosaicNames {
     pub mosaic_id: MosaicId,
-
     // todo: crate NamespaceName.
     // pub names: Vec<NamespaceName>,
 }
