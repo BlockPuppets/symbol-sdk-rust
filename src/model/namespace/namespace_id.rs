@@ -20,12 +20,14 @@ use crate::network::NetworkType;
 use crate::Uint64;
 
 use super::namespace_id;
+use crate::account::UnresolvedAddress;
 
 /// The `NamespaceId` structure describes mosaic id.
 ///
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize, Eq)]
 pub struct NamespaceId {
     pub id: Uint64,
+    #[serde(skip_serializing, skip_deserializing)]
     pub full_name: Option<String>,
 }
 
@@ -72,6 +74,21 @@ impl Id for NamespaceId {
     }
 
     fn box_clone(&self) -> Box<dyn Id + 'static> {
+        Box::new((*self).clone())
+    }
+}
+
+#[typetag::serde]
+impl UnresolvedAddress for NamespaceId {
+    fn recipient_to_string(&self) -> String {
+        self.id.to_hex()
+    }
+
+    fn to_vec(&self) -> Vec<u8> {
+        bcs::to_bytes(&self).unwrap()
+    }
+
+    fn box_clone(&self) -> Box<dyn UnresolvedAddress + 'static> {
         Box::new((*self).clone())
     }
 }
@@ -152,3 +169,4 @@ mod tests {
         assert_eq!(id.full_name, None);
     }
 }
+// mosaicBytes: [16, 56, 53, 66, 66, 69, 65, 54, 67, 67, 52, 54, 50, 66, 50, 52, 52, 16, 39, 0, 0, 0, 0, 0, 0]

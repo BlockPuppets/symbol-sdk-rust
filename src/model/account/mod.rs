@@ -13,7 +13,9 @@
 pub use self::account::*;
 pub use self::address::*;
 pub use self::public_account::*;
+pub use self::unresolved_address::*;
 
 mod account;
 mod address;
 mod public_account;
+mod unresolved_address;

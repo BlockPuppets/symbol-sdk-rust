@@ -13,8 +13,6 @@ use std::fmt;
 use std::ops::Deref;
 
 use anyhow::{ensure, Result};
-use serde::de::Error;
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 use crate::account::Address;
 use crate::model::id::Id;
@@ -24,7 +22,7 @@ use super::{generate_mosaic_id, MosaicNonce};
 
 /// The `MosaicId` structure describes mosaic id.
 ///
-#[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub struct MosaicId(Uint64);
 
 impl MosaicId {
@@ -99,25 +97,6 @@ impl Deref for MosaicId {
     type Target = Uint64;
     fn deref(&self) -> &Self::Target {
         &self.0
-    }
-}
-
-impl<'de> Deserialize<'de> for MosaicId {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let string = String::deserialize(deserializer)?;
-        MosaicId::from_hex(string.as_ref()).map_err(|e| D::Error::custom(e))
-    }
-}
-
-impl Serialize for MosaicId {
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        serializer.serialize_str(&self.to_hex())
     }
 }
 

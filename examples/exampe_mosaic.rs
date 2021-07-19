@@ -10,7 +10,7 @@ fn main() {
     let mosaic_absolute = Mosaic::create(id, 10_000);
     match mosaic_absolute {
         Ok(mosaic) => {
-            println!("mosaicBytes: {:?}", bcs::to_bytes(&mosaic).unwrap());
+            println!("mosaicBytes: {:?}",mosaic.to_vec());
             println!("{}", mosaic)
         }
         Err(err) => {

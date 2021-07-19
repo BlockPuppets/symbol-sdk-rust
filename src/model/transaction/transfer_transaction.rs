@@ -1,8 +1,18 @@
+/*
+ * // Copyright 2021 BlockPuppets.
+ * //
+ * // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+ * // https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+ * // <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
+ * // option. This file may not be copied, modified, or distributed
+ * // except according to those terms.
+ */
+
 use std::fmt;
 
 use anyhow::Result;
 
-use crate::account::Address;
+use crate::account::UnresolvedAddress;
 use crate::message::Message;
 use crate::mosaic::Mosaic;
 use crate::network::NetworkType;
@@ -16,18 +26,18 @@ use crate::Deadline;
 pub struct TransferTransaction {
     pub common: CommonTransaction,
     /// The `Address` of the recipient address.
-    pub recipient: Address,
+    pub recipient: Box<dyn UnresolvedAddress>,
     /// The vec of Mosaic.
     pub mosaics: Vec<Mosaic>,
     /// The transaction message of 2048 characters.
-    pub message: Box<dyn Message + 'static>,
+    pub message: Box<dyn Message>,
 }
 
 impl TransferTransaction {
     /// Create a transfer transaction object.
-    pub fn create<M: 'static + Message>(
+    pub fn create<M: 'static + Message, R: 'static + UnresolvedAddress>(
         deadline: Deadline,
-        recipient: Address,
+        recipient: R,
         mosaics: Vec<Mosaic>,
         message: M,
         network_type: NetworkType,
@@ -45,7 +55,7 @@ impl TransferTransaction {
 
         Ok(Self {
             common,
-            recipient,
+            recipient: Box::new(recipient),
             mosaics,
             message: Box::new(message),
         })

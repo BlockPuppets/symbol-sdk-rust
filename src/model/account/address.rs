@@ -23,6 +23,7 @@ use crate::helpers::is_hex;
 use crate::helpers::H192;
 use crate::network::NetworkType;
 use crate::{hex_decode, H256};
+use crate::account::UnresolvedAddress;
 
 /// The `Address` struct describes an Symbol address with its network.
 ///
@@ -237,6 +238,20 @@ impl Address {
 
     pub fn as_bytes(&self) -> &[u8] {
         self.address.as_bytes()
+    }
+}
+
+#[typetag::serde]
+impl UnresolvedAddress for Address {
+    fn recipient_to_string(&self) -> String {
+        self.address_str()
+    }
+
+    fn to_vec(&self) -> Vec<u8> {
+       self.as_bytes().to_vec()
+    }
+    fn box_clone(&self) -> Box<dyn UnresolvedAddress + 'static> {
+        Box::new((*self).clone())
     }
 }
 
