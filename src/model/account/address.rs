@@ -24,6 +24,7 @@ use crate::helpers::H192;
 use crate::network::NetworkType;
 use crate::{hex_decode, H256};
 use crate::account::UnresolvedAddress;
+use std::any::Any;
 
 /// The `Address` struct describes an Symbol address with its network.
 ///
@@ -247,11 +248,17 @@ impl UnresolvedAddress for Address {
         self.address_str()
     }
 
-    fn to_vec(&self) -> Vec<u8> {
+    fn unresolved_address_to_bytes(&self, _network_type: NetworkType) -> Vec<u8> {
        self.as_bytes().to_vec()
     }
     fn box_clone(&self) -> Box<dyn UnresolvedAddress + 'static> {
         Box::new((*self).clone())
+    }
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+    fn into_any(self: Box<Self>) -> Box<dyn Any> {
+        self
     }
 }
 

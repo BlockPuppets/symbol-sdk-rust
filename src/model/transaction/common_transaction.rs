@@ -59,7 +59,7 @@ impl CommonTransaction {
         CommonTransaction {
             transaction_info: None,
             network_type,
-            signature: None,
+            signature: Default::default(),
             signer: Default::default(),
             version,
             transaction_type,

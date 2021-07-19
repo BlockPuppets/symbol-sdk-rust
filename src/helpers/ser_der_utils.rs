@@ -3,7 +3,7 @@ use std::str::FromStr;
 use crypto::prelude::PublicKey;
 use hex::ToHex;
 
-use crate::Id;
+use crate::UnresolvedMosaicId;
 
 pub fn ser_to_hex_upper<D: AsRef<[u8]>, S>(data: &D, serializer: S) -> Result<S::Ok, S::Error>
 where
@@ -20,7 +20,7 @@ where
     PublicKey::from_str(&s).map_err(serde::de::Error::custom)
 }
 
-pub fn ser_to_id<S>(data: &Box<dyn Id + 'static>, serializer: S) -> Result<S::Ok, S::Error>
+pub fn ser_to_id<S>(data: &Box<dyn UnresolvedMosaicId + 'static>, serializer: S) -> Result<S::Ok, S::Error>
 where
     S: serde::Serializer,
 {

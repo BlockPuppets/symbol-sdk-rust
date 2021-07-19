@@ -12,7 +12,7 @@ use std::fmt;
 
 use anyhow::{ensure, Result};
 
-use crate::{ser_to_id, Id, Uint64};
+use crate::{ser_to_id, UnresolvedMosaicId, Uint64};
 
 /// A `Mosaic` describes an instance of a mosaic definition.
 /// Mosaics can be transferred by means of a transfer transaction.
@@ -24,7 +24,7 @@ pub struct Mosaic {
     /// This can either be of type `MosaicId` or `NamespaceId`.
     ///
     #[serde(serialize_with = "ser_to_id")]
-    pub id: Box<dyn Id + 'static>,
+    pub id: Box<dyn UnresolvedMosaicId + 'static>,
     /// The mosaic amount.
     /// The quantity is always given in smallest units for the mosaic
     /// i.e. if it has a divisibility of 3 the quantity is given in millis.
@@ -44,7 +44,7 @@ impl Mosaic {
 
     /// Create `Mosaic` with absolute amount.
     ///
-    pub fn create<I: 'static + Id>(id: I, amount: u64) -> Result<Self> {
+    pub fn create<I: 'static + UnresolvedMosaicId>(id: I, amount: u64) -> Result<Self> {
         ensure!(
             amount <= Self::MAX_AMOUNT_ABSOLUTE,
             format!(
@@ -69,7 +69,7 @@ impl Mosaic {
     /// To get an absolute amount, multiply the number of assets you want to send by 10 pow(divisibility).
     /// For example, if the mosaic had divisibility 2, to send 10 units (relative) you should define 1000 (absolute) instead.
     ///
-    pub fn create_relative<I: 'static + Id>(id: I, amount: u64, divisibility: u8) -> Result<Self> {
+    pub fn create_relative<I: 'static + UnresolvedMosaicId>(id: I, amount: u64, divisibility: u8) -> Result<Self> {
         ensure!(
             divisibility <= Self::MAX_DIVISIBILITY,
             format!(

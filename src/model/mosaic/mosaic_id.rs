@@ -15,10 +15,10 @@ use std::ops::Deref;
 use anyhow::{ensure, Result};
 
 use crate::account::Address;
-use crate::model::id::Id;
-use crate::Uint64;
+use crate::{Uint64, UnresolvedMosaicId};
 
 use super::{generate_mosaic_id, MosaicNonce};
+use std::any::Any;
 
 /// The `MosaicId` structure describes mosaic id.
 ///
@@ -53,14 +53,22 @@ impl MosaicId {
 }
 
 #[typetag::serde]
-impl Id for MosaicId {
+impl UnresolvedMosaicId for MosaicId {
     fn to_uint64(&self) -> Uint64 {
         self.0
     }
 
-    fn box_clone(&self) -> Box<dyn Id + 'static> {
+    fn box_clone(&self) -> Box<dyn UnresolvedMosaicId + 'static> {
         Box::new((*self).clone())
     }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+    fn into_any(self: Box<Self>) -> Box<dyn Any> {
+        self
+    }
+
 }
 
 impl fmt::Display for MosaicId {

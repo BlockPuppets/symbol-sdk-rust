@@ -15,12 +15,12 @@ use std::ops::Deref;
 use anyhow::{ensure, Result};
 
 use crate::core::format::alias_to_recipient;
-use crate::model::id::Id;
 use crate::network::NetworkType;
-use crate::Uint64;
+use crate::{Uint64, UnresolvedMosaicId};
 
 use super::namespace_id;
 use crate::account::UnresolvedAddress;
+use std::any::Any;
 
 /// The `NamespaceId` structure describes mosaic id.
 ///
@@ -68,13 +68,18 @@ impl NamespaceId {
 }
 
 #[typetag::serde]
-impl Id for NamespaceId {
+impl UnresolvedMosaicId for NamespaceId {
     fn to_uint64(&self) -> Uint64 {
         self.id
     }
-
-    fn box_clone(&self) -> Box<dyn Id + 'static> {
+    fn box_clone(&self) -> Box<dyn UnresolvedMosaicId + 'static> {
         Box::new((*self).clone())
+    }
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+    fn into_any(self: Box<Self>) -> Box<dyn Any> {
+        self
     }
 }
 
@@ -84,12 +89,19 @@ impl UnresolvedAddress for NamespaceId {
         self.id.to_hex()
     }
 
-    fn to_vec(&self) -> Vec<u8> {
-        bcs::to_bytes(&self).unwrap()
+    fn unresolved_address_to_bytes(&self, network_type: NetworkType) -> Vec<u8> {
+        self.encode_unresolved_address(network_type)
     }
 
     fn box_clone(&self) -> Box<dyn UnresolvedAddress + 'static> {
         Box::new((*self).clone())
+    }
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn into_any(self: Box<Self>) -> Box<dyn Any> {
+        self
     }
 }
 

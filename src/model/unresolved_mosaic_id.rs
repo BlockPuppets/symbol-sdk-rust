@@ -8,50 +8,58 @@
  * // except according to those terms.
  */
 
-use crate::network::NetworkType;
-use anyhow::{anyhow, Result};
-use std::any::Any;
 use std::fmt;
 
-///  Custom trait for unresolved address
-///
+use crate::Uint64;
+use anyhow::{anyhow, Result};
+use std::any::Any;
+
+/// An `trait` is used to define mosaicIds and namespaceIds
 #[typetag::serde]
-pub trait UnresolvedAddress: Sync + Send
-where
-    Self: fmt::Debug,
-{
-    fn recipient_to_string(&self) -> String;
-    fn unresolved_address_to_bytes(&self, network_type: NetworkType) -> Vec<u8>;
-    fn box_clone(&self) -> Box<dyn UnresolvedAddress>;
+pub trait UnresolvedMosaicId: Send + Sync {
+    fn to_uint64(&self) -> Uint64;
+    fn box_clone(&self) -> Box<dyn UnresolvedMosaicId>;
     fn as_any(&self) -> &dyn Any;
     fn into_any(self: Box<Self>) -> Box<dyn Any>;
 }
 
-impl Clone for Box<dyn UnresolvedAddress + 'static> {
-    fn clone(&self) -> Box<dyn UnresolvedAddress + 'static> {
+impl dyn UnresolvedMosaicId {
+    fn as_bytes(&self) -> [u8; 8] {
+        self.to_uint64().to_fixed_bytes()
+    }
+}
+
+impl Clone for Box<dyn UnresolvedMosaicId + 'static> {
+    fn clone(&self) -> Box<dyn UnresolvedMosaicId + 'static> {
         self.box_clone()
     }
 }
 
-impl<'a> PartialEq for &'a dyn UnresolvedAddress {
+impl<'a> PartialEq for &'a dyn UnresolvedMosaicId {
     fn eq(&self, other: &Self) -> bool {
-        self.recipient_to_string() == other.recipient_to_string()
+        self.to_uint64() == other.to_uint64()
     }
 }
 
-impl<'a> PartialEq for Box<dyn UnresolvedAddress + 'static> {
+impl<'a> PartialEq for Box<dyn UnresolvedMosaicId + 'static> {
     fn eq(&self, other: &Self) -> bool {
         self.as_ref() == other.as_ref()
     }
 }
 
-impl fmt::Display for dyn UnresolvedAddress {
+impl fmt::Display for dyn UnresolvedMosaicId {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.recipient_to_string())
+        write!(f, "{}", self.to_uint64().to_hex())
     }
 }
 
-impl dyn UnresolvedAddress {
+impl fmt::Debug for dyn UnresolvedMosaicId {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.to_uint64().to_hex())
+    }
+}
+
+impl dyn UnresolvedMosaicId {
     /// Downcast a reference to this generic `UnresolvedAddress` to a specific type.
     ///
     /// # Panics
@@ -59,14 +67,14 @@ impl dyn UnresolvedAddress {
     /// Panics if the type is not `T`. In normal usage, you should know the
     /// specific type. In other cases, use `try_downcast_ref`.
     ///
-    pub fn downcast_ref<T: 'static + UnresolvedAddress>(&self) -> &T {
+    pub fn downcast_ref<T: 'static + UnresolvedMosaicId>(&self) -> &T {
         self.try_downcast_ref::<T>()
-            .unwrap_or_else(|| panic!("downcast to wrong UnresolvedAddress type; original `UnresolvedAddress` type"))
+            .unwrap_or_else(|| panic!("downcast to wrong type; original `UnresolvedAddress` type"))
     }
 
     /// Downcast a reference to this generic `UnresolvedAddress` to a specific type.
     #[inline]
-    pub fn try_downcast_ref<T: 'static + UnresolvedAddress>(&self) -> Option<&T> {
+    pub fn try_downcast_ref<T: 'static + UnresolvedMosaicId>(&self) -> Option<&T> {
         self.as_any().downcast_ref::<T>()
     }
 
@@ -77,13 +85,13 @@ impl dyn UnresolvedAddress {
     /// Panics if the `UnresolvedAddress` type is not `T`. In normal usage, you should know the
     /// specific type. In other cases, use `try_downcast`.
     ///
-    pub fn downcast<T: 'static + UnresolvedAddress>(self: Box<Self>) -> Box<T> {
+    pub fn downcast<T: 'static + UnresolvedMosaicId>(self: Box<Self>) -> Box<T> {
         self.try_downcast().unwrap_or_else(|err| panic!("{}", err))
     }
 
     /// Downcast this generic `UnresolvedAddress` to a specific type.
     #[inline]
-    pub fn try_downcast<T: 'static + UnresolvedAddress>(self: Box<Self>) -> Result<Box<T>> {
+    pub fn try_downcast<T: 'static + UnresolvedMosaicId>(self: Box<Self>) -> Result<Box<T>> {
         if self.as_ref().as_any().is::<T>() {
             Ok(self.into_any().downcast().unwrap())
         } else {
@@ -96,40 +104,33 @@ impl dyn UnresolvedAddress {
 
 #[cfg(test)]
 mod tests {
-    use crate::account::Address;
     use crate::core::utils::unresolved_mapping;
+    use crate::mosaic::MosaicId;
     use crate::namespace::NamespaceId;
-    use hex::ToHex;
 
     lazy_static! {
+        pub static ref MOSAIC_ID: MosaicId = MosaicId::from_hex("11F4B1B3AC033DB5").unwrap();
         pub static ref NAMESPACE_ID: NamespaceId =
             NamespaceId::from_hex("9550CA3FC9B41FC5").unwrap();
-        pub static ref ADDRESS: Address =
-            Address::from_raw("VATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA35C4KNQ").unwrap();
     }
 
     #[test]
-    fn test_can_map_hex_str_to_address() {
-        let unresolved =
-            unresolved_mapping::to_unresolved_address(&ADDRESS.address.encode_hex::<String>())
-                .unwrap();
-        assert_eq!(unresolved.clone().try_downcast::<Address>().is_ok(), true);
+    fn test_can_map_hex_string_to_mosaic_id() {
+        let unresolved = unresolved_mapping::to_unresolved_mosaic(&MOSAIC_ID.to_hex()).unwrap();
+        assert_eq!(unresolved.clone().try_downcast::<MosaicId>().is_ok(), true);
         assert_eq!(unresolved.try_downcast::<NamespaceId>().is_ok(), false);
     }
 
     #[test]
-    fn test_can_map_hex_str_to_namespace_id() {
-        let unresolved = unresolved_mapping::to_unresolved_address(&NAMESPACE_ID.to_hex()).unwrap();
-        assert_eq!(
-            unresolved.clone().try_downcast::<NamespaceId>().is_ok(),
-            true
-        );
-        assert_eq!(unresolved.try_downcast::<Address>().is_ok(), false);
+    fn test_can_map_hex_string_to_namespace_id() {
+        let unresolved = unresolved_mapping::to_unresolved_mosaic(&NAMESPACE_ID.to_hex()).unwrap();
+        assert_eq!(unresolved.clone().try_downcast::<NamespaceId>().is_ok(), true);
+        assert_eq!(unresolved.try_downcast::<MosaicId>().is_ok(), false);
     }
 
     #[test]
     #[should_panic(expected = "Input string is not in valid hexadecimal notation.")]
     fn test_should_panic_if_id_not_in_hex() {
-        let _ = unresolved_mapping::to_unresolved_address("test").unwrap();
+        let _ = unresolved_mapping::to_unresolved_mosaic("test").unwrap();
     }
 }
