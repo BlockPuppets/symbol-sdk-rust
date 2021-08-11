@@ -2,8 +2,7 @@ use std::str::FromStr;
 
 use crypto::prelude::PublicKey;
 use hex::ToHex;
-
-use crate::UnresolvedMosaicId;
+use crate::mosaic::UnresolvedMosaicId;
 
 pub fn ser_to_hex_upper<D: AsRef<[u8]>, S>(data: &D, serializer: S) -> Result<S::Ok, S::Error>
 where

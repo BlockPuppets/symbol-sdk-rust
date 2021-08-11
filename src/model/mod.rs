@@ -11,12 +11,9 @@
 pub use self::node_identity_equality_strategy::*;
 pub use self::transaction::Deadline;
 pub use self::uint64::*;
-pub use self::unresolved_mosaic_id::*;
 
 pub mod account;
 pub mod blockchain;
-#[allow(dead_code)]
-mod unresolved_mosaic_id;
 
 #[allow(dead_code)]
 pub mod message;

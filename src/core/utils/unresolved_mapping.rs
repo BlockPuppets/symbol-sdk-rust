@@ -9,9 +9,9 @@
  */
 
 use crate::account::{Address, UnresolvedAddress};
-use crate::mosaic::MosaicId;
+use crate::mosaic::{MosaicId, UnresolvedMosaicId};
 use crate::namespace::NamespaceId;
-use crate::{hex_decode, is_hex, UnresolvedMosaicId};
+use crate::{hex_decode, is_hex};
 use anyhow::{ensure, Result};
 
 /// Map unresolved mosaic hex string to MosaicId or NamespaceId.

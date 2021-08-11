@@ -18,6 +18,7 @@ crate-type = ["lib"]
 [dependencies.symbol-crypto-core]
 git = "https://github.com/BlockPuppets/symbol-crypto-core"
 features = ['serde', 'with_mnemonic']
+optional = true
 
 [dependencies.anyhow]
 version = "^1.0"
@@ -81,6 +82,11 @@ default_features = false
 version = "1.8"
 features = ["rt"]
 default_features = false
+
+[features]
+default = ['sym']  # default support for symbol blockchain
+nis1 = ['symbol-crypto-core/nis1'] # support for nem nis1 blockchain
+sym = ['symbol-crypto-core/sym']
 
 [dev-dependencies]
 lazy_static = "1.4"

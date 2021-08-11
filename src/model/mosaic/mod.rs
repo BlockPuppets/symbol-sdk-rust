@@ -22,6 +22,7 @@ pub use self::mosaic_info::*;
 pub use self::mosaic_names::*;
 pub use self::mosaic_nonce::*;
 pub use self::mosaic_supply_change_action::*;
+pub use self::unresolved_mosaic_id::*;
 
 mod mosaic;
 mod mosaic_flags;
@@ -30,6 +31,8 @@ mod mosaic_info;
 mod mosaic_names;
 mod mosaic_nonce;
 mod mosaic_supply_change_action;
+#[allow(dead_code)]
+pub mod unresolved_mosaic_id;
 
 /// Generates a `MosaicId` given a `MosaicNonce` and a `Address`.
 ///

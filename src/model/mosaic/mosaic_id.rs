@@ -11,14 +11,14 @@
 use std::convert::TryFrom;
 use std::fmt;
 use std::ops::Deref;
+use std::any::Any;
 
 use anyhow::{ensure, Result};
 
 use crate::account::Address;
-use crate::{Uint64, UnresolvedMosaicId};
+use crate::Uint64;
 
-use super::{generate_mosaic_id, MosaicNonce};
-use std::any::Any;
+use super::{generate_mosaic_id, MosaicNonce, UnresolvedMosaicId};
 
 /// The `MosaicId` structure describes mosaic id.
 ///
@@ -68,7 +68,6 @@ impl UnresolvedMosaicId for MosaicId {
     fn into_any(self: Box<Self>) -> Box<dyn Any> {
         self
     }
-
 }
 
 impl fmt::Display for MosaicId {
