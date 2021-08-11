@@ -1,5 +1,5 @@
 /*
- * // Copyright 2021 BlockPuppets developers.
+ * // Copyright 2021 BlockPuppets.
  * //
  * // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
  * // https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -8,6 +8,7 @@
  * // except according to those terms.
  */
 
+use std::any::Any;
 use std::convert::TryFrom;
 use std::fmt;
 use std::ops::Deref;
@@ -15,17 +16,19 @@ use std::ops::Deref;
 use anyhow::{ensure, Result};
 
 use crate::core::format::alias_to_recipient;
-use crate::model::id::Id;
 use crate::network::NetworkType;
 use crate::Uint64;
 
 use super::namespace_id;
+use crate::account::UnresolvedAddress;
+use crate::mosaic::UnresolvedMosaicId;
 
 /// The `NamespaceId` structure describes mosaic id.
 ///
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize, Eq)]
 pub struct NamespaceId {
     pub id: Uint64,
+    #[serde(skip_serializing, skip_deserializing)]
     pub full_name: Option<String>,
 }
 
@@ -66,13 +69,40 @@ impl NamespaceId {
 }
 
 #[typetag::serde]
-impl Id for NamespaceId {
+impl UnresolvedMosaicId for NamespaceId {
     fn to_uint64(&self) -> Uint64 {
         self.id
     }
-
-    fn box_clone(&self) -> Box<dyn Id + 'static> {
+    fn box_clone(&self) -> Box<dyn UnresolvedMosaicId + 'static> {
         Box::new((*self).clone())
+    }
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+    fn into_any(self: Box<Self>) -> Box<dyn Any> {
+        self
+    }
+}
+
+#[typetag::serde]
+impl UnresolvedAddress for NamespaceId {
+    fn recipient_to_string(&self) -> String {
+        self.id.to_hex()
+    }
+
+    fn unresolved_address_to_bytes(&self, network_type: NetworkType) -> Vec<u8> {
+        self.encode_unresolved_address(network_type)
+    }
+
+    fn box_clone(&self) -> Box<dyn UnresolvedAddress + 'static> {
+        Box::new((*self).clone())
+    }
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn into_any(self: Box<Self>) -> Box<dyn Any> {
+        self
     }
 }
 

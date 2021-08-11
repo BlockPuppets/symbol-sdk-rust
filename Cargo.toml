@@ -1,10 +1,11 @@
 [package]
 name = "symbol-sdk"
 version = "0.1.1-alpha.0"
-authors = ["Puppet Black <blockpuppetblack0@gmail.com>"]
+authors = [ "The BlockPuppet Developers", "The Symbol SDK Rust Project Developers" ]
 readme = "README.md"
 license = "Apache-2.0"
 repository = "https://github.com/BlockPuppets/symbol-sdk-rust"
+documentation = "https://docs.rs/symbol-sdk"
 keywords = ["symbol", "nem"]
 categories = ["blockchain", "sdk"]
 exclude = [".gitignore"]
@@ -17,6 +18,13 @@ crate-type = ["lib"]
 [dependencies.symbol-crypto-core]
 git = "https://github.com/BlockPuppets/symbol-crypto-core"
 features = ['serde', 'with_mnemonic']
+optional = true
+
+[dependencies.anyhow]
+version = "^1.0"
+
+[dependencies.typetag]
+version = "^0.1"
 
 [dependencies.serde]
 version = "^1.0"
@@ -25,11 +33,16 @@ features = ["derive"]
 [dependencies.serde_json]
 version = "^1.0"
 
-[dependencies.typetag]
-version = "^0.1"
-
 [dependencies.hex]
 version = "^0.4"
+
+[dependencies.regex]
+version = "^1"
+
+[dependencies.rand]
+version = "0.8"
+features = ["std_rng"]
+default-features = false
 
 [dependencies.sha3]
 version = "^0.9"
@@ -42,24 +55,16 @@ version = "^0.4"
 version = "^0.9"
 
 [dependencies.fixed-hash]
-version = "0.7"
-
-[dependencies.anyhow]
-version = "1.0"
-
-[dependencies.regex]
-version = "^1"
-
-[dependencies.rand]
-version = "0.8"
-features = ["std_rng"]
-default-features = false
+version = "^0.7"
 
 [dependencies.byteorder]
 version = "^1.4"
 default-features = false
 
-[dependencies.round]
+[dependencies.chrono]
+version = "0.4"
+
+[dependencies.bcs]
 version = "0.1"
 
 [dependencies.async-trait]
@@ -74,14 +79,16 @@ features = ["json"]
 default_features = false
 
 [dependencies.tokio]
-version = "1.7"
-features = ["macros", "rt-multi-thread"]
+version = "1.8"
+features = ["rt"]
+default_features = false
 
-[dependencies.chrono]
-version = "0.4"
+[features]
+default = ['sym']  # default support for symbol blockchain
+nis1 = ['symbol-crypto-core/nis1'] # support for nem nis1 blockchain
+sym = ['symbol-crypto-core/sym']
 
 [dev-dependencies]
 lazy_static = "1.4"
 
-[dependencies.bcs]
-version = "0.1"
+tokio = { version = "1.8", features = ["macros", "rt-multi-thread"] }

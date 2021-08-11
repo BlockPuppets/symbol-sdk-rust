@@ -1,5 +1,5 @@
 /*
- * // Copyright 2021 BlockPuppets developers.
+ * // Copyright 2021 BlockPuppets.
  * //
  * // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
  * // https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -10,8 +10,8 @@
 
 use anyhow::{ensure, Result};
 
-use crate::{hex_to_utf8, is_hex};
 use crate::message::{Message, MessageType};
+use crate::{hex_to_utf8, is_hex};
 
 /// The `PlainMessage` struct defines a plain string.
 /// When sending it to the network we transform the payload to hex-string.
@@ -69,6 +69,9 @@ impl Message for PlainMessage {
     }
     fn payload(&self) -> String {
         self.payload.to_owned()
+    }
+    fn box_clone(&self) -> Box<dyn Message + 'static> {
+        Box::new((*self).clone())
     }
 }
 

@@ -1,5 +1,5 @@
 /*
- * // Copyright 2021 BlockPuppets developers.
+ * // Copyright 2021 BlockPuppets.
  * //
  * // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
  * // https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -12,9 +12,9 @@ use base32::Alphabet::RFC4648;
 use ripemd160::Ripemd160;
 use sha3::{Digest, Sha3_256};
 
-use crate::{H256, Uint64};
 use crate::account::Address;
 use crate::network::NetworkType;
+use crate::{Uint64, H256};
 
 pub fn public_key_to_address(public_key: H256, network_type: NetworkType) -> Vec<u8> {
     // step 1: sha3 hash of the public key

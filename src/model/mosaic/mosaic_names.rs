@@ -1,5 +1,5 @@
 /*
- * // Copyright 2021 BlockPuppets developers.
+ * // Copyright 2021 BlockPuppets.
  * //
  * // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
  * // https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -14,7 +14,6 @@ use crate::mosaic::MosaicId;
 ///
 pub struct MosaicNames {
     pub mosaic_id: MosaicId,
-
     // todo: crate NamespaceName.
     // pub names: Vec<NamespaceName>,
 }

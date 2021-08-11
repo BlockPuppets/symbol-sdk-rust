@@ -1,5 +1,5 @@
 /*
- * // Copyright 2021 BlockPuppets developers.
+ * // Copyright 2021 BlockPuppets.
  * //
  * // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
  * // https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -13,10 +13,10 @@ use std::str::FromStr;
 
 use anyhow::Result;
 
-use crate::{H256, H512};
 use crate::account::{Address, PublicAccount};
 use crate::blockchain::{BlockInfo, BlockType, NemesisImportanceBlockInfo};
 use crate::network::NetworkType;
+use crate::{H256, H512};
 
 use super::{block_dto::BlockDto, block_meta_dto::BlockMetaDto};
 
@@ -31,13 +31,10 @@ pub struct BlockInfoDto {
 impl BlockInfoDto {
     pub fn to_compact(&self) -> Result<BlockInfo> {
         let network_type = NetworkType::try_from(self.block.network)?;
-        let signer =
-            PublicAccount::from_public_key(&self.block.signer_public_key, network_type)?;
+        let signer = PublicAccount::from_public_key(&self.block.signer_public_key, network_type)?;
 
         let beneficiary_address = if !self.block.beneficiary_address.is_empty() {
-            Some(Address::from_encoded(
-                &self.block.beneficiary_address,
-            )?)
+            Some(Address::from_encoded(&self.block.beneficiary_address)?)
         } else {
             None
         };

@@ -1,5 +1,5 @@
 /*
- * // Copyright 2021 BlockPuppets developers.
+ * // Copyright 2021 BlockPuppets.
  * //
  * // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
  * // https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -12,18 +12,18 @@ use std::fmt;
 
 use anyhow::Result;
 
-use crate::{hex_decode, is_hex};
 use crate::message::{
-    MessageType, PERSISTENT_DELEGATION_UNLOCK, PersistentHarvestingDelegationMessage, PlainMessage,
-    RawMessage,
+    MessageType, PersistentHarvestingDelegationMessage, PlainMessage, RawMessage,
+    PERSISTENT_DELEGATION_UNLOCK,
 };
+use crate::{hex_decode, is_hex};
 
 /// An abstract message trait that serves as the base of all message types.
 ///
 #[typetag::serde]
 pub trait Message: Sync + Send
-    where
-        Self: fmt::Debug,
+where
+    Self: fmt::Debug,
 {
     fn message_type(&self) -> MessageType;
 
@@ -54,7 +54,38 @@ pub trait Message: Sync + Send
                 dto + &hex::encode(&self.payload_to_vec())
             }
             _ => String::new(),
-        }.to_uppercase()
+        }
+        .to_uppercase()
+    }
+
+    fn box_clone(&self) -> Box<dyn Message>;
+
+    fn to_vec(&self) -> Vec<u8> {
+        if self.payload().is_empty() {
+            return vec![];
+        };
+        let mut buf = Vec::new();
+        buf.extend(self.message_type().to_bytes().to_vec());
+        buf.extend(self.payload_to_vec());
+        buf
+    }
+}
+
+impl Clone for Box<dyn Message + 'static> {
+    fn clone(&self) -> Box<dyn Message + 'static> {
+        self.box_clone()
+    }
+}
+
+impl<'a> PartialEq for &'a dyn Message {
+    fn eq(&self, other: &Self) -> bool {
+        self.to_vec() == other.to_vec()
+    }
+}
+
+impl<'a> PartialEq for Box<dyn Message + 'static> {
+    fn eq(&self, other: &Self) -> bool {
+        self.as_ref() == other.as_ref()
     }
 }
 
@@ -111,12 +142,21 @@ mod tests {
     #[test]
     fn test_should_create_an_plain_message_dto_struct() {
         let message = PlainMessage::create("test");
-        assert_eq!(message.to_dto(), format!("00{}", utf8_to_hex("test")));
+        assert_eq!(
+            message.to_dto(),
+            format!("00{}", utf8_to_hex("test").to_uppercase())
+        );
     }
 
     #[test]
     fn test_should_create_an_encrypted_message_dto_struct() {
-        let message = EncryptedMessage { r#type: MessageType::SecureMessageType, payload: "test".to_string() };
-        assert_eq!(message.to_dto(), format!("01{}", utf8_to_hex("test")));
+        let message = EncryptedMessage {
+            r#type: MessageType::SecureMessageType,
+            payload: "test".to_string(),
+        };
+        assert_eq!(
+            message.to_dto(),
+            format!("01{}", utf8_to_hex("test").to_uppercase())
+        );
     }
 }

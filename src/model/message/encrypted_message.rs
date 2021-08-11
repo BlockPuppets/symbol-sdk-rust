@@ -1,5 +1,5 @@
 /*
- * // Copyright 2021 BlockPuppets developers.
+ * // Copyright 2021 BlockPuppets.
  * //
  * // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
  * // https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -95,6 +95,9 @@ impl Message for EncryptedMessage {
     fn payload(&self) -> String {
         self.payload.to_owned()
     }
+    fn box_clone(&self) -> Box<dyn Message + 'static> {
+        Box::new((*self).clone())
+    }
 }
 
 #[cfg(test)]
@@ -112,8 +115,7 @@ pub mod tests {
         static ref SENDER: Account =
             Account::from_hex_private_key(SENDER_PRIVATE_KEY, NetworkType::PrivateTest).unwrap();
         static ref RECIPIENT: Account =
-            Account::from_hex_private_key(RECIPIENT_PRIVATE_KEY, NetworkType::PrivateTest)
-                .unwrap();
+            Account::from_hex_private_key(RECIPIENT_PRIVATE_KEY, NetworkType::PrivateTest).unwrap();
     }
 
     #[test]

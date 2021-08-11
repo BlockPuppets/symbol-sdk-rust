@@ -1,5 +1,5 @@
 /*
- * // Copyright 2021 BlockPuppets developers.
+ * // Copyright 2021 BlockPuppets.
  * //
  * // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
  * // https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -13,7 +13,10 @@ use std::fmt;
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct MosaicRestrictionNetworkProperties {
     /// Maximum number of mosaic restriction values.
-    #[serde(rename = "maxMosaicRestrictionValues", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "maxMosaicRestrictionValues",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub max_mosaic_restriction_values: Option<String>,
 }
 

@@ -1,5 +1,5 @@
 /*
- * // Copyright 2021 BlockPuppets developers.
+ * // Copyright 2021 BlockPuppets.
  * //
  * // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
  * // https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -12,7 +12,7 @@ use anyhow::{bail, Result};
 use hex::ToHex;
 use sha3::{Digest, Sha3_256};
 
-use crate::{H256, hex_decode, parse_u64};
+use crate::{hex_decode, parse_u64, H256};
 
 use super::{
     MerkleTreeBranch, MerkleTreeBranchLink, MerkleTreeLeaf, MerkleTreeNodeType, MerkleTreeTrait,

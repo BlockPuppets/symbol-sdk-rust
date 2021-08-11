@@ -1,5 +1,5 @@
 /*
- * // Copyright 2021 BlockPuppets developers.
+ * // Copyright 2021 BlockPuppets.
  * //
  * // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
  * // https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -11,20 +11,18 @@
 use std::convert::TryFrom;
 use std::fmt;
 use std::ops::Deref;
+use std::any::Any;
 
 use anyhow::{ensure, Result};
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use serde::de::Error;
 
 use crate::account::Address;
-use crate::model::id::Id;
 use crate::Uint64;
 
-use super::{generate_mosaic_id, MosaicNonce};
+use super::{generate_mosaic_id, MosaicNonce, UnresolvedMosaicId};
 
 /// The `MosaicId` structure describes mosaic id.
 ///
-#[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub struct MosaicId(Uint64);
 
 impl MosaicId {
@@ -55,13 +53,20 @@ impl MosaicId {
 }
 
 #[typetag::serde]
-impl Id for MosaicId {
+impl UnresolvedMosaicId for MosaicId {
     fn to_uint64(&self) -> Uint64 {
         self.0
     }
 
-    fn box_clone(&self) -> Box<dyn Id + 'static> {
+    fn box_clone(&self) -> Box<dyn UnresolvedMosaicId + 'static> {
         Box::new((*self).clone())
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+    fn into_any(self: Box<Self>) -> Box<dyn Any> {
+        self
     }
 }
 
@@ -102,25 +107,6 @@ impl Deref for MosaicId {
     }
 }
 
-impl<'de> Deserialize<'de> for MosaicId {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where
-            D: Deserializer<'de>,
-    {
-        let string = String::deserialize(deserializer)?;
-        MosaicId::from_hex(string.as_ref()).map_err(|e| D::Error::custom(e))
-    }
-}
-
-impl Serialize for MosaicId {
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-        where
-            S: Serializer,
-    {
-        serializer.serialize_str(&self.to_hex())
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use crate::account::Address;
@@ -143,8 +129,7 @@ mod tests {
 
     #[test]
     fn test_should_create_given_nonce_and_owner() {
-        let owner =
-            Address::from_public_key(PUBLIC_KEY, NetworkType::PrivateTest).unwrap();
+        let owner = Address::from_public_key(PUBLIC_KEY, NetworkType::PrivateTest).unwrap();
         let nonce = MosaicNonce::from(0);
 
         let mosaic_id = MosaicId::create_from_nonce(nonce, owner);
@@ -153,8 +138,7 @@ mod tests {
 
     #[test]
     fn test_should_create_twice_the_same_given_nonce_and_owner() {
-        let owner =
-            Address::from_public_key(PUBLIC_KEY, NetworkType::PrivateTest).unwrap();
+        let owner = Address::from_public_key(PUBLIC_KEY, NetworkType::PrivateTest).unwrap();
         let nonce = MosaicNonce::from(0);
 
         let mosaic_id_one = MosaicId::create_from_nonce(nonce, owner);

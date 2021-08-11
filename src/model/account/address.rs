@@ -1,5 +1,5 @@
 /*
- * // Copyright 2021 BlockPuppets developers.
+ * // Copyright 2021 BlockPuppets.
  * //
  * // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
  * // https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -16,13 +16,15 @@ use std::str::FromStr;
 use anyhow::{anyhow, ensure, Result};
 use hex::ToHex;
 
-use crate::{H256, hex_decode};
 use crate::core::format::{
     decode_base32, encode_base32, is_valid_address, public_key_to_address, raw_prettify,
 };
-use crate::helpers::H192;
 use crate::helpers::is_hex;
+use crate::helpers::H192;
 use crate::network::NetworkType;
+use crate::{hex_decode, H256};
+use crate::account::UnresolvedAddress;
+use std::any::Any;
 
 /// The `Address` struct describes an Symbol address with its network.
 ///
@@ -234,6 +236,30 @@ impl Address {
             Self::CHECKSUM_SIZE,
         )
     }
+
+    pub fn as_bytes(&self) -> &[u8] {
+        self.address.as_bytes()
+    }
+}
+
+#[typetag::serde]
+impl UnresolvedAddress for Address {
+    fn recipient_to_string(&self) -> String {
+        self.address_str()
+    }
+
+    fn unresolved_address_to_bytes(&self, _network_type: NetworkType) -> Vec<u8> {
+       self.as_bytes().to_vec()
+    }
+    fn box_clone(&self) -> Box<dyn UnresolvedAddress + 'static> {
+        Box::new((*self).clone())
+    }
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+    fn into_any(self: Box<Self>) -> Box<dyn Any> {
+        self
+    }
 }
 
 impl fmt::Display for Address {
@@ -345,7 +371,7 @@ mod tests {
 
     #[test]
     #[should_panic(
-    expected = "Address ZCTVW234AQ4TZIDZENGNOZXPRPSDRSFRF has to be 39 characters long"
+        expected = "Address ZCTVW234AQ4TZIDZENGNOZXPRPSDRSFRF has to be 39 characters long"
     )]
     fn test_should_panic_when_the_address_is_not_valid_in_length() {
         Address::from_raw("ZCTVW234AQ4TZIDZENGNOZXPRPSDRSFRF").unwrap();

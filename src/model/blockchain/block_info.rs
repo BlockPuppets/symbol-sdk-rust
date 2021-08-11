@@ -1,5 +1,5 @@
 /*
- * // Copyright 2021 BlockPuppets developers.
+ * // Copyright 2021 BlockPuppets.
  * //
  * // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
  * // https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -12,10 +12,10 @@ use std::fmt;
 
 use serde::Serialize;
 
-use crate::{GenerationHash, H256, H512};
 use crate::account::{Address, PublicAccount};
 use crate::network::NetworkType;
 use crate::ser_to_hex_upper;
+use crate::{GenerationHash, H256, H512};
 
 use super::BlockType;
 

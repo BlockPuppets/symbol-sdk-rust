@@ -1,5 +1,5 @@
 /*
- * // Copyright 2021 BlockPuppets developers.
+ * // Copyright 2021 BlockPuppets.
  * //
  * // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
  * // https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -13,9 +13,9 @@ use std::collections::HashMap;
 use hex::ToHex;
 use reqwest::Method;
 
-use crate::{H256, MosaicIds, MosaicSearchCriteria};
 use crate::clients::search_criteria::BlockSearchCriteria;
 use crate::mosaic::MosaicId;
+use crate::{MosaicIds, MosaicSearchCriteria, H256};
 
 /// Type alias to improve readability.
 pub(crate) type RoutePathName = &'static str;

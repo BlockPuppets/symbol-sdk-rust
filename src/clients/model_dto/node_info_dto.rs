@@ -1,5 +1,5 @@
 /*
- * // Copyright 2021 BlockPuppets developers.
+ * // Copyright 2021 BlockPuppets.
  * //
  * // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
  * // https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -41,7 +41,10 @@ impl NodeInfoDto {
 
         Ok(NodeInfo {
             version: self.version,
-            public_account: PublicAccount::from_public_key(self.public_key.to_owned(), network_type)?,
+            public_account: PublicAccount::from_public_key(
+                self.public_key.to_owned(),
+                network_type,
+            )?,
             network_generation_hash_seed: self.network_generation_hash_seed.parse()?,
             roles: self.roles,
             port: self.port,
@@ -52,5 +55,3 @@ impl NodeInfoDto {
         })
     }
 }
-
-

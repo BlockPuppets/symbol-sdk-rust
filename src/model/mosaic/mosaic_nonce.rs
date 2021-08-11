@@ -1,5 +1,5 @@
 /*
- * // Copyright 2021 BlockPuppets developers.
+ * // Copyright 2021 BlockPuppets.
  * //
  * // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
  * // https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -14,8 +14,6 @@ use std::ops::Deref;
 use anyhow::{ensure, Result};
 use fixed_hash::rustc_hex::ToHex;
 use hex::FromHex;
-
-use crate::random_bytes;
 
 /// The `MosaicNonce` struct.
 ///
@@ -40,8 +38,7 @@ impl MosaicNonce {
     /// Creates a random `MosaicNonce`.
     ///
     pub fn random() -> MosaicNonce {
-        let nonce = random_bytes::<4>();
-        MosaicNonce(nonce)
+        MosaicNonce(rand::random::<[u8; 4]>())
     }
 
     /// Creates a new `MosaicNonce` from a hexadecimal string.

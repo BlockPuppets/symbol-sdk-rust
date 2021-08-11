@@ -1,5 +1,5 @@
 /*
- * // Copyright 2021 BlockPuppets developers.
+ * // Copyright 2021 BlockPuppets.
  * //
  * // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
  * // https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -15,8 +15,8 @@ use async_trait::async_trait;
 use reqwest::header::{CONTENT_LENGTH, CONTENT_TYPE};
 use serde_json::Value;
 
-use crate::clients::{consts::HTTP_REQUEST_TIMEOUT, Error, SymbolResponse};
 use crate::clients::async_client::request::Request;
+use crate::clients::{consts::HTTP_REQUEST_TIMEOUT, Error, SymbolResponse};
 use crate::SymbolError;
 
 #[derive(Debug)]
