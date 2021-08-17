@@ -21,6 +21,10 @@ pub trait UnresolvedMosaicId: Send + Sync {
     fn box_clone(&self) -> Box<dyn UnresolvedMosaicId>;
     fn as_any(&self) -> &dyn Any;
     fn into_any(self: Box<Self>) -> Box<dyn Any>;
+    /// Create Builder object
+    fn to_builder(&self) -> buffer::unresolved_mosaic_id_dto::UnresolvedMosaicIdDto {
+        buffer::unresolved_mosaic_id_dto::UnresolvedMosaicIdDto(*self.to_uint64())
+    }
 }
 
 impl dyn UnresolvedMosaicId {

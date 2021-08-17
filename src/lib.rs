@@ -16,6 +16,7 @@ extern crate lazy_static;
 #[macro_use]
 extern crate serde;
 extern crate symbol_crypto_core as crypto;
+extern crate catbuffer_rust as buffer;
 
 pub use self::clients::*;
 pub use self::helpers::*;

@@ -9,9 +9,11 @@
  */
 
 use crate::account::PublicAccount;
+use crate::buffer::*;
 use crate::network::NetworkType;
 use crate::transaction::{TransactionInfo, TransactionType, TransactionVersion};
-use crate::{Deadline, H256};
+use crate::{hex_decode, Deadline, H256};
+use std::convert::TryFrom;
 
 pub type Height = u64;
 
@@ -75,6 +77,40 @@ impl CommonTransaction {
                 _ => H256::default(),
             },
             _ => H256::default(),
+        }
+    }
+
+    /// Converts the optional signer to a KeyDto that can be serialized.
+    fn __get_signer_as_builder(&self) -> key_dto::KeyDto {
+        if let Some(signer) = self.signer {
+            signer.to_builder()
+        } else {
+            key_dto::KeyDto([0u8; 32])
+        }
+    }
+
+    /// Converts the optional signer to a KeyDto that can be serialized.
+    fn __get_signature_as_builder(&self) -> signature_dto::SignatureDto {
+        if let Some(ref signature) = self.signature {
+            signature_dto::SignatureDto(<[u8; 64]>::try_from(hex_decode(&signature)).unwrap())
+        } else {
+            signature_dto::SignatureDto([0u8; 64])
+        }
+    }
+
+    fn __version_to_dto(&self) -> u8 {
+        (((self.network_type.value() as u32) << 8) + *self.version as u32) as u8
+    }
+
+    pub fn create_builder(&self) -> transaction_builder::TransactionBuilder {
+        transaction_builder::TransactionBuilder {
+            signature: self.__get_signature_as_builder(),
+            signer_public_key: self.__get_signer_as_builder(),
+            version: self.__version_to_dto(),
+            network: self.network_type.to_builder(),
+            _type: self.transaction_type.to_builder(),
+            fee: amount_dto::AmountDto(self.max_fee),
+            deadline: timestamp_dto::TimestampDto(*self.deadline),
         }
     }
 }

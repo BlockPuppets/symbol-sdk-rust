@@ -17,4 +17,5 @@ pub trait Transaction: Sync + Send
 where
     Self: fmt::Debug,
 {
+    fn serializer(&self) -> Vec<u8>;
 }

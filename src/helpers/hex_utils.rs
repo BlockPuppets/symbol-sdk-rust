@@ -30,7 +30,6 @@ pub fn hex_to_utf8(hex: &str) -> String {
     String::from_utf8(decode).unwrap()
 }
 
-#[cfg(test)]
 pub fn utf8_to_hex(txt: &str) -> String {
     use core::fmt::Write;
     let mut ret = String::with_capacity(2 * txt.len());

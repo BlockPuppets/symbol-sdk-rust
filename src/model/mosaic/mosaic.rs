@@ -102,6 +102,11 @@ impl Mosaic {
     pub fn to_vec(&self) -> Vec<u8> {
         bcs::to_bytes(&self).unwrap()
     }
+
+    /// Create Builder object
+    pub fn to_builder(&self) -> buffer::unresolved_mosaic_builder::UnresolvedMosaicBuilder {
+        buffer::unresolved_mosaic_builder::UnresolvedMosaicBuilder::from_binary(&*self.to_vec())
+    }
 }
 
 impl fmt::Display for Mosaic {

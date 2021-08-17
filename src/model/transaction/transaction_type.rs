@@ -175,6 +175,11 @@ impl TransactionType {
     pub fn to_bytes(&self) -> [u8; 2] {
         self.value().to_le_bytes()
     }
+
+    /// Create Builder object
+    pub fn to_builder(&self) -> buffer::entity_type_dto::EntityTypeDto {
+        buffer::entity_type_dto::EntityTypeDto::from_binary(&self.to_bytes())
+    }
 }
 
 /// Returns a 'TransactionType' for the given u16 value.

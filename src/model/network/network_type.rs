@@ -81,6 +81,11 @@ impl NetworkType {
     pub fn to_bytes(&self) -> [u8; 1] {
         self.value().to_le_bytes()
     }
+
+    /// Create Builder object
+    pub fn to_builder(&self) -> buffer::network_type_dto::NetworkTypeDto {
+        buffer::network_type_dto::NetworkTypeDto::from_binary(&self.to_bytes())
+    }
 }
 
 impl fmt::Display for NetworkType {

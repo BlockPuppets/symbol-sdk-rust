@@ -66,6 +66,11 @@ impl NamespaceId {
     pub fn encode_unresolved_address(&self, network_type: NetworkType) -> Vec<u8> {
         alias_to_recipient(self.id, network_type)
     }
+
+    /// Create Builder object
+    pub fn to_builder(&self) -> buffer::namespace_id_dto::NamespaceIdDto {
+        buffer::namespace_id_dto::NamespaceIdDto(self.as_u64())
+    }
 }
 
 #[typetag::serde]

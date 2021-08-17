@@ -20,6 +20,9 @@ git = "https://github.com/BlockPuppets/symbol-crypto-core"
 features = ['serde', 'with_mnemonic']
 optional = true
 
+[dependencies.catbuffer-rust]
+git = "https://github.com/BlockPuppets/catbuffer-rust"
+
 [dependencies.anyhow]
 version = "^1.0"
 

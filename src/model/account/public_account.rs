@@ -114,6 +114,11 @@ impl PublicAccount {
     ) -> Result<()> {
         verify_signature(self.public_key, data, signature)
     }
+
+    /// Create Builder object
+    pub fn to_builder(&self) -> buffer::key_dto::KeyDto {
+        buffer::key_dto::KeyDto(self.public_key.into())
+    }
 }
 
 impl fmt::Display for PublicAccount {
