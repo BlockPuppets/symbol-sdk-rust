@@ -565,22 +565,3 @@ mod tests {
         }
     }
 }
-
-#[cfg(test)]
-mod tests {
-
-    use super::*;
-    #[test]
-    fn test_should_create_transfer_transaction() {
-        let vector = "D10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019054410000000000000000010000000000000090F36CA680C35D630662A0C38DC89D4978D10B511B3D241A0100030000000000BA36BD286FB7F2670300000000000000D787D9329996A177020000000000000029CF5FD941AD25D5010000000000000000";
-        let bytes_vector = hex::decode(vector).unwrap();
-        let build_object = TransferTransactionBuilder::from_binary(&*bytes_vector);
-
-        println!("{:?}", build_object);
-        assert_eq!(
-            build_object.serializer(),
-            bytes_vector
-        );
-
-    }
-}

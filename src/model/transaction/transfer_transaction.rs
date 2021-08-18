@@ -103,19 +103,26 @@ impl TransferTransaction {
         mosaics_clone
     }
 
-    pub fn create_builder(&self) -> transfer_transaction_builder::TransferTransactionBuilder {
+    fn __to_transaction_body_builder(
+        &self,
+    ) -> transfer_transaction_body_builder::TransferTransactionBodyBuilder {
+        transfer_transaction_body_builder::TransferTransactionBodyBuilder {
+            recipient_address: buffer::unresolved_address_dto::UnresolvedAddressDto::from_binary(
+                &self
+                    .recipient
+                    .unresolved_address_to_bytes(self.common.network_type),
+            ),
+            mosaics: self.sort_mosaics().iter().map(|m| m.to_builder()).collect(),
+            message: self.__get_message_buffer(),
+        }
+    }
+
+    pub fn to_transaction_builder(
+        &self,
+    ) -> transfer_transaction_builder::TransferTransactionBuilder {
         transfer_transaction_builder::TransferTransactionBuilder {
             super_object: self.common.create_builder(),
-            body: transfer_transaction_body_builder::TransferTransactionBodyBuilder {
-                recipient_address:
-                    buffer::unresolved_address_dto::UnresolvedAddressDto::from_binary(
-                        &self
-                            .recipient
-                            .unresolved_address_to_bytes(self.common.network_type),
-                    ),
-                mosaics: self.sort_mosaics().iter().map(|m| m.to_builder()).collect(),
-                message: self.__get_message_buffer(),
-            },
+            body: self.__to_transaction_body_builder(),
         }
     }
 }
@@ -123,7 +130,23 @@ impl TransferTransaction {
 #[typetag::serde]
 impl Transaction for TransferTransaction {
     fn serializer(&self) -> Vec<u8> {
-        self.create_builder().serializer()
+        self.to_transaction_builder().serializer()
+    }
+
+    fn to_embedded_transaction_builder(
+        &self,
+    ) -> Box<dyn embedded_transaction_helper::EmbeddedTransactionHelper> {
+        Box::new(
+            embedded_transfer_transaction_builder::EmbeddedTransferTransactionBuilder {
+                super_object: embedded_transaction_builder::EmbeddedTransactionBuilder {
+                    signer_public_key: self.common.__get_signer_as_builder(),
+                    version: self.common.__version_to_dto(),
+                    network: self.common.network_type.to_builder(),
+                    _type: entity_type_dto::EntityTypeDto::TRANSFER_TRANSACTION,
+                },
+                body: self.__to_transaction_body_builder(),
+            },
+        )
     }
 }
 
@@ -139,7 +162,40 @@ impl fmt::Display for TransferTransaction {
 
 #[cfg(test)]
 pub mod tests {
-    // fn test_should_create_transfer_transaction() {
-    //     todo!()
-    // }
+    use super::*;
+    use crate::account::Address;
+    use crate::message::PlainMessage;
+    use chrono::Duration;
+
+    const EPOCH_ADJUSTMENT: u64 = 1573430400;
+
+    #[test]
+    fn should_default_max_fee_field_be_set_to_0() {
+        let transfer_transaction = TransferTransaction::create(
+            Deadline::create(EPOCH_ADJUSTMENT, Duration::hours(2)).unwrap(),
+            Address::from_raw("VATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA35C4KNQ").unwrap(),
+            vec![],
+            PlainMessage::create("test-message"),
+            NetworkType::PrivateTest,
+            None,
+        )
+        .unwrap();
+
+        assert_eq!(transfer_transaction.common.max_fee, 0);
+    }
+
+    #[test]
+    fn should_filled_max_fee_override_transaction_max_fee() {
+        let transfer_transaction = TransferTransaction::create(
+            Deadline::create(EPOCH_ADJUSTMENT, Duration::hours(2)).unwrap(),
+            Address::from_raw("VATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA35C4KNQ").unwrap(),
+            vec![],
+            PlainMessage::create("test-message"),
+            NetworkType::PrivateTest,
+            Some(1),
+        )
+        .unwrap();
+
+        assert_eq!(transfer_transaction.common.max_fee, 1);
+    }
 }

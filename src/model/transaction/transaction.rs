@@ -18,4 +18,8 @@ where
     Self: fmt::Debug,
 {
     fn serializer(&self) -> Vec<u8>;
+
+    fn to_embedded_transaction_builder(
+        &self,
+    ) -> Box<dyn buffer::embedded_transaction_helper::EmbeddedTransactionHelper>;
 }

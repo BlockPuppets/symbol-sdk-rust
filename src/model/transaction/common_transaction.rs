@@ -81,7 +81,7 @@ impl CommonTransaction {
     }
 
     /// Converts the optional signer to a KeyDto that can be serialized.
-    fn __get_signer_as_builder(&self) -> key_dto::KeyDto {
+    pub(crate) fn __get_signer_as_builder(&self) -> key_dto::KeyDto {
         if let Some(signer) = self.signer {
             signer.to_builder()
         } else {
@@ -90,7 +90,7 @@ impl CommonTransaction {
     }
 
     /// Converts the optional signer to a KeyDto that can be serialized.
-    fn __get_signature_as_builder(&self) -> signature_dto::SignatureDto {
+    pub(crate) fn __get_signature_as_builder(&self) -> signature_dto::SignatureDto {
         if let Some(ref signature) = self.signature {
             signature_dto::SignatureDto(<[u8; 64]>::try_from(hex_decode(&signature)).unwrap())
         } else {
@@ -98,7 +98,7 @@ impl CommonTransaction {
         }
     }
 
-    fn __version_to_dto(&self) -> u8 {
+    pub(crate) fn __version_to_dto(&self) -> u8 {
         (((self.network_type.value() as u32) << 8) + *self.version as u32) as u8
     }
 
