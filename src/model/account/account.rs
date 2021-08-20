@@ -22,10 +22,12 @@ use crate::account::PublicAccount;
 use crate::message::{EncryptedMessage, PlainMessage};
 use crate::network::NetworkType;
 use crate::{is_hex, GenerationHash};
+use crate::transaction::Transaction;
+use crate::model::transaction::SignedTransaction;
 
 /// The `Account` struct contains account's `Keypair` and `PublicAccount`.
 ///
-#[derive(Debug, Clone, PartialEq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Serialize, Deserialize)]
 pub struct Account {
     /// The keyPair containing the public and private key of this account.
     pub key_pair: Keypair,
@@ -282,12 +284,23 @@ impl Account {
             .verify_signature(data.as_ref(), signature)
     }
 
+    /// Sign a transaction.
+    ///
+    /// # Inputs
+    ///
+    /// * `transaction`: The transaction to be signed.
+    /// * `generation_hash`: Network generation hash hex.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` whose okay value is an Symbol `SignedTransaction` or whose error value
+    /// is an `Error` describing the error that occurred.
     pub fn sign_transaction(
         &self,
-        _transaction: Vec<u8>,
-        _generation_hash: GenerationHash,
-    ) -> Result<Vec<u8>> {
-        unimplemented!()
+        transaction: impl Transaction,
+        generation_hash: GenerationHash,
+    ) -> Result<SignedTransaction> {
+        transaction.sign_with(*self, generation_hash)
     }
 
     pub fn sign_transaction_with_cosignatories(

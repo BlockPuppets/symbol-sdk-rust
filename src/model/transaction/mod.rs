@@ -9,6 +9,7 @@
  */
 
 pub use self::deadline::*;
+pub use self::signed_transaction::*;
 pub use self::transaction::*;
 pub use self::transaction_info::*;
 pub use self::transaction_type::*;
@@ -17,6 +18,7 @@ pub use self::transfer_transaction::*;
 
 mod common_transaction;
 mod deadline;
+mod signed_transaction;
 mod transaction;
 mod transaction_info;
 mod transaction_type;

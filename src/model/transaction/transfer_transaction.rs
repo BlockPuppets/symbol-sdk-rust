@@ -35,6 +35,7 @@ pub struct TransferTransaction {
 }
 
 impl TransferTransaction {
+
     /// Create a transfer transaction object.
     pub fn create<M: 'static + Message, R: 'static + UnresolvedAddress>(
         deadline: Deadline,
@@ -67,7 +68,42 @@ impl TransferTransaction {
         self.recipient.to_string()
     }
 
-    /// Return message buffer
+    /// Sorted mosaic vec.
+    pub fn sort_mosaics(&self) -> Vec<Mosaic> {
+        let mut mosaics_clone = self.mosaics.clone();
+        mosaics_clone.sort_by(|a, b| {
+            let long_a = a.id.to_uint64();
+            let long_b = b.id.to_uint64();
+            long_a.cmp(&long_b)
+        });
+        mosaics_clone
+    }
+
+    pub fn to_transaction_builder(
+        &self,
+    ) -> transfer_transaction_builder::TransferTransactionBuilder {
+        transfer_transaction_builder::TransferTransactionBuilder {
+            super_object: self.common.common_builder(),
+            body: self.__to_transaction_body_builder(),
+        }
+    }
+
+    // internal
+    fn __to_transaction_body_builder(
+        &self,
+    ) -> transfer_transaction_body_builder::TransferTransactionBodyBuilder {
+        transfer_transaction_body_builder::TransferTransactionBodyBuilder {
+            recipient_address: buffer::unresolved_address_dto::UnresolvedAddressDto::from_binary(
+                &self
+                    .recipient
+                    .unresolved_address_to_bytes(self.common.network_type),
+            ),
+            mosaics: self.sort_mosaics().iter().map(|m| m.to_builder()).collect(),
+            message: self.__get_message_buffer(),
+        }
+    }
+
+    // internal
     fn __get_message_buffer(&self) -> Vec<u8> {
         if self.message.to_vec().is_empty() || self.message.payload_to_vec().is_empty() {
             return vec![];
@@ -91,40 +127,6 @@ impl TransferTransaction {
             [type_buffer.as_ref(), payload_buffer.as_ref()].concat()
         }
     }
-
-    /// Sorted mosaic vec.
-    pub fn sort_mosaics(&self) -> Vec<Mosaic> {
-        let mut mosaics_clone = self.mosaics.clone();
-        mosaics_clone.sort_by(|a, b| {
-            let long_a = a.id.to_uint64();
-            let long_b = b.id.to_uint64();
-            long_a.cmp(&long_b)
-        });
-        mosaics_clone
-    }
-
-    fn __to_transaction_body_builder(
-        &self,
-    ) -> transfer_transaction_body_builder::TransferTransactionBodyBuilder {
-        transfer_transaction_body_builder::TransferTransactionBodyBuilder {
-            recipient_address: buffer::unresolved_address_dto::UnresolvedAddressDto::from_binary(
-                &self
-                    .recipient
-                    .unresolved_address_to_bytes(self.common.network_type),
-            ),
-            mosaics: self.sort_mosaics().iter().map(|m| m.to_builder()).collect(),
-            message: self.__get_message_buffer(),
-        }
-    }
-
-    pub fn to_transaction_builder(
-        &self,
-    ) -> transfer_transaction_builder::TransferTransactionBuilder {
-        transfer_transaction_builder::TransferTransactionBuilder {
-            super_object: self.common.create_builder(),
-            body: self.__to_transaction_body_builder(),
-        }
-    }
 }
 
 #[typetag::serde]
@@ -133,17 +135,16 @@ impl Transaction for TransferTransaction {
         self.to_transaction_builder().serializer()
     }
 
+    fn get_common_transaction(&self) -> &CommonTransaction {
+        &self.common
+    }
+
     fn to_embedded_transaction_builder(
         &self,
     ) -> Box<dyn embedded_transaction_helper::EmbeddedTransactionHelper> {
         Box::new(
             embedded_transfer_transaction_builder::EmbeddedTransferTransactionBuilder {
-                super_object: embedded_transaction_builder::EmbeddedTransactionBuilder {
-                    signer_public_key: self.common.__get_signer_as_builder(),
-                    version: self.common.__version_to_dto(),
-                    network: self.common.network_type.to_builder(),
-                    _type: entity_type_dto::EntityTypeDto::TRANSFER_TRANSACTION,
-                },
+                super_object: self.common.common_embedded_builder(),
                 body: self.__to_transaction_body_builder(),
             },
         )

@@ -70,7 +70,7 @@ impl CommonTransaction {
         }
     }
 
-    pub fn get_hash(&self) -> H256 {
+    pub fn get_transaction_hash(&self) -> H256 {
         match self.transaction_info.to_owned() {
             Some(h) => match h.hash {
                 Some(hs) => hs,
@@ -102,7 +102,7 @@ impl CommonTransaction {
         (((self.network_type.value() as u32) << 8) + *self.version as u32) as u8
     }
 
-    pub fn create_builder(&self) -> transaction_builder::TransactionBuilder {
+    pub fn common_builder(&self) -> transaction_builder::TransactionBuilder {
         transaction_builder::TransactionBuilder {
             signature: self.__get_signature_as_builder(),
             signer_public_key: self.__get_signer_as_builder(),
@@ -111,6 +111,17 @@ impl CommonTransaction {
             _type: self.transaction_type.to_builder(),
             fee: amount_dto::AmountDto(self.max_fee),
             deadline: timestamp_dto::TimestampDto(*self.deadline),
+        }
+    }
+
+    pub fn common_embedded_builder(
+        &self,
+    ) -> embedded_transaction_builder::EmbeddedTransactionBuilder {
+        embedded_transaction_builder::EmbeddedTransactionBuilder {
+            signer_public_key: self.__get_signer_as_builder(),
+            version: self.__version_to_dto(),
+            network: self.network_type.to_builder(),
+            _type: self.transaction_type.to_builder(),
         }
     }
 }
