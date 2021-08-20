@@ -12,14 +12,14 @@ use std::fmt;
 
 use anyhow::Result;
 
+use crate::{Deadline, hex_decode, utf8_to_hex};
 use crate::account::UnresolvedAddress;
 use crate::buffer::*;
 use crate::message::{Message, MessageType};
 use crate::mosaic::Mosaic;
 use crate::network::NetworkType;
-use crate::transaction::common_transaction::CommonTransaction;
 use crate::transaction::{Transaction, TransactionType, TransactionVersion};
-use crate::{hex_decode, utf8_to_hex, Deadline};
+use crate::transaction::common_transaction::CommonTransaction;
 
 /// Create a transfer transaction struct.
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -35,7 +35,6 @@ pub struct TransferTransaction {
 }
 
 impl TransferTransaction {
-
     /// Create a transfer transaction object.
     pub fn create<M: 'static + Message, R: 'static + UnresolvedAddress>(
         deadline: Deadline,
@@ -163,10 +162,12 @@ impl fmt::Display for TransferTransaction {
 
 #[cfg(test)]
 pub mod tests {
-    use super::*;
+    use chrono::Duration;
+
     use crate::account::Address;
     use crate::message::PlainMessage;
-    use chrono::Duration;
+
+    use super::*;
 
     const EPOCH_ADJUSTMENT: u64 = 1573430400;
 
@@ -180,7 +181,7 @@ pub mod tests {
             NetworkType::PrivateTest,
             None,
         )
-        .unwrap();
+            .unwrap();
 
         assert_eq!(transfer_transaction.common.max_fee, 0);
     }
@@ -195,7 +196,7 @@ pub mod tests {
             NetworkType::PrivateTest,
             Some(1),
         )
-        .unwrap();
+            .unwrap();
 
         assert_eq!(transfer_transaction.common.max_fee, 1);
     }

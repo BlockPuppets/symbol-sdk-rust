@@ -8,23 +8,25 @@
  * // except according to those terms.
  */
 
+use std::convert::TryFrom;
+use std::fmt;
+
+use anyhow::Result;
+use crypto::prelude::KeyPairSchema;
+use sha3::{Digest, Sha3_256};
+
+use crate::{GenerationHash, H256, hex_decode};
 use crate::account::Account;
 use crate::model::transaction::{SignedTransaction, TransactionType};
 use crate::network::NetworkType;
 use crate::transaction::common_transaction::CommonTransaction;
-use crate::{hex_decode, GenerationHash, H256};
-use anyhow::Result;
-use crypto::prelude::KeyPairSchema;
-use sha3::{Digest, Sha3_256};
-use std::convert::TryFrom;
-use std::fmt;
 
 /// An abstract transaction trait that serves as the base of all transaction types.
 ///
 #[typetag::serde]
 pub trait Transaction: Sync + Send
-where
-    Self: fmt::Debug,
+    where
+        Self: fmt::Debug,
 {
     fn serializer(&self) -> Vec<u8>;
 
@@ -70,7 +72,7 @@ where
                 generation_hash_bytes[..52].as_ref(),
                 byte_buffer_without_header,
             ]
-            .concat()
+                .concat()
         } else {
             [generation_hash_bytes, byte_buffer_without_header].concat()
         }
@@ -112,6 +114,49 @@ where
             _type: self.get_transaction_type(),
             network_type: self.get_network_type(),
         })
+    }
+
+    /// Transaction pending to be included in a block.
+    fn is_unconfirmed(&self) -> bool {
+        let common = self.get_common_transaction().clone();
+        if let Some(transaction_info) = common.transaction_info {
+            transaction_info.height == 0
+                && transaction_info.hash.is_some()
+                && transaction_info.merkle_component_hash.is_some()
+                && transaction_info.hash.unwrap_or_default()
+                == transaction_info.merkle_component_hash.unwrap_or_default()
+        } else {
+            false
+        }
+    }
+
+    /// Transaction included in a block.
+    fn is_confirmed(&self) -> bool {
+        let common = self.get_common_transaction().clone();
+        if let Some(transaction_info) = common.transaction_info {
+            transaction_info.height > 0
+        } else {
+            false
+        }
+    }
+
+    /// if a transaction has missing signatures.
+    fn has_missing_signatures(&self) -> bool {
+        let common = self.get_common_transaction().clone();
+        if let Some(transaction_info) = common.transaction_info {
+            transaction_info.height == 0
+                && transaction_info.hash.is_some()
+                && transaction_info.merkle_component_hash.is_some()
+                && transaction_info.hash.unwrap_or_default()
+                != transaction_info.merkle_component_hash.unwrap_or_default()
+        } else {
+            false
+        }
+    }
+
+    /// Transaction is not known by the network
+    fn is_unannounced(&self) -> bool {
+        self.get_common_transaction().transaction_info.is_none()
     }
 }
 
@@ -172,9 +217,9 @@ impl dyn Transaction {
             TransactionType::AggregateBonded,
             TransactionType::AggregateComplete,
         ]
-        .into_iter()
-        .take_while(|x| **x == entity_type)
-        .collect::<Vec<&TransactionType>>();
+            .iter()
+            .take_while(|x| **x == entity_type)
+            .collect::<Vec<&TransactionType>>();
 
         // add full signature
         let signature = transaction_bytes[8..8 + 64].as_ref();
@@ -215,8 +260,9 @@ impl dyn Transaction {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use std::str::FromStr;
+
+    use super::*;
 
     const KNOWN_PAYLOAD: &str = "970000000000000075DAC796D500CEFDFBD582BC6E0580401FE6DB02FBEA93673DF47844246CDEA93715EB700F295A459E59D96A2BC6B7E36C79016A96B9FA387E8B8937342FE30C6BE37B726EEE24C4B0E3C943E09A44691553759A89E92C4A84BBC4AD9AF5D49C0000000001984E4140420F0000000000E4B580B11A000000A0860100000000002AD8FC018D9A49E100056576696173";
     const KNOWN_AGGREGATE_PAYLOAD: &str = "0801000000000000AC1F3E0EE2C16F465CDC2E091DC44D6EB55F7FE3988A5F21309DF479BE6D3F0033E155695FB1133EA0EA64A67C1EDC2B430CFAF9722AF36BAE84DBDB1C8F1509C2F93346E27CE6AD1A9F8F5E3066F8326593A406BDF357ACB041E2F9AB402EFE000000000180414200000000000000006BA50FB91A000000EA8F8301E7EDFD701F62E1DC1601ABDE22E5FCD11C9C7E7A01B87F8DFB6B62B060000000000000005D00000000000000C2F93346E27CE6AD1A9F8F5E3066F8326593A406BDF357ACB041E2F9AB402EFE0000000001A854419050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E142000D000000000000746573742D6D657373616765000000";
@@ -243,7 +289,7 @@ mod tests {
             &tampered_sig, // replaced two first bytes of signature
             &GENERATION_HASH_BYTES,
         )
-        .unwrap();
+            .unwrap();
 
         assert_ne!(hash1, hash2);
     }
@@ -260,7 +306,7 @@ mod tests {
             &tampered_signer, // replaced two first bytes of signature
             &GENERATION_HASH_BYTES,
         )
-        .unwrap();
+            .unwrap();
 
         assert_ne!(hash1, hash2);
     }
@@ -274,7 +320,7 @@ mod tests {
             &KNOWN_PAYLOAD,
             &GENERATION_HASH_BYTES_MT, // uses different generation hash
         )
-        .unwrap();
+            .unwrap();
 
         assert_ne!(hash1, hash2);
     }
@@ -292,7 +338,7 @@ mod tests {
             &tampered_body,
             &GENERATION_HASH_BYTES_MT, // uses different generation hash
         )
-        .unwrap();
+            .unwrap();
 
         assert_ne!(hash1, hash2);
     }
@@ -322,7 +368,8 @@ mod tests {
     #[test]
     fn hash_only_merkle_transaction_hash_for_aggregate_transactions() {
         let hash1 =
-            Transaction::create_transaction_hash(&KNOWN_AGGREGATE_PAYLOAD, &GENERATION_HASH_BYTES).unwrap();
+            Transaction::create_transaction_hash(&KNOWN_AGGREGATE_PAYLOAD, &GENERATION_HASH_BYTES)
+                .unwrap();
 
         // modify end of payload ; this must not affect produced transaction hash
         // this test is valid only for Aggregate Transactions
@@ -330,7 +377,8 @@ mod tests {
         let hash_tampered_body = Transaction::create_transaction_hash(
             &tampered_size, // replace in size (header change should not affect hash)
             &GENERATION_HASH_BYTES,
-        ).unwrap();
+        )
+            .unwrap();
 
         // modify "merkle hash" part of payload ; this must affect produced transaction hash
         let tampered_payload = (&KNOWN_AGGREGATE_PAYLOAD[0..Transaction::BODY_INDEX * 2])
@@ -341,9 +389,13 @@ mod tests {
         let hash_tampered_merkle = Transaction::create_transaction_hash(
             &tampered_payload, // replace in merkle hash (will affect hash)
             &GENERATION_HASH_BYTES,
-        ).unwrap();
+        )
+            .unwrap();
 
         assert_eq!(hash1.to_fixed_bytes(), hash_tampered_body.to_fixed_bytes());
-        assert_ne!(hash1.to_fixed_bytes(), hash_tampered_merkle.to_fixed_bytes());
+        assert_ne!(
+            hash1.to_fixed_bytes(),
+            hash_tampered_merkle.to_fixed_bytes()
+        );
     }
 }

@@ -8,8 +8,8 @@
  * // except according to those terms.
  */
 
-use crate::transaction::common_transaction::Height;
 use crate::H256;
+use crate::transaction::common_transaction::Height;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq)]
 #[serde(rename_all = "camelCase")]

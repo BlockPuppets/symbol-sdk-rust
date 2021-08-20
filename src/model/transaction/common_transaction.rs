@@ -8,12 +8,13 @@
  * // except according to those terms.
  */
 
+use std::convert::TryFrom;
+
+use crate::{Deadline, H256, hex_decode};
 use crate::account::PublicAccount;
 use crate::buffer::*;
 use crate::network::NetworkType;
 use crate::transaction::{TransactionInfo, TransactionType, TransactionVersion};
-use crate::{hex_decode, Deadline, H256};
-use std::convert::TryFrom;
 
 pub type Height = u64;
 
@@ -98,15 +99,19 @@ impl CommonTransaction {
         }
     }
 
-    pub(crate) fn __version_to_dto(&self) -> u8 {
-        (((self.network_type.value() as u32) << 8) + *self.version as u32) as u8
+    pub(crate) fn __version_to_dto(&self) -> u16 {
+        ((self.network_type.value() as u16) << 8) + *self.version as u16
+    }
+
+    pub(crate) fn __version_to_hex(&self) -> String {
+        format!("0x{}", hex::encode(self.__version_to_dto().to_be_bytes()))
     }
 
     pub fn common_builder(&self) -> transaction_builder::TransactionBuilder {
         transaction_builder::TransactionBuilder {
             signature: self.__get_signature_as_builder(),
             signer_public_key: self.__get_signer_as_builder(),
-            version: self.__version_to_dto(),
+            version: self.__version_to_dto() as u8,
             network: self.network_type.to_builder(),
             _type: self.transaction_type.to_builder(),
             fee: amount_dto::AmountDto(self.max_fee),
@@ -119,7 +124,7 @@ impl CommonTransaction {
     ) -> embedded_transaction_builder::EmbeddedTransactionBuilder {
         embedded_transaction_builder::EmbeddedTransactionBuilder {
             signer_public_key: self.__get_signer_as_builder(),
-            version: self.__version_to_dto(),
+            version: self.__version_to_dto() as u8,
             network: self.network_type.to_builder(),
             _type: self.transaction_type.to_builder(),
         }
