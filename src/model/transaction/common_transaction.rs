@@ -10,11 +10,10 @@
 
 use std::convert::TryFrom;
 
-use crate::{Deadline, H256, hex_decode};
-use crate::account::PublicAccount;
+use crate::{account::PublicAccount, Deadline, H256, hex_decode, network::NetworkType};
 use crate::buffer::*;
-use crate::network::NetworkType;
-use crate::transaction::{TransactionInfo, TransactionType, TransactionVersion};
+
+use super::{TransactionInfo, TransactionType, TransactionVersion};
 
 pub type Height = u64;
 

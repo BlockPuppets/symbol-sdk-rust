@@ -8,18 +8,15 @@
  * // except according to those terms.
  */
 
-use std::convert::TryFrom;
-use std::fmt;
+use std::{convert::TryFrom, fmt};
 
 use anyhow::Result;
 use crypto::prelude::KeyPairSchema;
 use sha3::{Digest, Sha3_256};
 
-use crate::{GenerationHash, H256, hex_decode};
-use crate::account::Account;
-use crate::model::transaction::{SignedTransaction, TransactionType};
-use crate::network::NetworkType;
-use crate::transaction::common_transaction::CommonTransaction;
+use crate::{account::Account, GenerationHash, H256, hex_decode, network::NetworkType};
+
+use super::{CommonTransaction, SignedTransaction, TransactionType};
 
 /// An abstract transaction trait that serves as the base of all transaction types.
 ///
@@ -28,7 +25,6 @@ pub trait Transaction: Sync + Send
     where
         Self: fmt::Debug,
 {
-
     /// Get the byte size of a transaction using the builder.
     fn size(&self) -> usize {
         self.to_serializer().len()

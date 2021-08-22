@@ -1,6 +1,6 @@
+use symbol_sdk::{Client, MosaicSearchCriteria, Retry};
 use symbol_sdk::account::Address;
 use symbol_sdk::mosaic::MosaicId;
-use symbol_sdk::{Client, MosaicSearchCriteria, Retry};
 
 #[tokio::main]
 async fn main() {

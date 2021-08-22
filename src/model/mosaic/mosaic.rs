@@ -12,8 +12,9 @@ use std::fmt;
 
 use anyhow::{ensure, Result};
 
-use super::UnresolvedMosaicId;
 use crate::{ser_to_id, Uint64};
+
+use super::UnresolvedMosaicId;
 
 /// A `Mosaic` describes an instance of a mosaic definition.
 /// Mosaics can be transferred by means of a transfer transaction.
@@ -144,7 +145,7 @@ mod tests {
 
     #[test]
     #[should_panic(
-        expected = "Invalid divisibility 8, the divisibility must be in the range of 0 and 6."
+    expected = "Invalid divisibility 8, the divisibility must be in the range of 0 and 6."
     )]
     fn test_try_create_with_relative_should_return_panic() {
         let id = MosaicId::from(LO_HI);

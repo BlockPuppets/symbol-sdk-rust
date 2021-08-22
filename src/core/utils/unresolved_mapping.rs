@@ -8,11 +8,9 @@
  * // except according to those terms.
  */
 
-use crate::account::{Address, UnresolvedAddress};
-use crate::mosaic::{MosaicId, UnresolvedMosaicId};
-use crate::namespace::NamespaceId;
-use crate::{hex_decode, is_hex};
 use anyhow::{ensure, Result};
+
+use crate::{account::{Address, UnresolvedAddress}, hex_decode, is_hex, mosaic::{MosaicId, UnresolvedMosaicId}, namespace::NamespaceId};
 
 /// Map unresolved mosaic hex string to MosaicId or NamespaceId.
 pub fn to_unresolved_mosaic(mosaic_id: &str) -> Result<Box<dyn UnresolvedMosaicId>> {

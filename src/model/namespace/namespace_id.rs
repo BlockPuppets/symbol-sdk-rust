@@ -8,20 +8,14 @@
  * // except according to those terms.
  */
 
-use std::any::Any;
-use std::convert::TryFrom;
-use std::fmt;
-use std::ops::Deref;
+use std::{any::Any, convert::TryFrom, fmt, ops::Deref};
 
 use anyhow::{ensure, Result};
 
-use crate::core::format::alias_to_recipient;
-use crate::network::NetworkType;
-use crate::Uint64;
+use crate::{account::UnresolvedAddress, core::format::alias_to_recipient,
+            mosaic::UnresolvedMosaicId, network::NetworkType, Uint64};
 
 use super::namespace_id;
-use crate::account::UnresolvedAddress;
-use crate::mosaic::UnresolvedMosaicId;
 
 /// The `NamespaceId` structure describes mosaic id.
 ///

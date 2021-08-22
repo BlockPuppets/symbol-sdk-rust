@@ -8,8 +8,7 @@
  * // except according to those terms.
  */
 
-use std::convert::TryFrom;
-use std::fmt;
+use std::{convert::TryFrom, fmt};
 
 /// Enum containing transaction type constants.
 ///

@@ -10,10 +10,9 @@
 
 use std::fmt;
 
-use crate::account::{Address, PublicAccount};
-use crate::H256;
-use crate::model::network::NetworkType;
-use crate::model::transaction::TransactionType;
+use crate::{account::{Address, PublicAccount}, H256, network::NetworkType};
+
+use super::TransactionType;
 
 /// SignedTransaction object is used to transfer the transaction data and the signature to the server in order to initiate and broadcast a transaction.
 #[derive(Debug, Clone, PartialEq, Hash, Serialize, Deserialize)]

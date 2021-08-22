@@ -8,11 +8,12 @@
  * // except according to those terms.
  */
 
-use crate::blockchain::MerkleStateInfo;
+use crate::{Error, MosaicSearchCriteria, RetryStrategy};
+use crate::{blockchain::MerkleStateInfo, mosaic::{MosaicId, MosaicInfo}};
 use crate::clients::request::Request;
 use crate::model_dto::{MerkleStateInfoDto, MosaicInfoDto, MosaicPageDto};
-use crate::mosaic::{MosaicId, MosaicInfo};
-use crate::{Client, Error, MosaicSearchCriteria, Response, RetryStrategy};
+
+use super::{Client, Response};
 
 pub struct MosaicApi<R: RetryStrategy>(pub(crate) Client<R>);
 

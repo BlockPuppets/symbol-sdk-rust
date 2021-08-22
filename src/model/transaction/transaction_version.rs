@@ -8,8 +8,7 @@
  * // except according to those terms.
  */
 
-use std::fmt;
-use std::ops::Deref;
+use std::{fmt, ops::Deref};
 
 /// `TransactionVersion` struct containing transaction version constants.
 ///

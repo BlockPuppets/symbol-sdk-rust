@@ -12,18 +12,19 @@ use std::fmt;
 
 use anyhow::Result;
 
-use crate::message::{
-    MessageType, PersistentHarvestingDelegationMessage, PlainMessage, RawMessage,
-    PERSISTENT_DELEGATION_UNLOCK,
-};
 use crate::{hex_decode, is_hex};
+
+use super::{
+    MessageType, PERSISTENT_DELEGATION_UNLOCK, PersistentHarvestingDelegationMessage, PlainMessage,
+    RawMessage,
+};
 
 /// An abstract message trait that serves as the base of all message types.
 ///
 #[typetag::serde]
 pub trait Message: Sync + Send
-where
-    Self: fmt::Debug,
+    where
+        Self: fmt::Debug,
 {
     fn message_type(&self) -> MessageType;
 
@@ -55,7 +56,7 @@ where
             }
             _ => String::new(),
         }
-        .to_uppercase()
+            .to_uppercase()
     }
 
     fn box_clone(&self) -> Box<dyn Message>;

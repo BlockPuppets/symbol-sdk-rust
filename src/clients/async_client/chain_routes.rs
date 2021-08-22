@@ -8,10 +8,11 @@
  * // except according to those terms.
  */
 
+use crate::{Error, RetryStrategy};
 use crate::blockchain::ChainInfo;
-use crate::clients::model_dto::ChainInfoDto;
-use crate::clients::request::Request;
-use crate::{Client, Error, Response, RetryStrategy};
+use crate::clients::{model_dto::ChainInfoDto, request::Request};
+
+use super::{Client, Response};
 
 pub struct ChainApi<R: RetryStrategy>(pub(crate) Client<R>);
 

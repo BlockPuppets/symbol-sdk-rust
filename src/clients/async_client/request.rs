@@ -13,9 +13,8 @@ use std::collections::HashMap;
 use hex::ToHex;
 use reqwest::Method;
 
+use crate::{H256, mosaic::MosaicId, MosaicIds, MosaicSearchCriteria};
 use crate::clients::search_criteria::BlockSearchCriteria;
-use crate::mosaic::MosaicId;
-use crate::{MosaicIds, MosaicSearchCriteria, H256};
 
 /// Type alias to improve readability.
 pub(crate) type RoutePathName = &'static str;

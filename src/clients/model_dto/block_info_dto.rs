@@ -13,10 +13,10 @@ use std::str::FromStr;
 
 use anyhow::Result;
 
+use crate::{H256, H512};
 use crate::account::{Address, PublicAccount};
 use crate::blockchain::{BlockInfo, BlockType, NemesisImportanceBlockInfo};
 use crate::network::NetworkType;
-use crate::{H256, H512};
 
 use super::{block_dto::BlockDto, block_meta_dto::BlockMetaDto};
 

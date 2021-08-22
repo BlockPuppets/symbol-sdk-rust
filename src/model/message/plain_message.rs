@@ -10,8 +10,9 @@
 
 use anyhow::{ensure, Result};
 
-use crate::message::{Message, MessageType};
 use crate::{hex_to_utf8, is_hex};
+
+use super::{Message, MessageType};
 
 /// The `PlainMessage` struct defines a plain string.
 /// When sending it to the network we transform the payload to hex-string.

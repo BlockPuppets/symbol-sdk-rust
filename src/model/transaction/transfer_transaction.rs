@@ -12,14 +12,10 @@ use std::fmt;
 
 use anyhow::Result;
 
-use crate::account::UnresolvedAddress;
+use crate::{account::UnresolvedAddress, Deadline, hex_decode, message::{Message, MessageType}, mosaic::Mosaic, network::NetworkType, utf8_to_hex};
 use crate::buffer::*;
-use crate::message::{Message, MessageType};
-use crate::mosaic::Mosaic;
-use crate::network::NetworkType;
-use crate::transaction::common_transaction::CommonTransaction;
-use crate::transaction::{Transaction, TransactionType, TransactionVersion};
-use crate::{hex_decode, utf8_to_hex, Deadline};
+
+use super::{CommonTransaction, Transaction, TransactionType, TransactionVersion};
 
 /// Create a transfer transaction struct.
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -162,18 +158,19 @@ impl fmt::Display for TransferTransaction {
 
 #[cfg(test)]
 pub mod tests {
+    use std::str::FromStr;
+
     use chrono::Duration;
 
     use crate::account::{Address, PublicAccount};
+    use crate::account::tests::TESTING_ACCOUNT;
+    use crate::H256;
     use crate::message::{
-        PersistentHarvestingDelegationMessage, PlainMessage, PERSISTENT_DELEGATION_UNLOCK,
+        PERSISTENT_DELEGATION_UNLOCK, PersistentHarvestingDelegationMessage, PlainMessage,
     };
+    use crate::model::namespace::NamespaceId;
 
     use super::*;
-    use crate::account::tests::TESTING_ACCOUNT;
-    use crate::model::namespace::NamespaceId;
-    use crate::H256;
-    use std::str::FromStr;
 
     const EPOCH_ADJUSTMENT: u64 = 1573430400;
     const DELEGATED_PRIVATE_KEY: &str =
@@ -200,7 +197,7 @@ pub mod tests {
             NetworkType::PrivateTest,
             None,
         )
-        .unwrap();
+            .unwrap();
 
         assert_eq!(transfer_transaction.common.max_fee, 0);
     }
@@ -215,7 +212,7 @@ pub mod tests {
             NetworkType::PrivateTest,
             Some(1),
         )
-        .unwrap();
+            .unwrap();
 
         assert_eq!(transfer_transaction.common.max_fee, 1);
     }
@@ -230,7 +227,7 @@ pub mod tests {
             NetworkType::PrivateTest,
             None,
         )
-        .unwrap();
+            .unwrap();
 
         assert_eq!(transfer_transaction.message.payload(), "test-message");
         assert_eq!(transfer_transaction.mosaics.len(), 0);
@@ -263,7 +260,7 @@ pub mod tests {
             NetworkType::PrivateTest,
             None,
         )
-        .unwrap();
+            .unwrap();
 
         assert_eq!(transfer_transaction.message.payload(), "");
         assert_eq!(transfer_transaction.mosaics.len(), 0);
@@ -303,7 +300,7 @@ pub mod tests {
             NetworkType::PrivateTest,
             None,
         )
-        .unwrap();
+            .unwrap();
 
         assert_eq!(transfer_transaction.message.payload(), "test-message");
         assert_eq!(transfer_transaction.mosaics.len(), 1);
@@ -342,7 +339,7 @@ pub mod tests {
             NetworkType::PrivateTest,
             None,
         )
-        .unwrap();
+            .unwrap();
 
         assert_eq!(transfer_transaction.message.payload(), "test-message");
         assert_eq!(transfer_transaction.mosaics.len(), 1);
@@ -383,7 +380,7 @@ pub mod tests {
             NetworkType::PrivateTest,
             None,
         )
-        .unwrap();
+            .unwrap();
 
         // test recipientToString with Address recipient
         assert_eq!(
@@ -415,7 +412,7 @@ pub mod tests {
             NetworkType::PrivateTest,
             None,
         )
-        .unwrap();
+            .unwrap();
 
         // test recipientToString with NamespaceId recipient
         assert_eq!(
@@ -452,7 +449,7 @@ pub mod tests {
             network_type,
             None,
         )
-        .unwrap();
+            .unwrap();
 
         assert_eq!(
             transfer_transaction.message.message_type(),
@@ -478,7 +475,7 @@ pub mod tests {
             network_type,
             None,
         )
-        .unwrap();
+            .unwrap();
 
         println!("{}", transfer_transaction.message.payload());
         assert_eq!(
@@ -529,7 +526,7 @@ pub mod tests {
                 NetworkType::PrivateTest,
                 None,
             )
-            .unwrap();
+                .unwrap();
 
             assert_eq!(
                 transfer_transaction.to_serializer().len(),

@@ -8,10 +8,12 @@
  * // except according to those terms.
  */
 
+use crate::{Error, RetryStrategy};
 use crate::clients::request::Request;
 use crate::model_dto::RentalFeesDto;
 use crate::network::{NetworkConfiguration, NetworkName, NetworkType, RentalFees, TransactionFees};
-use crate::{Client, Error, Response, RetryStrategy};
+
+use super::{Client, Response};
 
 pub struct NetworkApi<R: RetryStrategy>(pub(crate) Client<R>);
 

@@ -8,8 +8,7 @@
  * // except according to those terms.
  */
 
-use std::convert::TryFrom;
-use std::fmt;
+use std::{convert::TryFrom, fmt};
 
 #[allow(non_camel_case_types)]
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize, Hash)]

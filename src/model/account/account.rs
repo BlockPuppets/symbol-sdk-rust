@@ -8,9 +8,6 @@
  * // except according to those terms.
  */
 
-use std::fmt;
-use std::fmt::Debug;
-
 use anyhow::{ensure, Result};
 use crypto::{
     prelude::{KeyPairSchema, PrivateKey, Signature},
@@ -18,12 +15,17 @@ use crypto::{
 };
 use hex::ToHex;
 
-use crate::account::PublicAccount;
-use crate::message::{EncryptedMessage, PlainMessage};
-use crate::network::NetworkType;
-use crate::{is_hex, GenerationHash, hex_decode};
-use crate::transaction::Transaction;
-use crate::model::transaction::SignedTransaction;
+use {std::fmt::{self, Debug}};
+
+use crate::{
+    GenerationHash, hex_decode,
+    is_hex,
+    message::{EncryptedMessage, PlainMessage},
+    network::NetworkType,
+    transaction::{SignedTransaction, Transaction},
+};
+
+use super::PublicAccount;
 
 /// The `Account` struct contains account's `Keypair` and `PublicAccount`.
 ///

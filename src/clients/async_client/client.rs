@@ -8,17 +8,14 @@
  * // except according to those terms.
  */
 
-use std::convert::TryInto;
-use std::sync::Arc;
+use std::{convert::TryInto, sync::Arc};
 
-use serde::de::DeserializeOwned;
-use serde::Deserialize;
+use serde::{de::DeserializeOwned, Deserialize};
 
-use crate::clients::{model_dto::BlockInfoDto, retry::RetryStrategy, Error, SymbolResponse};
-use crate::network::NetworkType;
-use crate::{BlockApi, ChainApi, GenerationHash, MosaicApi, NetworkApi, NodeApi};
+use crate::{GenerationHash, network::NetworkType};
+use crate::clients::{Error, model_dto::BlockInfoDto, retry::RetryStrategy, SymbolResponse};
 
-use super::{request::Request, HttpClient, Response, SimpleHttpClient};
+use super::{BlockApi, ChainApi, HttpClient, MosaicApi, NetworkApi, NodeApi, request::Request, Response, SimpleHttpClient};
 
 #[derive(Clone)]
 pub struct Client<R> {

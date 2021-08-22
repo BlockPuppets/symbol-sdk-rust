@@ -8,6 +8,7 @@
  * // except according to those terms.
  */
 
+pub use self::common_transaction::*;
 pub use self::deadline::*;
 pub use self::signed_transaction::*;
 pub use self::transaction::*;

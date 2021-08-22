@@ -10,9 +10,7 @@
 
 use std::error::Error as StdError;
 
-use crate::SymbolError;
-
-use super::SymbolResponse;
+use super::{SymbolError, SymbolResponse};
 
 #[derive(Debug)]
 pub enum Error {

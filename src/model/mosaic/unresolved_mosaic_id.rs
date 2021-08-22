@@ -8,11 +8,11 @@
  * // except according to those terms.
  */
 
-use std::fmt;
+use std::{any::Any, fmt};
+
+use anyhow::{anyhow, Result};
 
 use crate::Uint64;
-use anyhow::{anyhow, Result};
-use std::any::Any;
 
 /// An `trait` is used to define mosaicIds and namespaceIds
 #[typetag::serde]

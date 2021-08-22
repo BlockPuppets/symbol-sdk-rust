@@ -8,15 +8,11 @@
  * // except according to those terms.
  */
 
-use std::convert::TryFrom;
-use std::fmt;
-use std::ops::Deref;
-use std::any::Any;
+use std::{any::Any, convert::TryFrom, fmt, ops::Deref};
 
 use anyhow::{ensure, Result};
 
-use crate::account::Address;
-use crate::Uint64;
+use crate::{account::Address, Uint64};
 
 use super::{generate_mosaic_id, MosaicNonce, UnresolvedMosaicId};
 

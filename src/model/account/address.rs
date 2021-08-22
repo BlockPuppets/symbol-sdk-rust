@@ -8,23 +8,16 @@
  * // except according to those terms.
  */
 
-use std::convert::TryFrom;
-use std::fmt;
-use std::fmt::Debug;
-use std::str::FromStr;
+use std::{any::Any, convert::TryFrom, fmt::{self, Debug}, str::FromStr};
 
 use anyhow::{anyhow, ensure, Result};
 use hex::ToHex;
 
-use crate::core::format::{
+use crate::{core::format::{
     decode_base32, encode_base32, is_valid_address, public_key_to_address, raw_prettify,
-};
-use crate::helpers::is_hex;
-use crate::helpers::H192;
-use crate::network::NetworkType;
-use crate::{hex_decode, H256};
-use crate::account::UnresolvedAddress;
-use std::any::Any;
+}, H256, helpers::{H192, is_hex}, hex_decode, network::NetworkType};
+
+use super::UnresolvedAddress;
 
 /// The `Address` struct describes an Symbol address with its network.
 ///
@@ -254,7 +247,7 @@ impl UnresolvedAddress for Address {
     }
 
     fn unresolved_address_to_bytes(&self, _network_type: NetworkType) -> Vec<u8> {
-       self.as_bytes().to_vec()
+        self.as_bytes().to_vec()
     }
     fn box_clone(&self) -> Box<dyn UnresolvedAddress + 'static> {
         Box::new((*self).clone())
@@ -376,7 +369,7 @@ mod tests {
 
     #[test]
     #[should_panic(
-        expected = "Address ZCTVW234AQ4TZIDZENGNOZXPRPSDRSFRF has to be 39 characters long"
+    expected = "Address ZCTVW234AQ4TZIDZENGNOZXPRPSDRSFRF has to be 39 characters long"
     )]
     fn test_should_panic_when_the_address_is_not_valid_in_length() {
         Address::from_raw("ZCTVW234AQ4TZIDZENGNOZXPRPSDRSFRF").unwrap();

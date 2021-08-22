@@ -14,7 +14,8 @@ use anyhow::{ensure, Result};
 use crypto::prelude;
 
 use crate::is_hex;
-use crate::message::{Message, MessageType, PlainMessage};
+
+use super::{Message, MessageType, PlainMessage};
 
 /// The `EncryptedMessage` struct defines a encrypted message string.
 /// When sending it to the network we transform the payload to hex-string.

@@ -1,8 +1,8 @@
 use std::str::FromStr;
 
+use symbol_sdk::{Client, H256, Retry};
 use symbol_sdk::account::Address;
 use symbol_sdk::BlockSearchCriteria;
-use symbol_sdk::{Client, Retry, H256};
 
 #[tokio::main]
 async fn main() {

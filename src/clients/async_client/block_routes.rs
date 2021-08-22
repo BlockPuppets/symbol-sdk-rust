@@ -8,14 +8,13 @@
  * // except according to those terms.
  */
 
-use crate::blockchain::{BlockInfo, MerkleProofInfo};
+use crate::{blockchain::{BlockInfo, MerkleProofInfo}, BlockSearchCriteria, H256, RetryStrategy};
 use crate::clients::{
-    model_dto::{BlockInfoDto, BlockPageDto, MerkleProofInfoDto},
     Error,
+    model_dto::{BlockInfoDto, BlockPageDto, MerkleProofInfoDto},
 };
-use crate::{BlockSearchCriteria, RetryStrategy, H256};
 
-use super::{request::Request, Client, Response};
+use super::{Client, request::Request, Response};
 
 pub struct BlockApi<R: RetryStrategy>(pub(crate) Client<R>);
 

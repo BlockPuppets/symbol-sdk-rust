@@ -8,8 +8,7 @@
  * // except according to those terms.
  */
 
-use std::ops::{AddAssign, Deref};
-use std::time::UNIX_EPOCH;
+use std::{ops::{AddAssign, Deref}, time::UNIX_EPOCH};
 
 use anyhow::{ensure, Result};
 use chrono::{DateTime, Duration, Local, TimeZone};

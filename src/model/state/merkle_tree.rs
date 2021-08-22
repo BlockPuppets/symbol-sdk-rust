@@ -8,8 +8,7 @@
  * // except according to those terms.
  */
 
-use std::any::Any;
-use std::fmt::Debug;
+use std::{any::Any, fmt::Debug};
 
 use anyhow::Result;
 

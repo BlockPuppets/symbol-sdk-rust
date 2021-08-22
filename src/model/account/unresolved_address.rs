@@ -8,17 +8,18 @@
  * // except according to those terms.
  */
 
-use crate::network::NetworkType;
+use std::{any::Any, fmt};
+
 use anyhow::{anyhow, Result};
-use std::any::Any;
-use std::fmt;
+
+use crate::network::NetworkType;
 
 ///  Custom trait for unresolved address
 ///
 #[typetag::serde]
 pub trait UnresolvedAddress: Sync + Send
-where
-    Self: fmt::Debug,
+    where
+        Self: fmt::Debug,
 {
     fn recipient_to_string(&self) -> String;
     fn unresolved_address_to_bytes(&self, network_type: NetworkType) -> Vec<u8>;
@@ -96,10 +97,11 @@ impl dyn UnresolvedAddress {
 
 #[cfg(test)]
 mod tests {
+    use hex::ToHex;
+
     use crate::account::Address;
     use crate::core::utils::unresolved_mapping;
     use crate::namespace::NamespaceId;
-    use hex::ToHex;
 
     lazy_static! {
         pub static ref NAMESPACE_ID: NamespaceId =

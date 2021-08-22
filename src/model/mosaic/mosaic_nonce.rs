@@ -8,8 +8,7 @@
  * // except according to those terms.
  */
 
-use std::fmt;
-use std::ops::Deref;
+use std::{fmt, ops::Deref};
 
 use anyhow::{ensure, Result};
 use fixed_hash::rustc_hex::ToHex;

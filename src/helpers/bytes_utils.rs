@@ -8,7 +8,7 @@
  * // except according to those terms.
  */
 
-use rand::{thread_rng, RngCore};
+use rand::{RngCore, thread_rng};
 
 /// Retrieve the lazily-initialized thread-local random number generator,
 /// seeded by the system.

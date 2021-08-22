@@ -10,9 +10,9 @@
 
 use anyhow::{ensure, Result};
 
-use crate::account::{Account, PublicAccount};
-use crate::message::{EncryptedMessage, Message, MessageType};
-use crate::{hex_decode, is_hex};
+use crate::{account::{Account, PublicAccount}, hex_decode, is_hex};
+
+use super::{EncryptedMessage, Message, MessageType};
 
 /// 8-byte marker: FE2A8061577301E2 for `PersistentHarvestingDelegationMessage`
 pub const PERSISTENT_DELEGATION_UNLOCK: &'static str = "FE2A8061577301E2";

@@ -10,9 +10,7 @@
 
 use std::fmt;
 
-use crate::account::PublicAccount;
-use crate::network::NetworkType;
-use crate::H256;
+use crate::{account::PublicAccount, H256, network::NetworkType};
 
 #[serde(rename_all = "camelCase")]
 #[derive(Clone, Debug, Serialize, Deserialize)]

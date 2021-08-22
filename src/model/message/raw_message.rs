@@ -8,7 +8,7 @@
  * // except according to those terms.
  */
 
-use crate::message::{Message, MessageType};
+use super::{Message, MessageType};
 
 /// The `RawMessage` that doesn't assume any prefix.
 ///

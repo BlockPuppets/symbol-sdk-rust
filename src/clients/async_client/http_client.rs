@@ -8,16 +8,15 @@
  * // except according to those terms.
  */
 
-use std::convert::TryFrom;
-use std::fmt::Debug;
+use std::{convert::TryFrom, fmt::Debug};
 
 use async_trait::async_trait;
 use reqwest::header::{CONTENT_LENGTH, CONTENT_TYPE};
 use serde_json::Value;
 
-use crate::clients::async_client::request::Request;
-use crate::clients::{consts::HTTP_REQUEST_TIMEOUT, Error, SymbolResponse};
-use crate::SymbolError;
+use crate::clients::{consts::HTTP_REQUEST_TIMEOUT, Error, SymbolError, SymbolResponse};
+
+use super::request::Request;
 
 #[derive(Debug)]
 pub struct Response<R> {

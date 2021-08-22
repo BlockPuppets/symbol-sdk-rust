@@ -8,10 +8,7 @@
  * // except according to those terms.
  */
 
-use std::convert::TryFrom;
-use std::io::{Cursor, Write};
-use std::num::ParseIntError;
-use std::ops::Deref;
+use std::{convert::TryFrom, io::{Cursor, Write}, num::ParseIntError, ops::Deref};
 
 use byteorder::{BigEndian, ReadBytesExt};
 use hex::{FromHex, FromHexError};
