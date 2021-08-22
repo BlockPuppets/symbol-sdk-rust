@@ -21,7 +21,7 @@ use hex::ToHex;
 use crate::account::PublicAccount;
 use crate::message::{EncryptedMessage, PlainMessage};
 use crate::network::NetworkType;
-use crate::{is_hex, GenerationHash};
+use crate::{is_hex, GenerationHash, hex_decode};
 use crate::transaction::Transaction;
 use crate::model::transaction::SignedTransaction;
 
@@ -88,8 +88,14 @@ impl Account {
 
         ensure!(!message.is_empty(), "message must not be empty.");
 
+        let message_bytes = if is_hex(message) {
+            hex_decode(message)
+        } else {
+            message.as_bytes().to_vec()
+        };
+
         EncryptedMessage::create(
-            &message.as_bytes(),
+            &message_bytes,
             &self.private_key_to_hex(),
             &recipient_public_account.public_key_to_hex(),
         )

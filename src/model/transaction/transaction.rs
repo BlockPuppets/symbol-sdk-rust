@@ -28,7 +28,13 @@ pub trait Transaction: Sync + Send
     where
         Self: fmt::Debug,
 {
-    fn serializer(&self) -> Vec<u8>;
+
+    /// Get the byte size of a transaction using the builder.
+    fn size(&self) -> usize {
+        self.to_serializer().len()
+    }
+
+    fn to_serializer(&self) -> Vec<u8>;
 
     /// Get the `CommonTransaction`.
     fn get_common_transaction(&self) -> &CommonTransaction;
@@ -94,7 +100,7 @@ pub trait Transaction: Sync + Send
         generation_hash: GenerationHash,
     ) -> Result<SignedTransaction> {
         let generation_hash_bytes = generation_hash.to_fixed_bytes();
-        let transaction_buffer = self.serializer();
+        let transaction_buffer = self.to_serializer();
 
         let signing_bytes =
             self.get_signing_bytes(transaction_buffer.as_ref(), generation_hash_bytes.as_ref());

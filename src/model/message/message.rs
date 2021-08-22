@@ -71,6 +71,12 @@ where
     }
 }
 
+impl dyn Message {
+    pub fn empty_message() -> RawMessage {
+        RawMessage::default()
+    }
+}
+
 impl Clone for Box<dyn Message + 'static> {
     fn clone(&self) -> Box<dyn Message + 'static> {
         self.box_clone()

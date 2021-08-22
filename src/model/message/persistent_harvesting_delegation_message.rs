@@ -15,7 +15,7 @@ use crate::message::{EncryptedMessage, Message, MessageType};
 use crate::{hex_decode, is_hex};
 
 /// 8-byte marker: FE2A8061577301E2 for `PersistentHarvestingDelegationMessage`
-pub(crate) const PERSISTENT_DELEGATION_UNLOCK: &'static str = "FE2A8061577301E2";
+pub const PERSISTENT_DELEGATION_UNLOCK: &'static str = "FE2A8061577301E2";
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct PersistentHarvestingDelegationMessage {
@@ -30,7 +30,7 @@ impl PersistentHarvestingDelegationMessage {
 
     /// Create new `PersistentHarvestingDelegationMessage`.
     ///
-    pub fn new<C>(
+    pub fn create(
         remote_linked_private_key: &str,
         vrf_private_key: &str,
         node_public_account: PublicAccount,
@@ -38,6 +38,7 @@ impl PersistentHarvestingDelegationMessage {
         let ephemeral_keypair = Account::random(node_public_account.network_type());
 
         let data = remote_linked_private_key.to_string() + vrf_private_key;
+
         let mut encrypted = String::new();
         encrypted.push_str(PERSISTENT_DELEGATION_UNLOCK);
         encrypted.push_str(&ephemeral_keypair.public_key_to_hex());
@@ -50,7 +51,7 @@ impl PersistentHarvestingDelegationMessage {
 
         Self {
             r#type: MessageType::PersistentHarvestingDelegationMessageType,
-            payload: encrypted,
+            payload: encrypted.to_uppercase(),
         }
     }
 

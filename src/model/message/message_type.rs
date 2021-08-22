@@ -40,8 +40,8 @@ impl MessageType {
     pub fn value(self) -> i16 {
         self as i16
     }
-    pub fn to_bytes(&self) -> [u8; 2] {
-        self.value().to_le_bytes()
+    pub fn to_bytes(&self) -> [u8; 1] {
+        (self.value() as u8).to_le_bytes()
     }
 }
 
