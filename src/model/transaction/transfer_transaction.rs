@@ -10,9 +10,16 @@
 
 use std::fmt;
 
-use anyhow::Result;
+use anyhow::{bail, Result};
 
-use crate::{account::UnresolvedAddress, Deadline, hex_decode, message::{Message, MessageType}, mosaic::Mosaic, network::NetworkType, utf8_to_hex};
+use crate::{
+    account::UnresolvedAddress,
+    Deadline, hex_decode,
+    is_mosaic,
+    message::{Message, MessageType},
+    mosaic::Mosaic,
+    network::NetworkType, utf8_to_hex,
+};
 use crate::buffer::*;
 
 use super::{CommonTransaction, Transaction, TransactionType, TransactionVersion};
@@ -42,6 +49,8 @@ impl TransferTransaction {
     ) -> Result<Self> {
         let max_fee = max_fee.unwrap_or_default();
 
+        Self::validate(message.box_clone(), &mosaics)?;
+
         let common = CommonTransaction::create_from_type(
             TransactionType::Transfer,
             network_type,
@@ -56,6 +65,21 @@ impl TransferTransaction {
             mosaics,
             message: Box::new(message),
         })
+    }
+
+    /// Validate Transfer transaction creation with provided message
+    fn validate(message: Box<dyn Message>, mosaics: &[Mosaic]) -> Result<()> {
+        if message.message_type() == MessageType::PersistentHarvestingDelegationMessageType {
+            if !mosaics.is_empty() {
+                bail!("PersistentDelegationRequestTransaction should be created without Mosaic")
+            } else if !is_mosaic(&message.payload()) {
+                bail!("PersistentDelegationRequestTransaction message is invalid");
+            } else {
+                Ok(())
+            }
+        } else {
+            Ok(())
+        }
     }
 
     /// The String notation for the set recipient.
@@ -164,13 +188,16 @@ pub mod tests {
 
     use crate::account::{Address, PublicAccount};
     use crate::account::tests::TESTING_ACCOUNT;
+    use crate::clients::model_dto::{TransactionInfoDto, TransactionMetaDto};
     use crate::H256;
     use crate::message::{
         PERSISTENT_DELEGATION_UNLOCK, PersistentHarvestingDelegationMessage, PlainMessage,
     };
-    use crate::model::namespace::NamespaceId;
+    use crate::namespace::NamespaceId;
 
     use super::*;
+
+    const NETWORK_TYPE: NetworkType = NetworkType::PrivateTest;
 
     const EPOCH_ADJUSTMENT: u64 = 1573430400;
     const DELEGATED_PRIVATE_KEY: &str =
@@ -185,6 +212,10 @@ pub mod tests {
             H256::from_str("57F7DA205008026C776CB6AED843393F04CD458E0AA2D9F1D5F31A402072B2D6")
                 .unwrap();
         static ref MESSAGE_MARKER: &'static str = PERSISTENT_DELEGATION_UNLOCK;
+        static ref NAMESPACE_ID: NamespaceId =
+            NamespaceId::create_from_name("cat.currency").unwrap();
+        static ref CAT_CURRENCY: Mosaic =
+            Mosaic::create_relative((*NAMESPACE_ID).clone(), 100, 6).unwrap();
     }
 
     #[test]
@@ -194,7 +225,7 @@ pub mod tests {
             Address::from_raw("VATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA35C4KNQ").unwrap(),
             vec![],
             PlainMessage::create("test-message"),
-            NetworkType::PrivateTest,
+            NETWORK_TYPE,
             None,
         )
             .unwrap();
@@ -209,7 +240,7 @@ pub mod tests {
             Address::from_raw("VATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA35C4KNQ").unwrap(),
             vec![],
             PlainMessage::create("test-message"),
-            NetworkType::PrivateTest,
+            NETWORK_TYPE,
             Some(1),
         )
             .unwrap();
@@ -224,7 +255,7 @@ pub mod tests {
             Address::from_raw("VATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA35C4KNQ").unwrap(),
             vec![],
             PlainMessage::create("test-message"),
-            NetworkType::PrivateTest,
+            NETWORK_TYPE,
             None,
         )
             .unwrap();
@@ -257,7 +288,7 @@ pub mod tests {
             Address::from_raw("VATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA35C4KNQ").unwrap(),
             vec![],
             Message::empty_message(),
-            NetworkType::PrivateTest,
+            NETWORK_TYPE,
             None,
         )
             .unwrap();
@@ -288,16 +319,12 @@ pub mod tests {
 
     #[test]
     fn should_create_complete_an_transfer_transaction_and_sign_it_with_mosaics() {
-        let namespace_id = NamespaceId::create_from_name("cat.currency").unwrap();
-
-        let mosaic = Mosaic::create_relative(namespace_id, 100, 6).unwrap();
-
         let transfer_transaction = TransferTransaction::create(
             Deadline::create(EPOCH_ADJUSTMENT, Duration::hours(2)).unwrap(),
             Address::from_raw("VATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA35C4KNQ").unwrap(),
-            vec![mosaic],
+            vec![(*CAT_CURRENCY).clone()],
             PlainMessage::create("test-message"),
-            NetworkType::PrivateTest,
+            NETWORK_TYPE,
             None,
         )
             .unwrap();
@@ -327,16 +354,12 @@ pub mod tests {
     fn should_create_complete_an_transfer_transaction_with_namespace_id_recipient_address() {
         let address_alias = NamespaceId::create_from_name("nem.owner").unwrap();
 
-        let namespace_id = NamespaceId::create_from_name("cat.currency").unwrap();
-
-        let mosaic = Mosaic::create_relative(namespace_id, 100, 6).unwrap();
-
         let transfer_transaction = TransferTransaction::create(
             Deadline::create(EPOCH_ADJUSTMENT, Duration::hours(2)).unwrap(),
             address_alias.clone(),
-            vec![mosaic],
+            vec![(*CAT_CURRENCY).clone()],
             PlainMessage::create("test-message"),
-            NetworkType::PrivateTest,
+            NETWORK_TYPE,
             None,
         )
             .unwrap();
@@ -368,16 +391,12 @@ pub mod tests {
 
     #[test]
     fn should_format_transfer_transaction_payload_with_24_bytes_binary_address() {
-        let namespace_id = NamespaceId::create_from_name("cat.currency").unwrap();
-
-        let mosaic = Mosaic::create_relative(namespace_id, 100, 6).unwrap();
-
         let transfer_transaction = TransferTransaction::create(
             Deadline::create(EPOCH_ADJUSTMENT, Duration::hours(2)).unwrap(),
             Address::from_raw("VATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA35C4KNQ").unwrap(),
-            vec![mosaic],
+            vec![(*CAT_CURRENCY).clone()],
             PlainMessage::create("test-message"),
-            NetworkType::PrivateTest,
+            NETWORK_TYPE,
             None,
         )
             .unwrap();
@@ -400,16 +419,12 @@ pub mod tests {
 
     #[test]
     fn should_format_transfer_transaction_payload_with_8_bytes_binary_namespace_id() {
-        let namespace_id = NamespaceId::create_from_name("cat.currency").unwrap();
-
-        let mosaic = Mosaic::create_relative(namespace_id, 100, 6).unwrap();
-
         let transfer_transaction = TransferTransaction::create(
             Deadline::create(EPOCH_ADJUSTMENT, Duration::hours(2)).unwrap(),
             NamespaceId::create_from_name("nem.owner").unwrap(),
-            vec![mosaic],
+            vec![(*CAT_CURRENCY).clone()],
             PlainMessage::create("test-message"),
-            NetworkType::PrivateTest,
+            NETWORK_TYPE,
             None,
         )
             .unwrap();
@@ -433,10 +448,8 @@ pub mod tests {
     #[test]
     fn should_create_transfer_transaction_for_persistent_harvesting_delegation_request_transaction()
     {
-        let network_type = NetworkType::PrivateTest;
-
         let node_public_account =
-            PublicAccount::from_public_key(RECIPIENT_PUBLIC_KEY, network_type).unwrap();
+            PublicAccount::from_public_key(RECIPIENT_PUBLIC_KEY, NETWORK_TYPE).unwrap();
         let transfer_transaction = TransferTransaction::create(
             Deadline::create(EPOCH_ADJUSTMENT, Duration::hours(2)).unwrap(),
             Address::from_raw("VATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA35C4KNQ").unwrap(),
@@ -446,7 +459,7 @@ pub mod tests {
                 VRF_PRIVATE_KEY,
                 node_public_account,
             ),
-            network_type,
+            NETWORK_TYPE,
             None,
         )
             .unwrap();
@@ -459,10 +472,8 @@ pub mod tests {
 
     #[test]
     fn should_create_complete_an_persistent_delegation_request_transaction_and_sign_it() {
-        let network_type = NetworkType::PrivateTest;
-
         let node_public_account =
-            PublicAccount::from_public_key(RECIPIENT_PUBLIC_KEY, network_type).unwrap();
+            PublicAccount::from_public_key(RECIPIENT_PUBLIC_KEY, NETWORK_TYPE).unwrap();
         let transfer_transaction = TransferTransaction::create(
             Deadline::create(EPOCH_ADJUSTMENT, Duration::hours(2)).unwrap(),
             Address::from_raw("VATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA35C4KNQ").unwrap(),
@@ -472,12 +483,11 @@ pub mod tests {
                 VRF_PRIVATE_KEY,
                 node_public_account,
             ),
-            network_type,
+            NETWORK_TYPE,
             None,
         )
             .unwrap();
 
-        println!("{}", transfer_transaction.message.payload());
         assert_eq!(
             transfer_transaction.message.payload().len(),
             248 + MESSAGE_MARKER.len()
@@ -509,19 +519,87 @@ pub mod tests {
         );
     }
 
+    #[test]
+    #[should_panic(
+    expected = "PersistentDelegationRequestTransaction should be created without Mosaic"
+    )]
+    fn should_return_panic_with_mosaic_provided_when_creating_persistent_delegation_request_transaction() {
+        let node_public_account =
+            PublicAccount::from_public_key(RECIPIENT_PUBLIC_KEY, NETWORK_TYPE).unwrap();
+        TransferTransaction::create(
+            Deadline::create(EPOCH_ADJUSTMENT, Duration::hours(2)).unwrap(),
+            Address::from_raw("VATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA35C4KNQ").unwrap(),
+            vec![(*CAT_CURRENCY).clone()],
+            PersistentHarvestingDelegationMessage::create(
+                DELEGATED_PRIVATE_KEY,
+                VRF_PRIVATE_KEY,
+                node_public_account,
+            ),
+            NETWORK_TYPE,
+            None,
+        )
+            .unwrap();
+    }
+
+    #[test]
+    #[should_panic(expected = "PersistentDelegationRequestTransaction message is invalid")]
+    fn should_return_panic_with_invalid_message_when_creating_persistent_delegation_request_transaction() {
+        let node_public_account =
+            PublicAccount::from_public_key(RECIPIENT_PUBLIC_KEY, NETWORK_TYPE).unwrap();
+        TransferTransaction::create(
+            Deadline::create(EPOCH_ADJUSTMENT, Duration::hours(2)).unwrap(),
+            Address::from_raw("VATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA35C4KNQ").unwrap(),
+            vec![],
+            PersistentHarvestingDelegationMessage::create(
+                "abc",
+                VRF_PRIVATE_KEY,
+                node_public_account,
+            ),
+            NETWORK_TYPE,
+            None,
+        )
+            .unwrap();
+    }
+
+    #[test]
+    fn should_load_message_with_persistent_message_delegate() {
+        let message_hex =
+            "FE2A8061577301E29FB4BD2BA099AFA82DDB0212080CF649F0CB0FADAD7BA4CC04BE51E40A4EF0A27B8E2BEAB595F4075BB5A6A481835F3A6E4BBA63091A5866D90D2B7ACBBF158E51FE074619C4B0FF0C4AFEE1AE9A4D83A5A7A156C91CCA3A319D3279A64A63491E19656F7211760BB36EF6B3263C03837CE00E84FD82B32B721120DE";
+        let payload = TransactionInfoDto {
+            id: "5FA01EB485AC1F1E51EAA6BF".to_string(),
+            meta: TransactionMetaDto {
+                height: "108907".to_string(),
+                hash: "9661088F22C2DC72E76EE2B0F07BFC0D8E98EEE0CC8AE274362EDBB44F164F16".to_string(),
+                merkle_component_hash: "9661088F22C2DC72E76EE2B0F07BFC0D8E98EEE0CC8AE274362EDBB44F164F16".to_string(),
+                index: 0,
+            },
+            transaction: serde_json::json!(
+                {
+                    "size": 292,
+                    "signature": "494A6AF4CDA3C8B5ED0061F561F65EFCBF911BC5179B120440A753345B209F380CE3417D40B773D755746C5B5DACC2F0C78B6A0EAC093CE96CBA18E45380B50C",
+                    "signerPublicKey": "60FAE3A39D580BB5118686569D159E3F2B991504D3ED0A304C3B7DA5FCCD0353",
+                    "version": 1,
+                    "network": 152,
+                    "type": 16724,
+                    "maxFee": "20000000",
+                    "deadline": "30905923815",
+                    "recipientAddress": "98BE002792600453CF3A23F9894BDA172CE4EFA7C6F3C109",
+                    "message": message_hex,
+                    "mosaics": []
+                }),
+        };
+        todo!();
+    }
+
     pub mod tests_size {
         use super::*;
 
         #[test]
         fn should_return_180_for_transfer_transaction_with_1_mosaic_and_message_nem() {
-            let namespace_id = NamespaceId::create_from_name("cat.currency").unwrap();
-
-            let mosaic = Mosaic::create_relative(namespace_id, 100, 6).unwrap();
-
             let transfer_transaction = TransferTransaction::create(
                 Deadline::create(EPOCH_ADJUSTMENT, Duration::hours(2)).unwrap(),
                 Address::from_raw("VATNE7Q5BITMUTRRN6IB4I7FLSDRDWZA35C4KNQ").unwrap(),
-                vec![mosaic],
+                vec![(*CAT_CURRENCY).clone()],
                 PlainMessage::create("NEM"),
                 NetworkType::PrivateTest,
                 None,

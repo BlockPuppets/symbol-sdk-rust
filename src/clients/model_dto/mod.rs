@@ -30,6 +30,8 @@ pub use self::node_time_dto::*;
 pub use self::pagination::*;
 pub use self::rental_fees_dto::*;
 pub use self::server_info_dto::*;
+pub use self::transaction_info_dto::*;
+pub use self::transaction_meta_dto::*;
 pub use self::unlocked_account_dto::*;
 
 mod block_dto;
@@ -55,3 +57,5 @@ mod pagination;
 mod rental_fees_dto;
 mod server_info_dto;
 mod unlocked_account_dto;
+mod transaction_info_dto;
+mod transaction_meta_dto;

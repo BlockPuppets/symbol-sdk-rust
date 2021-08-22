@@ -19,6 +19,15 @@ pub fn is_hex(input: &str) -> bool {
     re.is_match(input)
 }
 
+pub fn is_mosaic(input: &str) -> bool {
+    if input.len() % 2 != 0 {
+        return false;
+    };
+
+    let re = Regex::new(r"^[a-fA-F0-9]{264}$").unwrap();
+    re.is_match(input)
+}
+
 pub fn hex_decode(data: &str) -> Vec<u8> {
     hex::decode(data)
         .map_err(|err| panic!("Failed to decode hex data {} : {}", data, err))
