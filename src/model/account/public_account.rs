@@ -8,7 +8,7 @@
  * // except according to those terms.
  */
 
-use std::{self, fmt::Debug, str::FromStr};
+use std::{fmt::{self, Debug}, str::FromStr};
 
 use anyhow::Result;
 use crypto::prelude::{KeyPairSchema, PublicKey};
